@@ -1,0 +1,56 @@
+*.class
+
+# Package Files #
+*.jar
+*.war
+*.ear
+
+#Gradle temporary files
+target/
+
+#Eclipse files
+**/.project
+**/.classpath
+**/.settings/
+blog/bin/
+**/.tern-project
+
+#IntelliJ files
+**/*.iml
+**/.idea
+**/.gradle
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+### VS Code ###
+.vscode/
+
+#Gradle
+.gradle
+!gradle/wrapper/gradle-wrapper.jar
+
+#Files
+*.log
+*.gz
+
+# Target dirs
+/build/
+out/
+classes/
+
+common/build/
+eventstore/build/
+service/build/
+common/out/
+eventstore/out/
+service/out/
+common/bin/
+eventstore/bin/
+service/bin/
+
+

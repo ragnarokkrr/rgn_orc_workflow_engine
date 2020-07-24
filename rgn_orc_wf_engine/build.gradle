@@ -1,0 +1,62 @@
+// https://github.com/spring-guides/gs-multi-module
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+}
+
+plugins {
+    id 'org.springframework.boot' version '2.3.1.RELEASE'
+    id 'io.spring.dependency-management' version '1.0.9.RELEASE'
+    id 'java-library'
+    id 'eclipse'
+    id 'idea'
+    // id 'jacoco'
+    //id 'org.sonarqube' version '2.7.1'
+}
+
+
+allprojects {
+
+    group 'ragna.wf.orc'
+    version '1.0-SNAPSHOT'
+    description 'Ragna ORC'
+    sourceCompatibility = JavaVersion.VERSION_14
+    targetCompatibility = JavaVersion.VERSION_14
+
+}
+
+subprojects {
+    apply plugin: 'java-library'
+    apply plugin: 'java'
+    apply plugin: 'org.springframework.boot'
+    apply plugin: 'io.spring.dependency-management'
+
+    apply from: "${project.rootDir}/dependencies.gradle"
+
+
+    // jacoco {
+    //    toolVersion = "0.8.4"
+    // }
+
+    idea{
+        module{
+            inheritOutputDirs = false
+            outputDir = compileJava.destinationDir
+            testOutputDir = compileTestJava.destinationDir
+        }
+    }
+
+    repositories {
+        mavenCentral()
+    }
+
+    test {
+        useJUnitPlatform()
+    }
+
+}
+
+bootJar {
+    enabled = false
+}

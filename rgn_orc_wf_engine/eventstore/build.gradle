@@ -1,0 +1,12 @@
+dependencies {
+    implementation project(':rgn-orc-wf-engine-common')
+}
+
+bootJar {
+    enabled = false
+}
+
+jar {
+    enabled = true
+}
+

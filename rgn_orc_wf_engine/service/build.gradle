@@ -1,0 +1,9 @@
+dependencies {
+    implementation project(':rgn-orc-wf-engine-common')
+    implementation project(':rgn-orc-wf-engine-eventstore')
+}
+
+
+bootJar {
+    enabled = true
+}
