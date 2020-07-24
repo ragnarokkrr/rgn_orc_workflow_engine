@@ -1,0 +1,53 @@
+version: '3'
+services:
+  kafka:
+    image: wurstmeister/kafka
+    container_name: "kafka"
+    ports:
+      - "9092:9092"
+      - "1099:1099"
+    environment:
+      - KAFKA_ADVERTISED_HOST_NAME=kafka
+      - KAFKA_ADVERTISED_PORT=9092
+      - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
+      - KAFKA_CREATE_TOPICS=credit-granting-orchestration-engine-in-v1:1:1,credit-granting-orchestration-engine-out-v1:1:1,credit-granting-orchestration-engine-error-v1:1:1,credit-proposals-tracking-v1:1:1,credit-granting-orchestration-engine-result-v1:1:1
+      - KAFKA_AUTO_CREATE_TOPICS_ENABLE=false
+      - KAFKA_JMX_OPTS=-Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=kafka -Dcom.sun.management.jmxremote.rmi.port=1099
+    links:
+      - zookeeper:zk
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    depends_on:
+      - zookeeper
+
+  zookeeper:
+    image: wurstmeister/zookeeper
+    container_name: "zookeeper"
+    ports:
+      - "2181:2181"
+    environment:
+      - KAFKA_ADVERTISED_HOST_NAME=zookeeper
+
+  orc_mongodb:
+    image: mongo:latest
+    container_name: "orc_mongodb"
+    environment:
+      - MONGO_DATA_DIR=/data/db
+      - MONGO_LOG_DIR=/dev/null
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=admin
+      - MONGO_INITDB_DATABASE=credit-granting-orchestration-engine
+    volumes:
+      - mongodb_data:/data/db
+    ports:
+      - 27017:27017
+    entrypoint: mongod --smallfiles --logpath=/dev/null --bind_ip_all --replSet repDB
+
+  mailhog:
+    image: mailhog/mailhog
+    ports:
+      - 1025:1025 # smtp server
+      - 8025:8025 # web ui
+
+volumes:
+  mongodb_data:
