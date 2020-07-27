@@ -7,8 +7,12 @@ import lombok.Setter;
 import org.fissore.slf4j.FluentLogger;
 import org.fissore.slf4j.FluentLoggerFactory;
 import org.springframework.util.Assert;
+import ragna.wf.orc.common.events.DomainEvent;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -18,6 +22,9 @@ import java.util.stream.Collectors;
 @NoArgsConstructor(access = AccessLevel.PACKAGE)
 public class WorkflowRoot {
     private static final FluentLogger LOGGER = FluentLoggerFactory.getLogger(WorkflowRoot.class);
+
+    // @Transient
+    private final Collection<DomainEvent> domainEvents = new ArrayList<>();
 
     private String id;
     private CustomerRequest customerRequest;
@@ -83,6 +90,15 @@ public class WorkflowRoot {
         this.status = WorkflowStatus.CONFIGURED;
         this.updatedOn = LocalDateTime.now();
         return this;
+    }
+
+    // TODO @AfterDomainEventPublication / Spring Data
+    public void clearDomainEventsCallback() {
+    }
+
+    // TODO @DomainEvents / Spring Data
+    public Collection<DomainEvent> events() {
+        return List.copyOf(domainEvents);
     }
 
 }

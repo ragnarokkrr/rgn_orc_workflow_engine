@@ -5,10 +5,11 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Data;
 import lombok.Setter;
+import org.springframework.util.CollectionUtils;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Data
 @Builder(toBuilder = true)
@@ -19,17 +20,27 @@ public class Configuration {
     private LocalDateTime date;
     private Status status;
 
-    @Builder.Default
-    private List<ConfiguredTask> configuredTasks = new ArrayList<>();
+    private List<ConfiguredTask> configuredTasks;
 
     public enum Status {
         ACTIVE,
         CLOSED
     }
 
+
     public static class ConfigurationBuilder {
         public ConfigurationBuilder addAllTasks(final List<ConfiguredTask> configuredTaskList) {
-            configuredTaskList.forEach(configuredTask -> this.configuredTasks.add(configuredTask.toBuilder().build()));
+
+            if (CollectionUtils.isEmpty(configuredTaskList)) {
+                this.configuredTasks = List.of();
+                return this;
+            }
+
+            this.configuredTasks = configuredTaskList
+                    .stream()
+                    .map(configuredTask -> configuredTask.toBuilder().build())
+                    .collect(Collectors.toList());
+
             return this;
         }
 

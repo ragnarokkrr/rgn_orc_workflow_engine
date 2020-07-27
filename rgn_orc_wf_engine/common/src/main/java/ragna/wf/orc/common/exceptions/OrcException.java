@@ -1,4 +1,4 @@
-package ragna.wf.orc.common;
+package ragna.wf.orc.common.exceptions;
 
 import org.apache.commons.lang3.StringUtils;
 

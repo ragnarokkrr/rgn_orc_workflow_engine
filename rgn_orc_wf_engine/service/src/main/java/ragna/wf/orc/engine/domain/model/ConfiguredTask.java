@@ -4,9 +4,10 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Data;
 import lombok.Setter;
+import org.springframework.util.CollectionUtils;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Data
 @Setter(AccessLevel.NONE)
@@ -18,16 +19,20 @@ public class ConfiguredTask {
   private int order;
   private TaskResponsible taskResponsible;
 
-  @Builder.Default
-  private List<ConfiguredTaskCriteria> configuredTaskCriteriaList = new ArrayList<>();
+  private List<ConfiguredTaskCriteria> configuredTaskCriteriaList;
 
   public static class ConfiguredTaskBuilder {
     public ConfiguredTaskBuilder addAllCriteria(
         final List<ConfiguredTaskCriteria> configuredTaskCriteriaList) {
 
-      configuredTaskCriteriaList.forEach(
-          configuredTaskCriteria ->
-              this.configuredTaskCriteriaList.add(configuredTaskCriteria.toBuilder().build()));
+      if (CollectionUtils.isEmpty(configuredTaskCriteriaList)){
+        this.configuredTaskCriteriaList = List.of();
+      }
+
+      this.configuredTaskCriteriaList = configuredTaskCriteriaList
+              .stream()
+              .map(configuredTaskCriteria -> configuredTaskCriteria.toBuilder().build())
+              .collect(Collectors.toList());
 
       return this;
     }

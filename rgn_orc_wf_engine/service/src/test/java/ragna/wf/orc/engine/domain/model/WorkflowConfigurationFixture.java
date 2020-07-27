@@ -22,6 +22,7 @@ public final class WorkflowConfigurationFixture {
                                         .name("John Connor")
                                         .email("john.connor@sky.net")
                                         .build())
+
                                 .addAllCriteria(List.of(
                                         ConfiguredTaskCriteriaFactory.TASK_CRITERIA_ASC.get(),
                                         ConfiguredTaskCriteriaFactory.TASK_CRITERIA_DESC.get()
@@ -36,6 +37,7 @@ public final class WorkflowConfigurationFixture {
                                         .name("Sarah Connor")
                                         .email("sarah.connor@sky.net")
                                         .build())
+
                                 .addAllCriteria(List.of())
                                 .build()
                 ))
