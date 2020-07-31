@@ -1,17 +1,22 @@
 package ragna.wf.orc.engine.domain.model;
 
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.util.CollectionUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Data
 @Setter(AccessLevel.NONE)
 @Builder(toBuilder = true)
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class ConfiguredTask {
 
   private TaskType taskType;
@@ -26,7 +31,7 @@ public class ConfiguredTask {
         final List<ConfiguredTaskCriteria> configuredTaskCriteriaList) {
 
       if (CollectionUtils.isEmpty(configuredTaskCriteriaList)){
-        this.configuredTaskCriteriaList = List.of();
+        this.configuredTaskCriteriaList = new ArrayList<>();
       }
 
       this.configuredTaskCriteriaList = configuredTaskCriteriaList

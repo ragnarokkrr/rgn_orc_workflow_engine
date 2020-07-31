@@ -3,16 +3,18 @@ package ragna.wf.orc.engine.domain.model;
 import ragna.wf.orc.engine.domain.service.ConfiguredTaskCriteriaFactory;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 public final class WorkflowConfigurationFixture {
     private WorkflowConfigurationFixture() {
     }
 
-    public static Configuration sampleConfiguration() {
+    public static Configuration sampleTwoTasksConfiguration() {
         return Configuration.builder()
                 .id("configId-1")
-                .configuredTasks(List.of(
+                // Kryo serialization problems with immutable collections
+                .configuredTasks(new ArrayList<>(List.of(
                         ConfiguredTask.builder()
                                 .order(1)
                                 .taskType(TaskType.ANALYSIS)
@@ -22,11 +24,11 @@ public final class WorkflowConfigurationFixture {
                                         .name("John Connor")
                                         .email("john.connor@sky.net")
                                         .build())
-
-                                .addAllCriteria(List.of(
+                                // Kryo serialization problems with immutable collections
+                                .addAllCriteria(new ArrayList<>(List.of(
                                         ConfiguredTaskCriteriaFactory.TASK_CRITERIA_ASC.get(),
                                         ConfiguredTaskCriteriaFactory.TASK_CRITERIA_DESC.get()
-                                ))
+                                )))
                                 .build(),
                         ConfiguredTask.builder()
                                 .order(2)
@@ -37,12 +39,28 @@ public final class WorkflowConfigurationFixture {
                                         .name("Sarah Connor")
                                         .email("sarah.connor@sky.net")
                                         .build())
-
-                                .addAllCriteria(List.of())
+                                // Kryo serialization problems with immutable collections
+                                .addAllCriteria(new ArrayList<>())
                                 .build()
-                ))
+                )))
                 .date(LocalDateTime.now())
                 .status(Configuration.Status.ACTIVE)
                 .build();
+    }
+
+    public static List<TaskCriteriaEvaluationCommand> johnConnorCriteriaEvaluation() {
+        return new ArrayList<>(List.of(
+                TaskCriteriaEvaluationCommand.builder()
+                        .id(ConfiguredTaskCriteriaFactory.TASK_CRITERIA_ASC.get().getId())
+                        .value("8.5")
+                        .result(TaskCriteriaEvaluationCommand.Result.APPROVED)
+                        .status(TaskCriteriaEvaluationCommand.Status.MATCHED)
+                        .build(),
+                TaskCriteriaEvaluationCommand.builder()
+                        .id(ConfiguredTaskCriteriaFactory.TASK_CRITERIA_DESC.get().getId())
+                        .value("2")
+                        .result(TaskCriteriaEvaluationCommand.Result.APPROVED)
+                        .status(TaskCriteriaEvaluationCommand.Status.MATCHED)
+                        .build()));
     }
 }

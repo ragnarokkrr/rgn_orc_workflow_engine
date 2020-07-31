@@ -1,27 +1,25 @@
 package ragna.wf.orc.common.exceptions;
 
-import org.apache.commons.lang3.StringUtils;
-
 public class OrcException extends RuntimeException {
-    private final String code;
+    private final ErrorCode code;
 
     public OrcException() {
-        super("Orc Exception Occured");
-        this.code = StringUtils.EMPTY;
+        super(String.format("%s: %s", ErrorCode.GENERAL_ERROR.getCode(), ErrorCode.GENERAL_ERROR.getMessage()));
+        this.code = ErrorCode.GENERAL_ERROR;
     }
 
     public OrcException(String message) {
-        super(message);
-        this.code = StringUtils.EMPTY;
+        super(String.format("%s: %s", ErrorCode.GENERAL_ERROR.getCode(), message));
+        this.code = ErrorCode.GENERAL_ERROR;
     }
 
-    public OrcException(String message, String code) {
-        super(message);
+    public OrcException(String message, ErrorCode code) {
+        super(String.format("%s: %s", code.getCode(), message));
         this.code = code;
     }
 
-    public OrcException(String message, String code, Throwable throwable) {
-        super(message, throwable);
+    public OrcException(String message, ErrorCode code, Throwable throwable) {
+        super(String.format("%s: %s", code.getCode(), message), throwable);
         this.code = code;
     }
 

@@ -26,13 +26,13 @@ class WorkflowRootTest {
     }
 
     @Test
-    void whenCreditGrantingWorkflowRootIsConfigured_thenStatusConfigured() {
+    void whenWorkflowRootIsConfigured_thenStatusConfigured() {
         // given
         final var customerRequest = kyleReese();
 
         // when
         final var workflowRoot = WorkflowRoot.createWorkflowRoot(customerRequest)
-                .addWorkflowConfiguration(WorkflowConfigurationFixture.sampleConfiguration())
+                .addWorkflowConfiguration(WorkflowConfigurationFixture.sampleTwoTasksConfiguration())
                 .createExecutionPlan()
                 .configured();
 
@@ -67,16 +67,18 @@ class WorkflowRootTest {
 
         assertThat(plannedTasks)
                 .extracting(PlannedTask::getStatus)
-                .contains(PlannedTask.Status.WAITING_FOR_RESULT, PlannedTask.Status.WAITING_FOR_RESULT)
-                ;
+                .contains(PlannedTask.Status.PLANNED, PlannedTask.Status.PLANNED)
+        ;
 
         assertThat(plannedTasks)
                 .extracting(PlannedTask::getTaskCriteriaResult)
                 .extracting(Map::isEmpty)
                 .contains(true, true)
-                ;
+        ;
 
     }
+
+    // TODO assertions / validations tests
 
     private CustomerRequest kyleReese() {
         return CustomerRequest.builder()
