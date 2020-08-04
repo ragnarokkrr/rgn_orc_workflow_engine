@@ -41,9 +41,11 @@ services:
       - mongodb_data:/data/db
     ports:
       - 27017:27017
-    entrypoint: mongod --smallfiles --logpath=/dev/null --bind_ip_all --replSet repDB
+    #entrypoint: mongod --smallfiles --logpath=/dev/null --bind_ip_all --replSet repDB
+    entrypoint: mongod --logpath=/dev/null --bind_ip_all --replSet repDB
 
   mailhog:
+    container_name: "mailhog"
     image: mailhog/mailhog
     ports:
       - 1025:1025 # smtp server

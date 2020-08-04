@@ -4,13 +4,15 @@ ext {
 dependencies {
     // Spring Boot - Webflux - Cloud  Stream
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-webflux'
-    // implementation 'org.springframework.boot:spring-boot-starter-data-mongodb-reactive'
+    implementation 'org.springframework.boot:spring-boot-starter-data-mongodb-reactive'
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-validation'
 
     // Springfox
-    implementation group: 'io.springfox', name: 'springfox-swagger2', version: springFox_version
-    implementation group: 'io.springfox', name: 'springfox-swagger-ui', version: springFox_version
-    implementation group: 'io.springfox', name: 'springfox-spring-integration-webflux', version: springFox_version
+    //implementation group: 'io.springfox', name: 'springfox-swagger2', version: springFox_version
+    //implementation group: 'io.springfox', name: 'springfox-swagger-ui', version: springFox_version
+    //implementation group: 'io.springfox', name: 'springfox-spring-webflux', version: springFox_version
+    //implementation group: 'io.springfox', name: 'springfox-spring-integration-webflux', version: springFox_version
+    implementation group: 'io.springfox', name: 'springfox-boot-starter', version: springFox_version
 
     // libs
     implementation group: 'io.vavr', name: 'vavr', version: '0.10.3'
@@ -39,5 +41,7 @@ dependencies {
 
     testCompileOnly 'org.projectlombok:lombok:1.18.12'
     testAnnotationProcessor 'org.projectlombok:lombok:1.18.12'
+
+    compile group: 'org.springframework.restdocs', name: 'spring-restdocs-webtestclient', version: '2.0.4.RELEASE'
 }
 
