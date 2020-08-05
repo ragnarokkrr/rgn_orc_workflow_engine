@@ -60,13 +60,13 @@ public class WorkflowRoot {
     }
 
     public WorkflowRoot addWorkflowConfiguration(final Configuration configuration) {
-        WorkflowStateAssertionAssertions.WORKFLOW_ALREADY_CONFIGURED.assertState(this, "addWorkflowConfiguration()");
+        WorkflowStateAssertions.WORKFLOW_ALREADY_CONFIGURED.assertState(this, "addWorkflowConfiguration()");
         this.configuration = configuration.toBuilder().build();
         return this;
     }
 
     public WorkflowRoot createExecutionPlan() {
-        WorkflowStateAssertionAssertions.EXECUTION_PLAN_REQUIREMENTS.assertState(this, "createExecutionPlan()");
+        WorkflowStateAssertions.EXECUTION_PLAN_REQUIREMENTS.assertState(this, "createExecutionPlan()");
 
         final var plannedTaskList = configuration
                 .getConfiguredTasks()
@@ -87,7 +87,7 @@ public class WorkflowRoot {
     }
 
     public WorkflowRoot configured() {
-        WorkflowStateAssertionAssertions.CONFIGURATION_REQUIREMENTS.assertState(this, "configured()");
+        WorkflowStateAssertions.CONFIGURATION_REQUIREMENTS.assertState(this, "configured()");
 
         this.status = WorkflowStatus.CONFIGURED;
         registerEvent(new WorkflowRootCreated(this));
@@ -96,7 +96,7 @@ public class WorkflowRoot {
 
     public WorkflowRoot triggerFirstTask() {
         LOGGER.debug().log(WorkflowUtils.fornatedMessage(this, "Triggering first task ", TRIGGER_FIRST_TASK));
-        WorkflowStateAssertionAssertions.NO_TASK_TRIGGER_VALID_STATUSES.assertState(this, TRIGGER_FIRST_TASK);
+        WorkflowStateAssertions.NO_TASK_TRIGGER_VALID_STATUSES.assertState(this, TRIGGER_FIRST_TASK);
         if (!WorkflowPlannedTaskService.onlyPlannedStatuses(this)) {
             final var message = WorkflowUtils.fornatedMessage(this, TRIGGER_FIRST_TASK);
             throw new OrcIllegalStateException(message, ErrorCode.CANT_TRIGGER_FIRST_TASK_ALL_TASKS_SHOULD_BE_PLANNED);
@@ -160,7 +160,7 @@ public class WorkflowRoot {
     }
 
     private WorkflowRoot finishTask(TaskType taskType, int order, PlannedTask.Result result) {
-        WorkflowStateAssertionAssertions.TASK_FINISH_VALID_STATUS.assertState(this, "finishTask()");
+        WorkflowStateAssertions.TASK_FINISH_VALID_STATUS.assertState(this, "finishTask()");
         final var taskToFinish = WorkflowPlannedTaskService.findTaskToFinish(this, taskType, order, "finishTask()");
 
         if (!Objects.equals(taskToFinish.getStatus(), PlannedTask.Status.TRIGGERED)) {
