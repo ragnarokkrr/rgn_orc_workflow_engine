@@ -1,7 +1,7 @@
-package ragna.wf.orc.engine.domain.model.events;
+package ragna.wf.orc.engine.domain.workflow.model.events;
 
 import ragna.wf.orc.common.events.DomainEvent;
-import ragna.wf.orc.engine.domain.model.WorkflowRoot;
+import ragna.wf.orc.engine.domain.workflow.model.WorkflowRoot;
 
 public class WorkflowRootTaskFinished extends DomainEvent {
   private WorkflowRootTaskFinished() {}
@@ -10,7 +10,7 @@ public class WorkflowRootTaskFinished extends DomainEvent {
     super(workflowRoot, workflowRoot.getId());
   }
 
-  public WorkflowRootTaskFinished(Object source, String objectId, String action) {
-    super(source, objectId, action);
+  public WorkflowRootTaskFinished(WorkflowRoot workflowRoot, String objectId, String action) {
+    super(workflowRoot, objectId, action);
   }
 }

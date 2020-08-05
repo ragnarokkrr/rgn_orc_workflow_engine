@@ -1,6 +1,6 @@
-package ragna.wf.orc.engine.domain.model;
+package ragna.wf.orc.engine.domain.workflow.model;
 
-import ragna.wf.orc.engine.domain.service.ConfiguredTaskCriteriaFactory;
+import ragna.wf.orc.engine.domain.workflow.service.ConfiguredTaskCriteriaFactory;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -21,7 +21,7 @@ public final class WorkflowConfigurationFixture {
                         .taskType(TaskType.ANALYSIS)
                         .description("John Connor analysis")
                         .taskResponsible(
-                            TaskResponsible.builder()
+                            ConfiguredTask.TaskResponsible.builder()
                                 .id("jc_500")
                                 .name("John Connor")
                                 .email("john.connor@sky.net")
@@ -38,7 +38,7 @@ public final class WorkflowConfigurationFixture {
                         .taskType(TaskType.DECISION)
                         .description("John Connor analysis")
                         .taskResponsible(
-                            TaskResponsible.builder()
+                            ConfiguredTask.TaskResponsible.builder()
                                 .id("sc_600")
                                 .name("Sarah Connor")
                                 .email("sarah.connor@sky.net")

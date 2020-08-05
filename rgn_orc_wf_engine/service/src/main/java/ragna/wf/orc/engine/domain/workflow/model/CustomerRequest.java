@@ -1,4 +1,4 @@
-package ragna.wf.orc.engine.domain.model;
+package ragna.wf.orc.engine.domain.workflow.model;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -12,8 +12,8 @@ import lombok.Setter;
 @Builder(toBuilder = true)
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class TaskResponsible {
+public class CustomerRequest {
   private String id;
   private String name;
-  private String email;
+  private String requestMemo;
 }

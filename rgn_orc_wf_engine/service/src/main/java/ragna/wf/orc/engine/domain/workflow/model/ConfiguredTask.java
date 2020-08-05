@@ -1,4 +1,4 @@
-package ragna.wf.orc.engine.domain.model;
+package ragna.wf.orc.engine.domain.workflow.model;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -24,11 +24,11 @@ public class ConfiguredTask {
   private int order;
   private TaskResponsible taskResponsible;
 
-  private List<ConfiguredTaskCriteria> configuredTaskCriteriaList;
+  private List<TaskCriteria> configuredTaskCriteriaList;
 
   public static class ConfiguredTaskBuilder {
     public ConfiguredTaskBuilder addAllCriteria(
-        final List<ConfiguredTaskCriteria> configuredTaskCriteriaList) {
+        final List<TaskCriteria> configuredTaskCriteriaList) {
 
       if (CollectionUtils.isEmpty(configuredTaskCriteriaList)) {
         this.configuredTaskCriteriaList = new ArrayList<>();
@@ -41,5 +41,35 @@ public class ConfiguredTask {
 
       return this;
     }
+  }
+
+  @Data
+  @Setter(AccessLevel.NONE)
+  @Builder(toBuilder = true)
+  @NoArgsConstructor(access = AccessLevel.PRIVATE)
+  @AllArgsConstructor(access = AccessLevel.PRIVATE)
+  public static class TaskCriteria {
+    private String id;
+    private String name;
+    private Long lowerBound;
+    private Long upperBound;
+    private Long acceptedValue;
+    private Order order;
+
+    public enum Order {
+      ASC,
+      DESC
+    }
+  }
+
+  @Data
+  @Setter(AccessLevel.NONE)
+  @Builder(toBuilder = true)
+  @NoArgsConstructor(access = AccessLevel.PRIVATE)
+  @AllArgsConstructor(access = AccessLevel.PRIVATE)
+  public static class TaskResponsible {
+    private String id;
+    private String name;
+    private String email;
   }
 }

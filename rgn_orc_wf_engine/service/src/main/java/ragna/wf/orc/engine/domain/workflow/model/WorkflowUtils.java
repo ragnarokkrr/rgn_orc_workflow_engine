@@ -1,4 +1,4 @@
-package ragna.wf.orc.engine.domain.model;
+package ragna.wf.orc.engine.domain.workflow.model;
 
 final class WorkflowUtils {
   static String fornatedMessage(WorkflowRoot workflowRoot, String action) {

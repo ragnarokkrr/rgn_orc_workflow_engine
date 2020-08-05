@@ -1,4 +1,4 @@
-package ragna.wf.orc.engine.domain.model;
+package ragna.wf.orc.engine.domain.workflow.model;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;

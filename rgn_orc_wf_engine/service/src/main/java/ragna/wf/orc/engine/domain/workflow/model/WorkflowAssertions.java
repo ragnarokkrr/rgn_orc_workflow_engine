@@ -1,4 +1,4 @@
-package ragna.wf.orc.engine.domain.model;
+package ragna.wf.orc.engine.domain.workflow.model;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.Assert;

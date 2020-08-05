@@ -1,4 +1,4 @@
-package ragna.wf.orc.engine.domain.model;
+package ragna.wf.orc.engine.domain.workflow.model;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -7,16 +7,20 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.fissore.slf4j.FluentLogger;
 import org.fissore.slf4j.FluentLoggerFactory;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.domain.AfterDomainEventPublication;
+import org.springframework.data.domain.DomainEvents;
+import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.util.Assert;
 import ragna.wf.orc.common.events.DomainEvent;
 import ragna.wf.orc.common.events.spring.ApplicationEventWrapper;
 import ragna.wf.orc.common.exceptions.ErrorCode;
 import ragna.wf.orc.common.exceptions.OrcIllegalStateException;
-import ragna.wf.orc.engine.domain.model.events.WorkflowRootCreated;
-import ragna.wf.orc.engine.domain.model.events.WorkflowRootFinished;
-import ragna.wf.orc.engine.domain.model.events.WorkflowRootTaskFinished;
-import ragna.wf.orc.engine.domain.model.events.WorkflowRootTaskTriggered;
-import ragna.wf.orc.engine.domain.model.mapper.TaskCriteriaMapper;
+import ragna.wf.orc.engine.domain.workflow.model.events.WorkflowRootCreated;
+import ragna.wf.orc.engine.domain.workflow.model.events.WorkflowRootFinished;
+import ragna.wf.orc.engine.domain.workflow.model.events.WorkflowRootTaskFinished;
+import ragna.wf.orc.engine.domain.workflow.model.events.WorkflowRootTaskTriggered;
+import ragna.wf.orc.engine.domain.workflow.model.mapper.TaskCriteriaMapper;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -26,6 +30,7 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+@Document(collection = "workflows")
 @Data
 @Setter(AccessLevel.NONE)
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -37,6 +42,7 @@ public class WorkflowRoot {
 
   private final Collection<DomainEvent> domainEvents = new ArrayList<>();
 
+  @Id
   private String id;
   private CustomerRequest customerRequest;
   private Configuration configuration;
@@ -90,7 +96,7 @@ public class WorkflowRoot {
     WorkflowStateAssertions.CONFIGURATION_REQUIREMENTS.assertState(this, "configured()");
 
     this.status = WorkflowStatus.CONFIGURED;
-    registerEvent(new WorkflowRootCreated(this));
+    registerEvent(new WorkflowRootCreated(this, this.id, "configured()"));
     return this;
   }
 
@@ -107,7 +113,7 @@ public class WorkflowRoot {
     final var firstTask = WorkflowPlannedTaskService.findFirst(this, TRIGGER_FIRST_TASK);
     firstTask.trigger();
     this.status = WorkflowStatus.ORCHESTRATING;
-    registerEvent(new WorkflowRootTaskTriggered(this));
+    registerEvent(new WorkflowRootTaskTriggered(this, this.id, "triggerFirstTask()"));
     return this;
   }
 
@@ -176,7 +182,7 @@ public class WorkflowRoot {
     taskToTrigger.trigger();
 
     this.status = WorkflowStatus.ORCHESTRATING;
-    registerEvent(new WorkflowRootTaskTriggered(this));
+    registerEvent(new WorkflowRootTaskTriggered(this, this.id, "triggerTask()"));
     return this;
   }
 
@@ -192,7 +198,7 @@ public class WorkflowRoot {
     taskToFinish.finish(result);
 
     this.status = WorkflowStatus.ORCHESTRATING;
-    registerEvent(new WorkflowRootTaskFinished(this));
+    registerEvent(new WorkflowRootTaskFinished(this, this.id, "finishTask()"));
     finishWorkflowIfConclusionStateAchieved(taskToFinish);
     return this;
   }
@@ -205,7 +211,7 @@ public class WorkflowRoot {
     if (isWorkFinished) {
       status = WorkflowStatus.FINISHED;
       evaluateWorkFlowResult();
-      registerEvent(new WorkflowRootFinished(this));
+      registerEvent(new WorkflowRootFinished(this, this.id, "finishWorkflowIfConclusionStateAchieved()"));
     }
 
     return this;
@@ -248,13 +254,13 @@ public class WorkflowRoot {
     domainEvents.add(domainEvent);
   }
 
-  // TODO @AfterDomainEventPublication / Spring Data
+  @AfterDomainEventPublication
   public void clearDomainEventsCallback() {
     this.domainEvents.clear();
   }
 
-  // TODO @DomainEvents / Spring Data
-  public List<ApplicationEventWrapper> springEvents() {
+  @DomainEvents
+  public List<ApplicationEventWrapper> aggregateDomainEvents() {
     return domainEvents.stream().map(ApplicationEventWrapper::wrap).collect(Collectors.toList());
   }
 }
