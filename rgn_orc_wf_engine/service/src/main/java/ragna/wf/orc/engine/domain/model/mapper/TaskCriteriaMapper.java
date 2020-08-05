@@ -7,7 +7,8 @@ import ragna.wf.orc.engine.domain.model.TaskCriteriaEvaluationCommand;
 
 @Mapper
 public interface TaskCriteriaMapper {
-    TaskCriteriaMapper INSTANCE = Mappers.getMapper(TaskCriteriaMapper.class);
+  TaskCriteriaMapper INSTANCE = Mappers.getMapper(TaskCriteriaMapper.class);
 
-    PlannedTask.TaskCriteriaResult toModel(TaskCriteriaEvaluationCommand taskCriteriaEvaluationCommand);
+  PlannedTask.TaskCriteriaResult toModel(
+      TaskCriteriaEvaluationCommand taskCriteriaEvaluationCommand);
 }

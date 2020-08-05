@@ -13,16 +13,15 @@ import lombok.Setter;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class ConfiguredTaskCriteria {
-    private String id;
-    private String name;
-    private Long lowerBound;
-    private Long upperBound;
-    private Long acceptedValue;
-    private Order order;
+  private String id;
+  private String name;
+  private Long lowerBound;
+  private Long upperBound;
+  private Long acceptedValue;
+  private Order order;
 
-    public enum Order {
-        ASC,
-        DESC
-    }
-
+  public enum Order {
+    ASC,
+    DESC
+  }
 }

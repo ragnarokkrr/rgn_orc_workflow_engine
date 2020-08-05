@@ -5,8 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
 public class RagnaOrcMain {
-    public static void main(String[] args) {
-        SpringApplication.run(RagnaOrcMain.class, args);
-
-    }
+  public static void main(String[] args) {
+    SpringApplication.run(RagnaOrcMain.class, args);
+  }
 }

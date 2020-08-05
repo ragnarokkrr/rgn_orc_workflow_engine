@@ -30,12 +30,12 @@ public class ConfiguredTask {
     public ConfiguredTaskBuilder addAllCriteria(
         final List<ConfiguredTaskCriteria> configuredTaskCriteriaList) {
 
-      if (CollectionUtils.isEmpty(configuredTaskCriteriaList)){
+      if (CollectionUtils.isEmpty(configuredTaskCriteriaList)) {
         this.configuredTaskCriteriaList = new ArrayList<>();
       }
 
-      this.configuredTaskCriteriaList = configuredTaskCriteriaList
-              .stream()
+      this.configuredTaskCriteriaList =
+          configuredTaskCriteriaList.stream()
               .map(configuredTaskCriteria -> configuredTaskCriteria.toBuilder().build())
               .collect(Collectors.toList());
 

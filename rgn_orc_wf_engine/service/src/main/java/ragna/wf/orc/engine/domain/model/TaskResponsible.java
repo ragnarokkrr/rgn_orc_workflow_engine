@@ -13,7 +13,7 @@ import lombok.Setter;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class TaskResponsible {
-    private String id;
-    private String name;
-    private String email;
+  private String id;
+  private String name;
+  private String email;
 }

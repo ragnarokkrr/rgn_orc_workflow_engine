@@ -16,7 +16,6 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class ExecutionPlan {
-    @Builder.Default
-    private LocalDateTime createdOn = LocalDateTime.now();
-    private List<PlannedTask> plannedTasks;
+  @Builder.Default private LocalDateTime createdOn = LocalDateTime.now();
+  private List<PlannedTask> plannedTasks;
 }

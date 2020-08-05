@@ -4,14 +4,13 @@ import ragna.wf.orc.common.events.DomainEvent;
 import ragna.wf.orc.engine.domain.model.WorkflowRoot;
 
 public class WorkflowRootTaskTriggered extends DomainEvent {
-    private WorkflowRootTaskTriggered() {
-    }
+  private WorkflowRootTaskTriggered() {}
 
-    public WorkflowRootTaskTriggered(final WorkflowRoot workflowRoot) {
-        super(workflowRoot, workflowRoot.getId());
-    }
+  public WorkflowRootTaskTriggered(final WorkflowRoot workflowRoot) {
+    super(workflowRoot, workflowRoot.getId());
+  }
 
-    public WorkflowRootTaskTriggered(Object source, String objectId, String action) {
-        super(source, objectId, action);
-    }
+  public WorkflowRootTaskTriggered(Object source, String objectId, String action) {
+    super(source, objectId, action);
+  }
 }

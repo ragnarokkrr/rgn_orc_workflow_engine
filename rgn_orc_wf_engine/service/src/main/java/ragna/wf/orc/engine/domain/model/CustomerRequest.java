@@ -13,8 +13,7 @@ import lombok.Setter;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class CustomerRequest {
-    private String id;
-    private String name;
-    private String requestMemo;
-
+  private String id;
+  private String name;
+  private String requestMemo;
 }

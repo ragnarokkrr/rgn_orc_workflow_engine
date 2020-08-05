@@ -1,6 +1,5 @@
 package ragna.wf.orc.engine.domain.model;
 
-
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -21,33 +20,31 @@ import java.util.stream.Collectors;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class Configuration {
 
-    private String id;
-    private LocalDateTime date;
-    private Status status;
+  private String id;
+  private LocalDateTime date;
+  private Status status;
 
-    private List<ConfiguredTask> configuredTasks;
+  private List<ConfiguredTask> configuredTasks;
 
-    public enum Status {
-        ACTIVE,
-        CLOSED
+  public enum Status {
+    ACTIVE,
+    CLOSED
+  }
+
+  public static class ConfigurationBuilder {
+    public ConfigurationBuilder addAllTasks(final List<ConfiguredTask> configuredTaskList) {
+
+      if (CollectionUtils.isEmpty(configuredTaskList)) {
+        this.configuredTasks = new ArrayList<>();
+        return this;
+      }
+
+      this.configuredTasks =
+          configuredTaskList.stream()
+              .map(configuredTask -> configuredTask.toBuilder().build())
+              .collect(Collectors.toList());
+
+      return this;
     }
-
-
-    public static class ConfigurationBuilder {
-        public ConfigurationBuilder addAllTasks(final List<ConfiguredTask> configuredTaskList) {
-
-            if (CollectionUtils.isEmpty(configuredTaskList)) {
-                this.configuredTasks = new ArrayList<>();
-                return this;
-            }
-
-            this.configuredTasks = configuredTaskList
-                    .stream()
-                    .map(configuredTask -> configuredTask.toBuilder().build())
-                    .collect(Collectors.toList());
-
-            return this;
-        }
-
-    }
+  }
 }
