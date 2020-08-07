@@ -1,0 +1,2 @@
+spring:
+  reactor.debug-agent.enabled: false

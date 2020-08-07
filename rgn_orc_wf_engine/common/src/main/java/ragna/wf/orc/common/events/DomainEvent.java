@@ -34,6 +34,6 @@ public class DomainEvent {
   }
 
   private Object createSnapshot(Object source) {
-    return KRYO.copy(source);
+    return KRYO.deepCopy(source);
   }
 }

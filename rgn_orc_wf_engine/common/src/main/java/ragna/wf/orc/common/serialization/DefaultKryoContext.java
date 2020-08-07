@@ -19,6 +19,7 @@ import de.javakaffee.kryoserializers.GregorianCalendarSerializer;
 import de.javakaffee.kryoserializers.JdkProxySerializer;
 import de.javakaffee.kryoserializers.SynchronizedCollectionsSerializer;
 import de.javakaffee.kryoserializers.UnmodifiableCollectionsSerializer;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.lang.reflect.InvocationHandler;
@@ -59,16 +60,16 @@ public class DefaultKryoContext implements KryoContext {
 
           TimeSerializers.addDefaultSerializers(kryo);
           // https://github.com/redisson/redisson/issues/918
-          kryo.register(Arrays.asList("").getClass(), new ArraysAsListSerializer());
+          kryo.register(Arrays.asList(StringUtils.EMPTY).getClass(), new ArraysAsListSerializer());
           kryo.register(Collections.EMPTY_LIST.getClass(), new CollectionsEmptyListSerializer());
           kryo.register(Collections.EMPTY_MAP.getClass(), new CollectionsEmptyMapSerializer());
           kryo.register(Collections.EMPTY_SET.getClass(), new CollectionsEmptySetSerializer());
           kryo.register(
-              Collections.singletonList("").getClass(), new CollectionsSingletonListSerializer());
+              Collections.singletonList(StringUtils.EMPTY).getClass(), new CollectionsSingletonListSerializer());
           kryo.register(
-              Collections.singleton("").getClass(), new CollectionsSingletonSetSerializer());
+              Collections.singleton(StringUtils.EMPTY).getClass(), new CollectionsSingletonSetSerializer());
           kryo.register(
-              Collections.singletonMap("", "").getClass(), new CollectionsSingletonMapSerializer());
+              Collections.singletonMap(StringUtils.EMPTY, StringUtils.EMPTY).getClass(), new CollectionsSingletonMapSerializer());
           kryo.register(GregorianCalendar.class, new GregorianCalendarSerializer());
           kryo.register(InvocationHandler.class, new JdkProxySerializer());
           UnmodifiableCollectionsSerializer.registerSerializers(kryo);
@@ -106,7 +107,7 @@ public class DefaultKryoContext implements KryoContext {
   }
 
   @Override
-  public Object copy(final Object obj) {
+  public Object deepCopy(final Object obj) {
     final var kryo = this.pool.borrow();
     final var copy = kryo.copy(obj);
     this.pool.release(kryo);

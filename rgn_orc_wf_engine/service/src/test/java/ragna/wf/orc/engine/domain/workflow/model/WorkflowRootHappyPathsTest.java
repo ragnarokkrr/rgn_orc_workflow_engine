@@ -92,7 +92,8 @@ class WorkflowRootHappyPathsTest {
   private CustomerRequest kyleReese() {
     return CustomerRequest.builder()
         .id("1")
-        .name("Kyle Reese")
+        .customerId("1")
+        .customerName("Kyle Reese")
         .requestMemo("Kyle Reese's request memo")
         .build();
   }

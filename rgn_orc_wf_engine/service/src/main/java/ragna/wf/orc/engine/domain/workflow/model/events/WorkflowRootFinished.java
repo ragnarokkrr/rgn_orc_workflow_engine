@@ -4,6 +4,10 @@ import ragna.wf.orc.common.events.DomainEvent;
 import ragna.wf.orc.engine.domain.workflow.model.WorkflowRoot;
 
 public class WorkflowRootFinished extends DomainEvent {
+  public WorkflowRootFinished() {
+    super();
+  }
+
   public WorkflowRootFinished(WorkflowRoot workflowRoot, String objectId, String action) {
     super(workflowRoot, objectId, action);
   }

@@ -7,5 +7,5 @@ public interface KryoContext {
 
   Object deserialize(final Class clazz, final byte[] serialized);
 
-  Object copy(final Object obj);
+  Object deepCopy(final Object obj);
 }

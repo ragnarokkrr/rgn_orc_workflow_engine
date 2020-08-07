@@ -1,4 +1,4 @@
-# Ragna ORC - DDD task orchestrator
+# Ragna ORC - DDD reactive  task orchestrator
 
 
 ```

@@ -26,12 +26,12 @@ public class SampleApi {
 
   @GetMapping("/flux")
   public Flux<String> helloPeople(String... names) {
-    return Flux.fromArray(names).map(name -> "Hello " + name);
+    return Flux.fromArray(names).map(name -> "Hello " + name + "!");
   }
 
   @GetMapping("/response-flux")
   public ResponseEntity<Flux<String>> helloPeople(@RequestParam List<String> names) {
     return ResponseEntity.of(
-        Optional.of(Flux.fromStream(names.stream().map(name -> "Hello " + name))));
+        Optional.of(Flux.fromStream(names.stream().map(name -> "Hello " + name + "!"))));
   }
 }
