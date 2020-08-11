@@ -12,7 +12,11 @@ public enum ErrorCode {
     INVALID_STATE_TO_RIGGER_TASK("ORC-0006", "Task should be PLANNED to trigger"),
     TRIED_TO_TRIGGER_FIRST_TASK_IN_WRONG_PLACE(
             "ORC-0007", "Tried to trigger first task in wrong place"),
-    WORKFLOW_NOT_FOUND("ORC-0008", "Workflow not found");
+    WORKFLOW_NOT_FOUND("ORC-0008", "Workflow not found"),
+
+    // Event Store errors
+    EVS_GENERAL_ERROR("EVS-0000", "General error"),
+    EVS_SERIALIZATION_ERROR("EVS-0001", "Serialization error");
 
     String code;
     String message;
@@ -23,10 +27,10 @@ public enum ErrorCode {
     }
 
     public String getCode() {
-    return code;
-  }
+        return code;
+    }
 
-  public String getMessage() {
-    return message;
-  }
+    public String getMessage() {
+        return message;
+    }
 }

@@ -4,14 +4,11 @@ ext {
 dependencies {
     // Spring Boot - Webflux - Cloud  Stream
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-webflux'
-    implementation 'org.springframework.boot:spring-boot-starter-data-mongodb-reactive'
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-validation'
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-data-mongodb-reactive'
+    implementation group: 'org.springframework.data', name: 'spring-data-releasetrain', version: 'Neumann-RELEASE', ext: 'pom'
 
     // Springfox
-    //implementation group: 'io.springfox', name: 'springfox-swagger2', version: springFox_version
-    //implementation group: 'io.springfox', name: 'springfox-swagger-ui', version: springFox_version
-    //implementation group: 'io.springfox', name: 'springfox-spring-webflux', version: springFox_version
-    //implementation group: 'io.springfox', name: 'springfox-spring-integration-webflux', version: springFox_version
     implementation group: 'io.springfox', name: 'springfox-boot-starter', version: springFox_version
 
     // libs
