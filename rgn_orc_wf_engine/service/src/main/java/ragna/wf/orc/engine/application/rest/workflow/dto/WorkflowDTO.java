@@ -1,4 +1,4 @@
-package ragna.wf.orc.engine.domain.workflow.service.vo;
+package ragna.wf.orc.engine.application.rest.workflow.dto;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
 @AllArgsConstructor(access = AccessLevel.PUBLIC)
-public class WorkflowVO {
+public class WorkflowDTO {
     private String id;
     private String configurationId;
     private String customerId;

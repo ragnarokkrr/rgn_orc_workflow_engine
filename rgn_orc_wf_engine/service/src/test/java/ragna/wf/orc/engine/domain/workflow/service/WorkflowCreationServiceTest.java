@@ -1,13 +1,17 @@
 package ragna.wf.orc.engine.domain.workflow.service;
 
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import ragna.wf.orc.engine.domain.configuration.service.WorkflowMetadataService;
-import ragna.wf.orc.engine.domain.workflow.model.WorkflowConfigurationFixture;
-import ragna.wf.orc.engine.domain.workflow.service.vo.CreateWorkflowCommand;
+import ragna.wf.orc.engine.domain.metadata.service.WorkflowMetadataService;
+import ragna.wf.orc.engine.domain.workflow.model.WorkflowModelFixture;
+import ragna.wf.orc.engine.domain.workflow.service.mapper.ConfigurationMapper;
+import ragna.wf.orc.engine.domain.workflow.service.vo.WorkflowVO;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
@@ -19,38 +23,56 @@ import static org.mockito.Mockito.doReturn;
 @SpringBootTest
 class WorkflowCreationServiceTest {
 
-  @MockBean private WorkflowMetadataService workflowMetadataService;
+    @MockBean
+    private WorkflowMetadataService workflowMetadataService;
 
-  @MockBean private WorkflowCreationService workflowCreationService;
+    @Autowired
+    private WorkflowCreationService workflowCreationService;
 
-  @Test
-  void whenANewRequestIsSubmitted_thenShouldCreateWorkflow() {
-    // given
-    doReturn(Mono.just(WorkflowConfigurationFixture.sampleTwoTasksConfiguration()))
-        .when(workflowMetadataService)
-        .peekConfigurationForWorkflow(any());
+    // TODO fix mongooperations injection
+    // @Autowired private MongoTestUtils mongoTestUtils;
 
-    final var createWorkflowCommand = kyleReese();
+    @BeforeEach
+    void init() {
+        // mongoTestUtils.init();
+    }
 
-    // when
-    final var workflowMono = workflowCreationService.createWorkflow(kyleReese());
+    @AfterEach
+    void tearDown() {
+        // mongoTestUtils.tearDown();
+    }
 
-    // then
-    StepVerifier.create(workflowMono)
-        .expectNextMatches(
+    @Test
+    void whenANewRequestIsSubmitted_thenShouldCreateWorkflow() {
+        // given
+        final var configuration = WorkflowModelFixture.sampleTwoTasksConfiguration();
+        doReturn(Mono.just(ConfigurationMapper.INSTANCE.toService(configuration)))
+                .when(workflowMetadataService)
+                .peekConfigurationForWorkflow(any());
+
+        final var createWorkflowCommand = ServiceFixtures.kyleReese();
+
+        // when
+        final var createWorkflowMono = workflowCreationService.createWorkflow(createWorkflowCommand);
+        // then
+        StepVerifier.create(createWorkflowMono)
+                .expectNextMatches(
             workflowVO -> {
-              assertThat(workflowVO).isNotNull();
-              return true;
+                assertThat(workflowVO)
+                        .hasFieldOrPropertyWithValue("configurationId", configuration.getId())
+                        .hasFieldOrPropertyWithValue("customerId", createWorkflowCommand.getCustomerId())
+                        .hasFieldOrPropertyWithValue("customerRequestId", createWorkflowCommand.getId())
+                        .hasFieldOrPropertyWithValue("result", WorkflowVO.Result.WORKFLOW_ONGOING)
+                        .hasFieldOrPropertyWithValue("status", WorkflowVO.Status.CONFIGURED)
+                        .hasNoNullFieldsOrProperties()
+                        .isNotNull();
+                return true;
             })
-        .verifyComplete();
-  }
+                .verifyComplete();
 
-  private CreateWorkflowCommand kyleReese() {
-    return CreateWorkflowCommand.builder()
-        .id("1")
-        .customerId("1")
-        .customerName("Kyle Reese")
-        .requestMemo("Kyle Reese's request memo")
-        .build();
-  }
+        // TODO fix mockito inline configuration
+        // verify(workflowRepository, times(1)).findByCustomerRequest(any());
+        // verify(workflowRepository, times(1)).save(any());
+    }
+
 }

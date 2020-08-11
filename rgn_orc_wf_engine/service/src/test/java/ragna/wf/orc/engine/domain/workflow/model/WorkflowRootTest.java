@@ -33,7 +33,7 @@ class WorkflowRootTest {
     // when
     final var workflowRoot =
         WorkflowRoot.createWorkflowRoot(customerRequest)
-            .addWorkflowConfiguration(WorkflowConfigurationFixture.sampleTwoTasksConfiguration())
+                .addWorkflowConfiguration(WorkflowModelFixture.sampleTwoTasksConfiguration())
             .createExecutionPlan()
             .configured();
 

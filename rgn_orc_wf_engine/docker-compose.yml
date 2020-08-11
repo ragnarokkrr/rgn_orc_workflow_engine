@@ -10,7 +10,7 @@ services:
       - KAFKA_ADVERTISED_HOST_NAME=kafka
       - KAFKA_ADVERTISED_PORT=9092
       - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
-      - KAFKA_CREATE_TOPICS=credit-granting-orchestration-engine-in-v1:1:1,credit-granting-orchestration-engine-out-v1:1:1,credit-granting-orchestration-engine-error-v1:1:1,credit-proposals-tracking-v1:1:1,credit-granting-orchestration-engine-result-v1:1:1
+      - KAFKA_CREATE_TOPICS=orc-in-v1:1:1,orc-out-v1:1:1,orc-error-v1:1:1,orc-result-v1:1:1
       - KAFKA_AUTO_CREATE_TOPICS_ENABLE=false
       - KAFKA_JMX_OPTS=-Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=kafka -Dcom.sun.management.jmxremote.rmi.port=1099
     links:
@@ -36,13 +36,29 @@ services:
       - MONGO_LOG_DIR=/dev/null
       - MONGO_INITDB_ROOT_USERNAME=admin
       - MONGO_INITDB_ROOT_PASSWORD=admin
-      - MONGO_INITDB_DATABASE=credit-granting-orchestration-engine
+      - MONGO_INITDB_DATABASE=orc-wf
     volumes:
       - mongodb_data:/data/db
+      #- ./.docker/mongodb/mongod.conf:/etc/mongod.conf
     ports:
       - 27017:27017
     #entrypoint: mongod --smallfiles --logpath=/dev/null --bind_ip_all --replSet repDB
     entrypoint: mongod --logpath=/dev/null --bind_ip_all --replSet repDB
+
+  orc_mongo_express:
+    image: mongo-express
+    container_name: "orc_mongo_express"
+    restart: always
+    ports:
+      - 8888:8081
+    #links:
+    #  - orc_mongodb
+    depends_on:
+      - orc_mongodb
+    environment:
+      ME_CONFIG_MONGODB_SERVER: orc_mongodb
+      ME_CONFIG_MONGODB_ADMINUSERNAME: admin
+      ME_CONFIG_MONGODB_ADMINPASSWORD: admin
 
   mailhog:
     container_name: "mailhog"

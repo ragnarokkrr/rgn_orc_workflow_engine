@@ -1,4 +1,4 @@
-package ragna.wf.orc.engine.domain.configuration.service.vo;
+package ragna.wf.orc.engine.domain.metadata.service.vo;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;

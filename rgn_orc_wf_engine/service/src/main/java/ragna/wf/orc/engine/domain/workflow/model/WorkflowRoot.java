@@ -3,11 +3,13 @@ package ragna.wf.orc.engine.domain.workflow.model;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.fissore.slf4j.FluentLogger;
 import org.fissore.slf4j.FluentLoggerFactory;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
 import org.springframework.data.domain.AfterDomainEventPublication;
 import org.springframework.data.domain.DomainEvents;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -18,6 +20,7 @@ import ragna.wf.orc.common.exceptions.ErrorCode;
 import ragna.wf.orc.common.exceptions.OrcIllegalStateException;
 import ragna.wf.orc.engine.domain.workflow.model.events.WorkflowRootCreated;
 import ragna.wf.orc.engine.domain.workflow.model.events.WorkflowRootFinished;
+import ragna.wf.orc.engine.domain.workflow.model.events.WorkflowRootTaskEvaluated;
 import ragna.wf.orc.engine.domain.workflow.model.events.WorkflowRootTaskFinished;
 import ragna.wf.orc.engine.domain.workflow.model.events.WorkflowRootTaskTriggered;
 import ragna.wf.orc.engine.domain.workflow.model.mapper.TaskCriteriaMapper;
@@ -40,6 +43,8 @@ public class WorkflowRoot {
   private static final String TRIGGER_FIRST_TASK = "triggerFirstTask()";
   private static final int PLANNED_TASK_LIST_OFFSET = 2;
 
+  @Transient
+  @Getter(AccessLevel.NONE)
   private final Collection<DomainEvent> domainEvents = new ArrayList<>();
 
   @Id
@@ -117,24 +122,26 @@ public class WorkflowRoot {
     return this;
   }
 
-  public WorkflowRoot addTaskCriteriaEvaluationResults(
-      final TaskType taskType,
-      final int order,
-      final List<TaskCriteriaEvaluationCommand> taskCriteriaEvaluationCommands) {
+  public WorkflowRoot registerTaskCriteriaEvaluationResults(
+          final TaskType taskType,
+          final int order,
+          final List<TaskCriteriaEvaluationCommand> taskCriteriaEvaluationCommands) {
     LOGGER
-        .debug()
-        .log(
-            WorkflowUtils.fornatedMessage(
-                this, "Adding criteria evaluation to task", "addTaskCriteriaEvaluationResults"));
+            .debug()
+            .log(
+                    WorkflowUtils.fornatedMessage(
+                            this, "Adding criteria evaluation to task", "addTaskCriteriaEvaluationResults"));
     final var plannedTask =
-        WorkflowPlannedTaskService.findTask(
-            this, taskType, order, "addTaskCriteriaEvaluationResults()");
+            WorkflowPlannedTaskService.findTask(
+                    this, taskType, order, "addTaskCriteriaEvaluationResults()");
 
     final var taskCriteriaResultList =
-        taskCriteriaEvaluationCommands.stream()
-            .map(TaskCriteriaMapper.INSTANCE::toModel)
-            .collect(Collectors.toList());
+            taskCriteriaEvaluationCommands.stream()
+                    .map(TaskCriteriaMapper.INSTANCE::toModel)
+                    .collect(Collectors.toList());
     plannedTask.addTaskCriteriaEvaluation(taskCriteriaResultList);
+    registerEvent(
+            new WorkflowRootTaskEvaluated(this, this.id, "addTaskCriteriaEvaluationResults()"));
     return this;
   }
 
@@ -211,7 +218,8 @@ public class WorkflowRoot {
     if (isWorkFinished) {
       status = WorkflowStatus.FINISHED;
       evaluateWorkFlowResult();
-      registerEvent(new WorkflowRootFinished(this, this.id, "finishWorkflowIfConclusionStateAchieved()"));
+      registerEvent(
+              new WorkflowRootFinished(this, this.id, "finishWorkflowIfConclusionStateAchieved()"));
     }
 
     return this;
@@ -260,7 +268,7 @@ public class WorkflowRoot {
   }
 
   @DomainEvents
-  public List<ApplicationEventWrapper> aggregateDomainEvents() {
+  public Collection<ApplicationEventWrapper> aggregateDomainEvents() {
     return domainEvents.stream().map(ApplicationEventWrapper::wrap).collect(Collectors.toList());
   }
 }
