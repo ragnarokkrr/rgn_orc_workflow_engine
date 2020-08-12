@@ -26,7 +26,7 @@ public class NotificationLogDto {
   @NoArgsConstructor
   @Builder
   public static class NotificationDto {
-    private Long id;
+    private String id;
     private String objectId;
     private String typedName;
     private LocalDateTime occurredOn;

@@ -5,6 +5,8 @@ import org.fissore.slf4j.FluentLogger;
 import org.fissore.slf4j.FluentLoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.reactive.TransactionalOperator;
 import ragna.wf.orc.engine.domain.metadata.service.WorkflowMetadataService;
 import ragna.wf.orc.engine.domain.metadata.service.vo.ConfigurationRequest;
 import ragna.wf.orc.engine.domain.metadata.service.vo.ConfigurationVO;
@@ -22,104 +24,109 @@ import javax.validation.Validator;
 @Service
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class WorkflowCreationService {
-    private static final FluentLogger LOGGER =
-            FluentLoggerFactory.getLogger(WorkflowCreationService.class);
+  private static final FluentLogger LOGGER =
+      FluentLoggerFactory.getLogger(WorkflowCreationService.class);
 
-    private final WorkflowMetadataService workflowMetadataService;
-    private final Validator validator;
-    private final WorkflowRepository workflowRepository;
+  private final WorkflowMetadataService workflowMetadataService;
+  private final Validator validator;
+  private final WorkflowRepository workflowRepository;
+  private final TransactionalOperator transactionalOperator;
 
-    public Mono<WorkflowVO> createWorkflow(final CreateWorkflowCommand createWorkflowCommand) {
-        LOGGER.info().log("Creating workflow. {}", createWorkflowCommand);
-        final var constraintViolations = validator.validate(createWorkflowCommand);
-        if (!constraintViolations.isEmpty()) {
-            return Mono.error(
-                    WorkflowExceptionFactory.newInvalidArgumentException(
-                            createWorkflowCommand, constraintViolations));
-        }
-
-        final var getConfigurationVOMono = getConfigurationVO(createWorkflowCommand);
-
-        final var workflowRootMono =
-                findWorkflowByCustomerRequest(createWorkflowCommand)
-                        .switchIfEmpty(
-                                createWorkflowRootMono(createWorkflowCommand)
-                                        .zipWith(getConfigurationVOMono, this::configureToWorkflow)
-                                        .flatMap(this::saveWorkflowRoot));
-
-        return workflowRootMono
-                .map(WorkflowMapper.INSTANCE::toService)
-                .doOnSuccess(
-                        workflowVO ->
-                                LOGGER.info().log("Workflow created {}. ({})", workflowVO, createWorkflowCommand));
+  @Transactional
+  public Mono<WorkflowVO> createWorkflow(final CreateWorkflowCommand createWorkflowCommand) {
+    LOGGER.info().log("Creating workflow. {}", createWorkflowCommand);
+    final var constraintViolations = validator.validate(createWorkflowCommand);
+    if (!constraintViolations.isEmpty()) {
+      return Mono.error(
+          WorkflowExceptionFactory.newInvalidArgumentException(
+              createWorkflowCommand, constraintViolations));
     }
 
-    private Mono<WorkflowRoot> findWorkflowByCustomerRequest(
-            final CreateWorkflowCommand createWorkflowCommand) {
-        return workflowRepository
-                .findByCustomerRequest(createWorkflowCommand.getId())
-                .doOnSuccess(
-                        workflowRoot ->
-                                LOGGER
-                                        .debug()
-                                        .log(
-                                                "Found WorkflowRoot for {}? '{}'",
-                                                createWorkflowCommand,
-                                                workflowRoot != null));
-    }
+    final var getConfigurationVOMono = getConfigurationVO(createWorkflowCommand);
 
-    private Mono<WorkflowRoot> createWorkflowRootMono(
-            final CreateWorkflowCommand createWorkflowCommand) {
-        return Mono.just(createWorkflowCommand)
-                .map(CustomerRequestMapper.INSTANCE::toModel)
-                .map(WorkflowRoot::createWorkflowRoot)
-                .doOnNext(
-                        workflowRoot ->
-                                LOGGER.debug().log("Workflow created {}.", workflowRoot, createWorkflowCommand));
-    }
+    final var newWorkflowRootMono =
+        findWorkflowByCustomerRequest(createWorkflowCommand)
+            .switchIfEmpty(
+                createWorkflowRootMono(createWorkflowCommand)
+                    .zipWith(getConfigurationVOMono, this::configureToWorkflow)
+                    .flatMap(this::saveWorkflowRoot));
 
-    private Mono<WorkflowRoot> saveWorkflowRoot(final WorkflowRoot workflowRoot) {
-        return workflowRepository
-                .save(workflowRoot)
-                .doOnNext(savedWorkflowRoot -> LOGGER.info().log("Workflow saved! {}", workflowRoot))
-                .doOnError(
-                        throwable -> LOGGER.error().log("Error saving workflow {}", workflowRoot, throwable));
-    }
+    return transactionalOperator.transactional(
+        newWorkflowRootMono
+            .map(WorkflowMapper.INSTANCE::toService)
+            .doOnSuccess(
+                workflowVO ->
+                    LOGGER
+                        .info()
+                        .log("Workflow created {}. ({})", workflowVO, createWorkflowCommand)));
+  }
 
-    private WorkflowRoot configureToWorkflow(
-            final WorkflowRoot workflowRoot, final ConfigurationVO configurationVO) {
-        final var configuration = ConfigurationMapper.INSTANCE.toModel(configurationVO);
-        return workflowRoot.addWorkflowConfiguration(configuration).createExecutionPlan().configured();
-    }
+  private Mono<WorkflowRoot> findWorkflowByCustomerRequest(
+      final CreateWorkflowCommand createWorkflowCommand) {
+    return workflowRepository
+        .findByCustomerRequest(createWorkflowCommand.getId())
+        .doOnSuccess(
+            workflowRoot ->
+                LOGGER
+                    .debug()
+                    .log(
+                        "Found WorkflowRoot for {}? '{}'",
+                        createWorkflowCommand,
+                        workflowRoot != null));
+  }
 
-    private Mono<ConfigurationVO> getConfigurationVO(
-            final CreateWorkflowCommand createWorkflowCommand) {
-        return workflowMetadataService
-                .peekConfigurationForWorkflow(
-                        ConfigurationRequest.builder()
-                                .customerId(createWorkflowCommand.getCustomerId())
-                                .build())
-                .doOnSubscribe(
-                        subscription ->
-                                LOGGER.debug().log("Looking for configuration. {}", createWorkflowCommand))
-                .doOnError(
-                        Throwable.class,
-                        throwable ->
-                                LOGGER
-                                        .error()
-                                        .log("Can' t find configuration for", createWorkflowCommand, throwable))
-                .doOnSuccess(
-                        configurationVO ->
-                                LOGGER
-                                        .debug()
-                                        .log("Configuration found {}! {}", createWorkflowCommand, configurationVO));
-    }
+  private Mono<WorkflowRoot> createWorkflowRootMono(
+      final CreateWorkflowCommand createWorkflowCommand) {
+    return Mono.just(createWorkflowCommand)
+        .map(CustomerRequestMapper.INSTANCE::toModel)
+        .map(WorkflowRoot::createWorkflowRoot)
+        .doOnNext(
+            workflowRoot ->
+                LOGGER.debug().log("Workflow created {}.", workflowRoot, createWorkflowCommand));
+  }
 
-    private Mono<WorkflowRoot> save(final WorkflowRoot workflowRoot) {
-        return workflowRepository
-                .save(workflowRoot)
-                .doOnSubscribe(subscription -> LOGGER.debug().log("Saving {}", workflowRoot))
-                .doOnError(throwable -> LOGGER.error().log("Failed to save {}", workflowRoot, throwable))
-                .doOnNext(savedWorkflowRoot -> LOGGER.debug().log("Saved {}", savedWorkflowRoot));
-    }
+  private Mono<WorkflowRoot> saveWorkflowRoot(final WorkflowRoot workflowRoot) {
+    return workflowRepository
+        .save(workflowRoot)
+        .doOnNext(savedWorkflowRoot -> LOGGER.info().log("Workflow saved! {}", workflowRoot))
+        .doOnError(
+            throwable -> LOGGER.error().log("Error saving workflow {}", workflowRoot, throwable));
+  }
+
+  private WorkflowRoot configureToWorkflow(
+      final WorkflowRoot workflowRoot, final ConfigurationVO configurationVO) {
+    final var configuration = ConfigurationMapper.INSTANCE.toModel(configurationVO);
+    return workflowRoot.addWorkflowConfiguration(configuration).createExecutionPlan().configured();
+  }
+
+  private Mono<ConfigurationVO> getConfigurationVO(
+      final CreateWorkflowCommand createWorkflowCommand) {
+    return workflowMetadataService
+        .peekConfigurationForWorkflow(
+            ConfigurationRequest.builder()
+                .customerId(createWorkflowCommand.getCustomerId())
+                .build())
+        .doOnSubscribe(
+            subscription ->
+                LOGGER.debug().log("Looking for configuration. {}", createWorkflowCommand))
+        .doOnError(
+            Throwable.class,
+            throwable ->
+                LOGGER
+                    .error()
+                    .log("Can' t find configuration for", createWorkflowCommand, throwable))
+        .doOnSuccess(
+            configurationVO ->
+                LOGGER
+                    .debug()
+                    .log("Configuration found {}! {}", createWorkflowCommand, configurationVO));
+  }
+
+  private Mono<WorkflowRoot> save(final WorkflowRoot workflowRoot) {
+    return workflowRepository
+        .save(workflowRoot)
+        .doOnSubscribe(subscription -> LOGGER.debug().log("Saving {}", workflowRoot))
+        .doOnError(throwable -> LOGGER.error().log("Failed to save {}", workflowRoot, throwable))
+        .doOnNext(savedWorkflowRoot -> LOGGER.debug().log("Saved {}", savedWorkflowRoot));
+  }
 }

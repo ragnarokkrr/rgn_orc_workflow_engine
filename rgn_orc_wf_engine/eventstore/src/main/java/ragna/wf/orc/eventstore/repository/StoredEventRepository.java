@@ -15,5 +15,6 @@ public interface StoredEventRepository extends ReactiveMongoRepository<StoredEve
   @Query("{'id': { $gte: ?0, $lte: ?1 }}")
   Flux<StoredEvent> findByEventIdBetween(final long low, final long high);
 
-  Flux<StoredEvent> findByObjectIdOrderByIdAsc(final String objectId);
+  // TODO wait for stored event id seq fix
+  Flux<StoredEvent> findByObjectIdOrderByOccurredOnAsc(final String objectId);
 }

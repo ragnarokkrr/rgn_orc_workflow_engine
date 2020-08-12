@@ -47,8 +47,7 @@ public class WorkflowRoot {
   @Getter(AccessLevel.NONE)
   private final Collection<DomainEvent> domainEvents = new ArrayList<>();
 
-  @Id
-  private String id;
+  @Id private String id;
   private CustomerRequest customerRequest;
   private Configuration configuration;
   private ExecutionPlan executionPlan;
@@ -123,25 +122,25 @@ public class WorkflowRoot {
   }
 
   public WorkflowRoot registerTaskCriteriaEvaluationResults(
-          final TaskType taskType,
-          final int order,
-          final List<TaskCriteriaEvaluationCommand> taskCriteriaEvaluationCommands) {
+      final TaskType taskType,
+      final int order,
+      final List<TaskCriteriaEvaluationCommand> taskCriteriaEvaluationCommands) {
     LOGGER
-            .debug()
-            .log(
-                    WorkflowUtils.fornatedMessage(
-                            this, "Adding criteria evaluation to task", "addTaskCriteriaEvaluationResults"));
+        .debug()
+        .log(
+            WorkflowUtils.fornatedMessage(
+                this, "Adding criteria evaluation to task", "addTaskCriteriaEvaluationResults"));
     final var plannedTask =
-            WorkflowPlannedTaskService.findTask(
-                    this, taskType, order, "addTaskCriteriaEvaluationResults()");
+        WorkflowPlannedTaskService.findTask(
+            this, taskType, order, "addTaskCriteriaEvaluationResults()");
 
     final var taskCriteriaResultList =
-            taskCriteriaEvaluationCommands.stream()
-                    .map(TaskCriteriaMapper.INSTANCE::toModel)
-                    .collect(Collectors.toList());
+        taskCriteriaEvaluationCommands.stream()
+            .map(TaskCriteriaMapper.INSTANCE::toModel)
+            .collect(Collectors.toList());
     plannedTask.addTaskCriteriaEvaluation(taskCriteriaResultList);
     registerEvent(
-            new WorkflowRootTaskEvaluated(this, this.id, "addTaskCriteriaEvaluationResults()"));
+        new WorkflowRootTaskEvaluated(this, this.id, "addTaskCriteriaEvaluationResults()"));
     return this;
   }
 
@@ -219,7 +218,7 @@ public class WorkflowRoot {
       status = WorkflowStatus.FINISHED;
       evaluateWorkFlowResult();
       registerEvent(
-              new WorkflowRootFinished(this, this.id, "finishWorkflowIfConclusionStateAchieved()"));
+          new WorkflowRootFinished(this, this.id, "finishWorkflowIfConclusionStateAchieved()"));
     }
 
     return this;
@@ -269,6 +268,7 @@ public class WorkflowRoot {
 
   @DomainEvents
   public Collection<ApplicationEventWrapper> aggregateDomainEvents() {
+    LOGGER.info().log("aggregateDomainEvents: {} ", domainEvents);
     return domainEvents.stream().map(ApplicationEventWrapper::wrap).collect(Collectors.toList());
   }
 }

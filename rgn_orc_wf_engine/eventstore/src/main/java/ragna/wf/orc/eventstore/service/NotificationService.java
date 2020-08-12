@@ -54,7 +54,7 @@ public class NotificationService {
   public Mono<List<NotificationLogVo.NotificationVo>> findNotificationsByObjectId(
           final String objectId) {
     return storedEventRepository
-            .findByObjectIdOrderByIdAsc(objectId)
+            .findByObjectIdOrderByOccurredOnAsc(objectId)
             .map(this::mapToNotification)
             .collectList();
   }
