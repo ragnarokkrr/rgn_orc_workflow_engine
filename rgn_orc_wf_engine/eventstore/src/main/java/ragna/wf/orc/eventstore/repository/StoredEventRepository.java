@@ -8,7 +8,7 @@ import ragna.wf.orc.eventstore.model.StoredEvent;
 import reactor.core.publisher.Flux;
 
 @Repository
-public interface StoredEventRepository extends ReactiveMongoRepository<StoredEvent, Long> {
+public interface StoredEventRepository extends ReactiveMongoRepository<StoredEvent, String> {
   @Query(value = "{'eventStatus': {$eq: 'UNPROCESSED'} }", sort = "{'id': 1}")
   Flux<StoredEvent> findByStatusUnprocessedOrderByIdAsc(final Pageable pageable);
 

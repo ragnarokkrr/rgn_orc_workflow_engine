@@ -17,7 +17,7 @@ import java.util.StringJoiner;
 public class StoredEvent {
   static final String SEQUENCE_NAME = "stored_events_seq";
   @Id
-  private Long id;
+  private String id;
   private String objectId;
   private String typedName;
   private byte[] payload;

@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.Profile;
 import org.springframework.data.mongodb.core.ReactiveMongoOperations;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import ragna.wf.orc.engine.domain.metadata.service.WorkflowMetadataService;
@@ -15,7 +16,7 @@ import ragna.wf.orc.engine.domain.workflow.model.WorkflowModelFixture;
 import ragna.wf.orc.engine.domain.workflow.service.mapper.ConfigurationMapper;
 import ragna.wf.orc.engine.domain.workflow.service.vo.WorkflowVO;
 import ragna.wf.orc.eventstore.config.EmbeddedMongoWithTransactionsConfig;
-import reactor.core.publisher.Flux;
+import ragna.wf.orc.common.data.mongodb.utils.MongoDbUtils;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
@@ -23,63 +24,61 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 
+@Profile("embedMongoWithTx")
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
 @Import(EmbeddedMongoWithTransactionsConfig.class)
 class WorkflowCreationServiceTest {
 
-    @MockBean
-    private WorkflowMetadataService workflowMetadataService;
+  @MockBean private WorkflowMetadataService workflowMetadataService;
 
-    @Autowired
-    private WorkflowCreationService workflowCreationService;
+  @Autowired private WorkflowCreationService workflowCreationService;
 
-    @Autowired private ReactiveMongoOperations reactiveMongoOperations;
+  @Autowired private ReactiveMongoOperations reactiveMongoOperations;
 
-    @BeforeEach
-    void before() {
-        final var createCollectionFlux =
-                Flux.just("stored_events", "database_sequences")
-                        .flatMap(reactiveMongoOperations::createCollection);
-        StepVerifier.create(createCollectionFlux).expectNextCount(2).verifyComplete();
-    }
+  @BeforeEach
+  void before() {
 
-    @AfterEach
-    void tearDown() {
-        // mongoTestUtils.tearDown();
-    }
+    final var createCollectionFlux = MongoDbUtils.reCreateCollections(this.reactiveMongoOperations);
 
-    @Test
-    void whenANewRequestIsSubmitted_thenShouldCreateWorkflow() {
-        // given
-        final var configuration = WorkflowModelFixture.sampleTwoTasksConfiguration();
-        doReturn(Mono.just(ConfigurationMapper.INSTANCE.toService(configuration)))
-                .when(workflowMetadataService)
-                .peekConfigurationForWorkflow(any());
+    StepVerifier.create(createCollectionFlux).expectNextCount(MongoDbUtils.getCollectionNames().size()).verifyComplete();
+  }
 
-        final var createWorkflowCommand = ServiceFixtures.kyleReese();
+  @AfterEach
+  void tearDown() {
+    // mongoTestUtils.tearDown();
+  }
 
-        // when
-        final var createWorkflowMono = workflowCreationService.createWorkflow(createWorkflowCommand);
-        // then
-        StepVerifier.create(createWorkflowMono)
-                .expectNextMatches(
+  @Test
+  void whenANewRequestIsSubmitted_thenShouldCreateWorkflow() {
+    // given
+    final var configuration = WorkflowModelFixture.sampleTwoTasksConfiguration();
+    doReturn(Mono.just(ConfigurationMapper.INSTANCE.toService(configuration)))
+        .when(workflowMetadataService)
+        .peekConfigurationForWorkflow(any());
+
+    final var createWorkflowCommand = ServiceFixtures.kyleReese();
+
+    // when
+    final var createWorkflowMono = workflowCreationService.createWorkflow(createWorkflowCommand);
+    // then
+    StepVerifier.create(createWorkflowMono)
+        .expectNextMatches(
             workflowVO -> {
-                assertThat(workflowVO)
-                        .hasFieldOrPropertyWithValue("configurationId", configuration.getId())
-                        .hasFieldOrPropertyWithValue("customerId", createWorkflowCommand.getCustomerId())
-                        .hasFieldOrPropertyWithValue("customerRequestId", createWorkflowCommand.getId())
-                        .hasFieldOrPropertyWithValue("result", WorkflowVO.Result.WORKFLOW_ONGOING)
-                        .hasFieldOrPropertyWithValue("status", WorkflowVO.Status.CONFIGURED)
-                        .hasNoNullFieldsOrProperties()
-                        .isNotNull();
-                return true;
+              assertThat(workflowVO)
+                  .hasFieldOrPropertyWithValue("configurationId", configuration.getId())
+                  .hasFieldOrPropertyWithValue("customerId", createWorkflowCommand.getCustomerId())
+                  .hasFieldOrPropertyWithValue("customerRequestId", createWorkflowCommand.getId())
+                  .hasFieldOrPropertyWithValue("result", WorkflowVO.Result.WORKFLOW_ONGOING)
+                  .hasFieldOrPropertyWithValue("status", WorkflowVO.Status.CONFIGURED)
+                  .hasNoNullFieldsOrProperties()
+                  .isNotNull();
+              return true;
             })
-                .verifyComplete();
+        .verifyComplete();
 
-        // TODO fix mockito inline configuration
-        // verify(workflowRepository, times(1)).findByCustomerRequest(any());
-        // verify(workflowRepository, times(1)).save(any());
-    }
-
+    // TODO fix mockito inline configuration
+    // verify(workflowRepository, times(1)).findByCustomerRequest(any());
+    // verify(workflowRepository, times(1)).save(any());
+  }
 }

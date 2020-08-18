@@ -18,8 +18,12 @@ public class StoredEventListener extends AbstractMongoEventListener<StoredEvent>
   public void onBeforeConvert(BeforeConvertEvent<StoredEvent> event) {
     final var source = event.getSource();
     if (source.getId() == null) {
-      source.setId(generateId());
+      source.setId(generateUUId());
     }
+  }
+
+  private String generateUUId() {
+    return UUID.randomUUID().toString();
   }
 
   private Long generateId() {

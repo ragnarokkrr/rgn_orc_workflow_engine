@@ -1,12 +1,16 @@
 package ragna.wf.orc.engine.domain.workflow.service;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.Profile;
+import org.springframework.data.mongodb.core.ReactiveMongoOperations;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import ragna.wf.orc.common.data.mongodb.utils.MongoDbUtils;
 import ragna.wf.orc.engine.domain.metadata.service.WorkflowMetadataService;
 import ragna.wf.orc.engine.domain.workflow.model.PlannedTask;
 import ragna.wf.orc.engine.domain.workflow.model.TaskType;
@@ -31,6 +35,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 
+@Profile("embedMongoWithTx")
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
 @Import(EmbeddedMongoWithTransactionsConfig.class)
@@ -44,8 +49,18 @@ class WorkflowServiceHappyPathTest {
     @Autowired
     private WorkflowTaskManagementService workflowTaskManagementService;
 
+    @Autowired private ReactiveMongoOperations reactiveMongoOperations;
+
     @Autowired
     private WorkflowRepository workflowRepository;
+
+    @BeforeEach
+    void before() {
+
+        final var createCollectionFlux = MongoDbUtils.reCreateCollections(this.reactiveMongoOperations);
+
+        StepVerifier.create(createCollectionFlux).expectNextCount(MongoDbUtils.getCollectionNames().size()).verifyComplete();
+    }
 
     @Test
     void whenWorkflowRootFinishesAndAdvanceAllTasksAndAchieveConclusionState_thenWorkflowIsFinished()

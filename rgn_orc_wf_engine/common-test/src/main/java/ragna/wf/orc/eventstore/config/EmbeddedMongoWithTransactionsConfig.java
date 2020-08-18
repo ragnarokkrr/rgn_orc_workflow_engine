@@ -62,16 +62,14 @@ public class EmbeddedMongoWithTransactionsConfig {
   @Bean
   public IMongodConfig mongodConfig() throws IOException, UnknownHostException {
 
-    final IMongodConfig mongodConfig =
-        new MongodConfigBuilder()
-            .version(mFeatureAwareVersion)
-            .withLaunchArgument("--replSet", mReplicaSetName)
-            .withLaunchArgument("--bind_ip", "127.0.0.1")
-            .stopTimeoutInMillis(mStopTimeoutMillis)
-            .cmdOptions(new MongoCmdOptionsBuilder().useNoJournal(false).build())
-            .net(new Net(mPortNumber, Network.localhostIsIPv6()))
-            .build();
-    return mongodConfig;
+    return new MongodConfigBuilder()
+        .version(mFeatureAwareVersion)
+        .withLaunchArgument("--replSet", mReplicaSetName)
+        .withLaunchArgument("--bind_ip", "127.0.0.1")
+        .stopTimeoutInMillis(mStopTimeoutMillis)
+        .cmdOptions(new MongoCmdOptionsBuilder().useNoJournal(false).build())
+        .net(new Net(mPortNumber, Network.localhostIsIPv6()))
+        .build();
   }
 
   /**
@@ -107,7 +105,7 @@ public class EmbeddedMongoWithTransactionsConfig {
         adminDatabase
             .runCommand(new Document("setFeatureCompatibilityVersion", "4.0"))
             .subscribe(new SubscriberHelpers.PrintDocumentSubscriber());
-        TimeUnit.SECONDS.sleep(2);
+        TimeUnit.SECONDS.sleep(3);
       } finally {
         if (mongoClient != null) {
           mongoClient.close();

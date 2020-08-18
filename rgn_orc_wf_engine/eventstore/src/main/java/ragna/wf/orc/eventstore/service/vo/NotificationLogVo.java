@@ -26,7 +26,7 @@ public class NotificationLogVo {
   @NoArgsConstructor
   @Builder
   public static class NotificationVo {
-    private Long id;
+    private String id;
     private String objectId;
     private String typedName;
     private LocalDateTime occurredOn;

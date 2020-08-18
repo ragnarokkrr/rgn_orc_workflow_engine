@@ -18,8 +18,8 @@ import ragna.wf.orc.eventstore.EventStoreTestApplication;
 import ragna.wf.orc.eventstore.config.EmbeddedMongoWithTransactionsConfig;
 import ragna.wf.orc.eventstore.model.StoredEvent;
 import ragna.wf.orc.eventstore.model.StoredEventStatus;
+import ragna.wf.orc.common.data.mongodb.utils.MongoDbUtils;
 import ragna.wf.orc.eventstore.repository.StoredEventRepository;
-import reactor.core.publisher.Flux;
 import reactor.test.StepVerifier;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -36,10 +36,9 @@ public class EventStoreServiceTest {
 
   @BeforeEach
   void before() {
-    final var createCollectionFlux =
-        Flux.just("stored_events", "database_sequences")
-            .flatMap(reactiveMongoOperations::createCollection);
-    StepVerifier.create(createCollectionFlux).expectNextCount(2).verifyComplete();
+    final var createCollectionFlux = MongoDbUtils.reCreateCollections(this.reactiveMongoOperations);
+
+    StepVerifier.create(createCollectionFlux).expectNextCount(MongoDbUtils.getCollectionNames().size()).verifyComplete();
   }
 
   @Test
