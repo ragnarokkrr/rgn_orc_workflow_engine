@@ -18,6 +18,7 @@ dependencies {
     implementation group: 'org.fissore', name: 'slf4j-fluent', version: '0.13.3'
     implementation group: 'com.esotericsoftware', name: 'kryo-shaded', version: '4.0.2'
     implementation group: 'de.javakaffee', name: 'kryo-serializers', version: '0.45'
+    implementation group: 'xyz.downgoon', name: 'snowflake', version: '1.0.0'
 
     // libs reactor add-ons
     implementation group: 'io.projectreactor.addons', name: 'reactor-extra', version: '3.3.3.RELEASE'

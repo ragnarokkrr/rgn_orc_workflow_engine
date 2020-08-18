@@ -7,8 +7,6 @@ import org.springframework.data.mongodb.core.mapping.event.BeforeConvertEvent;
 import org.springframework.stereotype.Component;
 import ragna.wf.orc.common.data.mongodb.sequences.SequenceGenerator;
 
-import java.util.UUID;
-
 @Component
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class StoredEventListener extends AbstractMongoEventListener<StoredEvent> {
@@ -18,15 +16,7 @@ public class StoredEventListener extends AbstractMongoEventListener<StoredEvent>
   public void onBeforeConvert(BeforeConvertEvent<StoredEvent> event) {
     final var source = event.getSource();
     if (source.getId() == null) {
-      source.setId(generateUUId());
+      source.setId(sequenceGenerator.nextId());
     }
-  }
-
-  private String generateUUId() {
-    return UUID.randomUUID().toString();
-  }
-
-  private Long generateId() {
-    return sequenceGenerator.generateSequence(StoredEvent.SEQUENCE_NAME).block();
   }
 }

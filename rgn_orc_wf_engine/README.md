@@ -103,7 +103,6 @@ In application startup params
     * [Project Reactor expand method](https://www.javacodegeeks.com/2020/02/project-reactor-expand-method.html)
 * Gradle
     * [easy reuse of test artifacts](https://stackoverflow.com/questions/5644011/multi-project-test-dependencies-with-gradle/60138176#60138176)
-  
 * CDC
     * https://hub.docker.com/r/debezium/example-mongodb
     * https://github.com/debezium/docker-images/blob/master/examples/mongodb/0.10/init-inventory.sh
@@ -111,4 +110,6 @@ In application startup params
     * https://docs.spring.io/spring-cloud-stream-app-starters/docs/Einstein.SR6/reference/htmlsingle/#spring-cloud-stream-modules-cdc-debezium-source
     * https://debezium.io/documentation/reference/1.2/development/engine.html
     * https://rmoff.net/2018/03/27/streaming-data-from-mongodb-into-kafka-with-kafka-connect-and-debezium/
+* General
+    * [Announcing Snowflake (twitter sequence generator)](https://blog.twitter.com/engineering/en_us/a/2010/announcing-snowflake.html)
     
