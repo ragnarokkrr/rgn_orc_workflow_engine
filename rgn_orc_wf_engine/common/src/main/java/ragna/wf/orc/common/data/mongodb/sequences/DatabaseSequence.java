@@ -8,7 +8,6 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Data
 public class DatabaseSequence {
 
-  @Id
-  private String id;
+  @Id private String id;
   private long seq;
 }

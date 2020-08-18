@@ -65,11 +65,14 @@ public class DefaultKryoContext implements KryoContext {
           kryo.register(Collections.EMPTY_MAP.getClass(), new CollectionsEmptyMapSerializer());
           kryo.register(Collections.EMPTY_SET.getClass(), new CollectionsEmptySetSerializer());
           kryo.register(
-              Collections.singletonList(StringUtils.EMPTY).getClass(), new CollectionsSingletonListSerializer());
+              Collections.singletonList(StringUtils.EMPTY).getClass(),
+              new CollectionsSingletonListSerializer());
           kryo.register(
-              Collections.singleton(StringUtils.EMPTY).getClass(), new CollectionsSingletonSetSerializer());
+              Collections.singleton(StringUtils.EMPTY).getClass(),
+              new CollectionsSingletonSetSerializer());
           kryo.register(
-              Collections.singletonMap(StringUtils.EMPTY, StringUtils.EMPTY).getClass(), new CollectionsSingletonMapSerializer());
+              Collections.singletonMap(StringUtils.EMPTY, StringUtils.EMPTY).getClass(),
+              new CollectionsSingletonMapSerializer());
           kryo.register(GregorianCalendar.class, new GregorianCalendarSerializer());
           kryo.register(InvocationHandler.class, new JdkProxySerializer());
           UnmodifiableCollectionsSerializer.registerSerializers(kryo);

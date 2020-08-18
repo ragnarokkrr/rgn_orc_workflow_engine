@@ -36,6 +36,6 @@ public class SequenceGenerator {
                 new Update().inc("seq", 1),
                 options().returnNew(true).upsert(true),
                 DatabaseSequence.class))
-            .map(DatabaseSequence::getSeq);
+        .map(DatabaseSequence::getSeq);
   }
 }
