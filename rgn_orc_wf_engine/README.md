@@ -49,6 +49,11 @@
 
 ### Test Environment
 
+### Transactions
+
+See references.
+Include profile ``spring_profiles_active=embedMongoWithTx``
+
 ### Swagger UI
 http://localhost:8080/swagger-ui/index.html
 
@@ -85,7 +90,25 @@ In application startup params
 
 ## References
 
-* https://gist.github.com/harveyconnor/518e088bad23a273cae6ba7fc4643549
-* [Mongo Express container with Docker Compose](https://zgadzaj.com/development/docker/docker-compose/containers/mongo-express)
-* [How to run MongoDB and Mongo-express with docker-compose?](https://stackoverflow.com/questions/47901561/how-to-run-mongodb-and-mongo-express-with-docker-compose)
-* [MongoDB container with Docker Compose](https://zgadzaj.com/development/docker/docker-compose/containers/mongodb#docker-mongodb-mongod-conf)
+* MongoDB / Docker
+    * [Gist - mongo replica set in docker compose](https://gist.github.com/harveyconnor/518e088bad23a273cae6ba7fc4643549)
+    * [Mongo Express container with Docker Compose](https://zgadzaj.com/development/docker/docker-compose/containers/mongo-express)
+    * [How to run MongoDB and Mongo-express with docker-compose?](https://stackoverflow.com/questions/47901561/how-to-run-mongodb-and-mongo-express-with-docker-compose)
+    * [MongoDB container with Docker Compose](https://zgadzaj.com/development/docker/docker-compose/containers/mongodb#docker-mongodb-mongod-conf)
+    * [Multi-project test dependencies with gradle](https://stackoverflow.com/questions/5644011/multi-project-test-dependencies-with-gradle/60138176#60138176)
+    * [MongoDB Admin Commands - setFeatureCompatibilityVersion](https://docs.mongodb.com/manual/reference/command/setFeatureCompatibilityVersion/)
+* Spring
+    * [Spring Boot Auto-configuration for Embedded MongoDB with Support for Transactions](https://apisimulator.io/spring-boot-auto-configuration-embedded-mongodb-transactions/)
+* Spring Webflux / Reactor
+    * [Project Reactor expand method](https://www.javacodegeeks.com/2020/02/project-reactor-expand-method.html)
+* Gradle
+    * [easy reuse of test artifacts](https://stackoverflow.com/questions/5644011/multi-project-test-dependencies-with-gradle/60138176#60138176)
+  
+* CDC
+    * https://hub.docker.com/r/debezium/example-mongodb
+    * https://github.com/debezium/docker-images/blob/master/examples/mongodb/0.10/init-inventory.sh
+    * https://start-scs.cfapps.io/
+    * https://docs.spring.io/spring-cloud-stream-app-starters/docs/Einstein.SR6/reference/htmlsingle/#spring-cloud-stream-modules-cdc-debezium-source
+    * https://debezium.io/documentation/reference/1.2/development/engine.html
+    * https://rmoff.net/2018/03/27/streaming-data-from-mongodb-into-kafka-with-kafka-connect-and-debezium/
+    

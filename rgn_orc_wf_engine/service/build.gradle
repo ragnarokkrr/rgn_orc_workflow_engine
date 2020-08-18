@@ -1,6 +1,7 @@
 dependencies {
     implementation project(':rgn-orc-wf-engine-common')
     implementation project(':rgn-orc-wf-engine-eventstore')
+    testImplementation project(':rgn-orc-wf-engine-common-test')
 }
 
 

@@ -1,7 +1,8 @@
 dependencies {
     implementation project(':rgn-orc-wf-engine-common')
-    testImplementation project(':rgn-orc-wf-engine-common-test')
+    implementation 'de.flapdoodle.embed:de.flapdoodle.embed.mongo'
 }
+
 
 bootJar {
     enabled = false
@@ -10,4 +11,3 @@ bootJar {
 jar {
     enabled = true
 }
-

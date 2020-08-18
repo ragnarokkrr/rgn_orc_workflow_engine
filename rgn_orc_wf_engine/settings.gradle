@@ -1,9 +1,12 @@
 rootProject.name = 'rgn-orc-wf-engine'
 include ':rgn-orc-wf-engine-common'
+include ':rgn-orc-wf-engine-common-test'
 include ':rgn-orc-wf-engine-eventstore'
 include ':rgn-orc-wf-engine-service'
 
 project(':rgn-orc-wf-engine-common').projectDir  = file('common')
+project(':rgn-orc-wf-engine-common-test').projectDir  = file('common-test')
 project(':rgn-orc-wf-engine-eventstore').projectDir  = file('eventstore')
 project(':rgn-orc-wf-engine-service').projectDir  = file('service')
+
 

@@ -44,12 +44,15 @@ out/
 classes/
 
 common/build/
+common-test/build/
 eventstore/build/
 service/build/
 common/out/
+common-test/out/
 eventstore/out/
 service/out/
 common/bin/
+common-test/bin/
 eventstore/bin/
 service/bin/
 

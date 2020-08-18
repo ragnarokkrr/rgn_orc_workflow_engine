@@ -5,6 +5,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import ragna.wf.orc.engine.domain.metadata.service.WorkflowMetadataService;
 import ragna.wf.orc.engine.domain.workflow.model.PlannedTask;
@@ -19,6 +20,7 @@ import ragna.wf.orc.engine.domain.workflow.service.vo.FinishTaskCommand;
 import ragna.wf.orc.engine.domain.workflow.service.vo.RegisterTaskResultsCommand;
 import ragna.wf.orc.engine.domain.workflow.service.vo.TriggerFirstTaskCommand;
 import ragna.wf.orc.engine.domain.workflow.service.vo.WorkflowVO;
+import ragna.wf.orc.eventstore.config.EmbeddedMongoWithTransactionsConfig;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
@@ -31,6 +33,7 @@ import static org.mockito.Mockito.doReturn;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
+@Import(EmbeddedMongoWithTransactionsConfig.class)
 class WorkflowServiceHappyPathTest {
     @MockBean
     private WorkflowMetadataService workflowMetadataService;
