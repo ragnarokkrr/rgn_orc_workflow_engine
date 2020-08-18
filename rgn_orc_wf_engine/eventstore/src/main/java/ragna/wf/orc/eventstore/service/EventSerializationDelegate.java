@@ -17,17 +17,17 @@ public class EventSerializationDelegate {
 
   public byte[] serializeEvent(final DomainEvent sourceObject) {
     return Try.of(() -> this.kryoContext.serialize(sourceObject))
-            .getOrElseThrow(
-                    t -> new SerializationException("Error serializing object to EVENT STORE", t));
+        .getOrElseThrow(
+            t -> new SerializationException("Error serializing object to EVENT STORE", t));
   }
 
   public DomainEvent deserialize(final String className, final byte[] payload) {
     final var clazz =
-            Try.of(() -> Class.forName(className))
-                    .getOrElseThrow(
-                            t ->
-                                    new SerializationException(
-                                            String.format("Cannot deserialize: %s", className), t));
+        Try.of(() -> Class.forName(className))
+            .getOrElseThrow(
+                t ->
+                    new SerializationException(
+                        String.format("Cannot deserialize: %s", className), t));
 
     return (DomainEvent) this.kryoContext.deserialize(clazz, payload);
   }

@@ -14,17 +14,17 @@ public interface RestMapper {
   RestMapper INSTANCE = Mappers.getMapper(RestMapper.class);
 
   CreateWorkflowCommand toService(
-          ragna.wf.orc.engine.application.rest.workflow.dto.CreateWorkflowCommand
-                  createWorkflowCommand);
+      ragna.wf.orc.engine.application.rest.workflow.dto.CreateWorkflowCommand
+          createWorkflowCommand);
 
   FinishTaskCommand toService(
-          String workflowId,
-          ragna.wf.orc.engine.application.rest.workflow.dto.FinishTaskCommand finishTaskCommand);
+      String workflowId,
+      ragna.wf.orc.engine.application.rest.workflow.dto.FinishTaskCommand finishTaskCommand);
 
   RegisterTaskResultsCommand toService(
-          String workflowId,
-          ragna.wf.orc.engine.application.rest.workflow.dto.RegisterTaskResultsCommand
-                  registerTaskResultsCommand);
+      String workflowId,
+      ragna.wf.orc.engine.application.rest.workflow.dto.RegisterTaskResultsCommand
+          registerTaskResultsCommand);
 
   default TriggerFirstTaskCommand toService(String workflowId) {
     return TriggerFirstTaskCommand.builder().workflowId(workflowId).build();

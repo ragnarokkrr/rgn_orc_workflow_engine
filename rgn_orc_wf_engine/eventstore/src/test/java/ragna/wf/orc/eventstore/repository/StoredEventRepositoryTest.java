@@ -32,7 +32,9 @@ public class StoredEventRepositoryTest {
   @BeforeEach
   void before() {
     final var createCollectionFlux = MongoDbUtils.reCreateCollections(this.reactiveMongoOperations);
-    StepVerifier.create(createCollectionFlux).expectNextCount(MongoDbUtils.getCollectionNames().size()).verifyComplete();
+    StepVerifier.create(createCollectionFlux)
+        .expectNextCount(MongoDbUtils.getCollectionNames().size())
+        .verifyComplete();
   }
 
   @Test

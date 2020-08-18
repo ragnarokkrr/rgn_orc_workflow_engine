@@ -15,8 +15,7 @@ import java.util.List;
 @Builder
 public class NotificationLogVo {
   private String notificationId;
-  @Builder.Default
-  private List<NotificationVo> notifications = new ArrayList<>();
+  @Builder.Default private List<NotificationVo> notifications = new ArrayList<>();
   private String next;
   private String previous;
   private Boolean archived;
@@ -80,9 +79,9 @@ public class NotificationLogVo {
       }
 
       return NotificationLogId.builder()
-              .high(this.high - previous)
-              .low(this.low - previous)
-              .build();
+          .high(this.high - previous)
+          .low(this.low - previous)
+          .build();
     }
 
     public String encode() {

@@ -16,12 +16,9 @@ import javax.validation.constraints.NotNull;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class FinishTaskCommand {
   // @NotBlank private String workflowId;
-  @NotNull
-  private TaskType taskType;
-  @NotNull
-  private int order;
-  @NotNull
-  private Result result;
+  @NotNull private TaskType taskType;
+  @NotNull private int order;
+  @NotNull private Result result;
 
   public enum TaskType {
     ANALYSIS,

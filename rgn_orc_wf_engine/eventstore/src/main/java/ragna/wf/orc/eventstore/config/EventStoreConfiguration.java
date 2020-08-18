@@ -8,7 +8,7 @@ import ragna.wf.orc.common.serialization.KryoContext;
 
 @Configuration
 @ComponentScan(
-        basePackages = {"ragna.wf.orc.common.data.mongodb.sequences", "ragna.wf.orc.eventstore"})
+    basePackages = {"ragna.wf.orc.common.data.mongodb.sequences", "ragna.wf.orc.eventstore"})
 public class EventStoreConfiguration {
 
   @Bean

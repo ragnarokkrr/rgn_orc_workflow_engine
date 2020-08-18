@@ -20,7 +20,7 @@ import java.util.List;
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class NotificationService {
   private static final FluentLogger LOGGER =
-          FluentLoggerFactory.getLogger(NotificationService.class);
+      FluentLoggerFactory.getLogger(NotificationService.class);
   private static final long LOG_NOTIFICATION_COUNT = 5;
 
   private final StoredEventRepository storedEventRepository;
@@ -33,60 +33,60 @@ public class NotificationService {
 
   public Mono<NotificationLogVo> currentNotificationLog() {
     return this.calculateCurrentNotificationId()
-            .map(NotificationLogVo.NotificationLogId::encode)
-            .flatMap(this::findNotificationLog);
+        .map(NotificationLogVo.NotificationLogId::encode)
+        .flatMap(this::findNotificationLog);
   }
 
   public Mono<NotificationLogVo> findNotificationLog(final String encodedNotificationLogId) {
     final var notificationLogId =
-            NotificationLogVo.NotificationLogId.createNotificationLogId(encodedNotificationLogId);
+        NotificationLogVo.NotificationLogId.createNotificationLogId(encodedNotificationLogId);
 
     return this.storedEventRepository
-            .findByEventIdBetween(notificationLogId.getLow(), notificationLogId.getHigh())
-            .map(this::mapToNotification)
-            .collectList()
-            .zipWith(
-                    this.count(),
-                    ((notifications, count) ->
-                            this.buildNotificationLog(notificationLogId, notifications, count)));
+        .findByEventIdBetween(notificationLogId.getLow(), notificationLogId.getHigh())
+        .map(this::mapToNotification)
+        .collectList()
+        .zipWith(
+            this.count(),
+            ((notifications, count) ->
+                this.buildNotificationLog(notificationLogId, notifications, count)));
   }
 
   public Mono<List<NotificationLogVo.NotificationVo>> findNotificationsByObjectId(
-          final String objectId) {
+      final String objectId) {
     return storedEventRepository
-            .findByObjectIdOrderByOccurredOnAsc(objectId)
-            .map(this::mapToNotification)
-            .collectList();
+        .findByObjectIdOrderByOccurredOnAsc(objectId)
+        .map(this::mapToNotification)
+        .collectList();
   }
 
   private NotificationLogVo.NotificationVo mapToNotification(StoredEvent storedEvent) {
     return NotificationLogVo.NotificationVo.builder()
-            .id(storedEvent.getId())
-            .objectId(storedEvent.getObjectId())
-            .status(NotificationLogVoMapper.INSTANCE.toService(storedEvent.getEventStatus()))
-            .serializationEngine(
-                    NotificationLogVoMapper.INSTANCE.toService(storedEvent.getSerializationEngine()))
-            .occurredOn(storedEvent.getOccurredOn())
-            .processingOn(storedEvent.getProcessingOn())
-            .processedOn(storedEvent.getProcessedOn())
-            .typedName(storedEvent.getTypedName())
-            .payload(this.payloadToJsonString(storedEvent))
-            .build();
+        .id(storedEvent.getId())
+        .objectId(storedEvent.getObjectId())
+        .status(NotificationLogVoMapper.INSTANCE.toService(storedEvent.getEventStatus()))
+        .serializationEngine(
+            NotificationLogVoMapper.INSTANCE.toService(storedEvent.getSerializationEngine()))
+        .occurredOn(storedEvent.getOccurredOn())
+        .processingOn(storedEvent.getProcessingOn())
+        .processedOn(storedEvent.getProcessedOn())
+        .typedName(storedEvent.getTypedName())
+        .payload(this.payloadToJsonString(storedEvent))
+        .build();
   }
 
   private NotificationLogVo buildNotificationLog(
-          final NotificationLogVo.NotificationLogId notificationLogId,
-          final List<NotificationLogVo.NotificationVo> notifications,
-          final long count) {
+      final NotificationLogVo.NotificationLogId notificationLogId,
+      final List<NotificationLogVo.NotificationVo> notifications,
+      final long count) {
     final var archived = notificationLogId.getHigh() < count;
 
     return NotificationLogVo.builder()
-            .notificationId(notificationLogId.encode())
-            .notifications(notifications)
-            .next(notificationLogId.next(defaultLogNotificationCount()).encode())
-            .previous(notificationLogId.previous(defaultLogNotificationCount()).encode())
-            .archived(archived)
-            .build();
+        .notificationId(notificationLogId.encode())
+        .notifications(notifications)
+        .next(notificationLogId.next(defaultLogNotificationCount()).encode())
+        .previous(notificationLogId.previous(defaultLogNotificationCount()).encode())
+        .archived(archived)
+        .build();
   }
 
   private long defaultLogNotificationCount() {
@@ -96,8 +96,8 @@ public class NotificationService {
   private Mono<NotificationLogVo.NotificationLogId> calculateCurrentNotificationId() {
 
     return count()
-            .map(this::calculateNotificationLogId)
-            .doOnError(throwable -> LOGGER.error().log("Failed to find current", throwable));
+        .map(this::calculateNotificationLogId)
+        .doOnError(throwable -> LOGGER.error().log("Failed to find current", throwable));
   }
 
   private NotificationLogVo.NotificationLogId calculateNotificationLogId(Long count) {
@@ -111,14 +111,14 @@ public class NotificationService {
   private String payloadToJsonString(final StoredEvent storedEvent) {
 
     final var object =
-            this.eventSerializationDelegate.deserialize(
-                    storedEvent.getTypedName(), storedEvent.getPayload());
+        this.eventSerializationDelegate.deserialize(
+            storedEvent.getTypedName(), storedEvent.getPayload());
 
     return Try.of(() -> this.objectMapper.writeValueAsString(object))
-            .getOrElseThrow(
-                    t ->
-                            new SerializationException(
-                                    String.format("Cannot convert to JsonString: %s", storedEvent.getTypedName()),
-                                    t));
+        .getOrElseThrow(
+            t ->
+                new SerializationException(
+                    String.format("Cannot convert to JsonString: %s", storedEvent.getTypedName()),
+                    t));
   }
 }

@@ -15,12 +15,8 @@ import javax.validation.constraints.NotBlank;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class CreateWorkflowCommand {
-    @NotBlank
-    private String id;
-    @NotBlank
-    private String customerId;
-    @NotBlank
-    private String customerName;
-    @NotBlank
-    private String requestMemo;
+  @NotBlank private String id;
+  @NotBlank private String customerId;
+  @NotBlank private String customerName;
+  @NotBlank private String requestMemo;
 }

@@ -13,15 +13,13 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class StoredEventVo {
-    @Id
-    private Long id;
-    private String objectId;
-    private String typedName;
-    private byte[] payload;
-    private LocalDateTime occurredOn;
-    private LocalDateTime processingOn;
-    private LocalDateTime processedOn;
-    private StoredEventStatus eventStatus;
-    private SerializationEngine serializationEngine;
-
+  @Id private Long id;
+  private String objectId;
+  private String typedName;
+  private byte[] payload;
+  private LocalDateTime occurredOn;
+  private LocalDateTime processingOn;
+  private LocalDateTime processedOn;
+  private StoredEventStatus eventStatus;
+  private SerializationEngine serializationEngine;
 }

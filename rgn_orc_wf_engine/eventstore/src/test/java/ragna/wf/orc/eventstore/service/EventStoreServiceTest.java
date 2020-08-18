@@ -13,12 +13,12 @@ import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.mongodb.core.ReactiveMongoOperations;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import ragna.wf.orc.common.data.mongodb.utils.MongoDbUtils;
 import ragna.wf.orc.common.events.DomainEvent;
 import ragna.wf.orc.eventstore.EventStoreTestApplication;
 import ragna.wf.orc.eventstore.config.EmbeddedMongoWithTransactionsConfig;
 import ragna.wf.orc.eventstore.model.StoredEvent;
 import ragna.wf.orc.eventstore.model.StoredEventStatus;
-import ragna.wf.orc.common.data.mongodb.utils.MongoDbUtils;
 import ragna.wf.orc.eventstore.repository.StoredEventRepository;
 import reactor.test.StepVerifier;
 
@@ -38,7 +38,9 @@ public class EventStoreServiceTest {
   void before() {
     final var createCollectionFlux = MongoDbUtils.reCreateCollections(this.reactiveMongoOperations);
 
-    StepVerifier.create(createCollectionFlux).expectNextCount(MongoDbUtils.getCollectionNames().size()).verifyComplete();
+    StepVerifier.create(createCollectionFlux)
+        .expectNextCount(MongoDbUtils.getCollectionNames().size())
+        .verifyComplete();
   }
 
   @Test

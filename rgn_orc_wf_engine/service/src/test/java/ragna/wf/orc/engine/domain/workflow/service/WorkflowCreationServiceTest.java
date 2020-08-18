@@ -11,12 +11,12 @@ import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.mongodb.core.ReactiveMongoOperations;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import ragna.wf.orc.common.data.mongodb.utils.MongoDbUtils;
 import ragna.wf.orc.engine.domain.metadata.service.WorkflowMetadataService;
 import ragna.wf.orc.engine.domain.workflow.model.WorkflowModelFixture;
 import ragna.wf.orc.engine.domain.workflow.service.mapper.ConfigurationMapper;
 import ragna.wf.orc.engine.domain.workflow.service.vo.WorkflowVO;
 import ragna.wf.orc.eventstore.config.EmbeddedMongoWithTransactionsConfig;
-import ragna.wf.orc.common.data.mongodb.utils.MongoDbUtils;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
@@ -41,7 +41,9 @@ class WorkflowCreationServiceTest {
 
     final var createCollectionFlux = MongoDbUtils.reCreateCollections(this.reactiveMongoOperations);
 
-    StepVerifier.create(createCollectionFlux).expectNextCount(MongoDbUtils.getCollectionNames().size()).verifyComplete();
+    StepVerifier.create(createCollectionFlux)
+        .expectNextCount(MongoDbUtils.getCollectionNames().size())
+        .verifyComplete();
   }
 
   @AfterEach

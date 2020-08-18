@@ -18,26 +18,26 @@ class WorkflowRootHappyPathsTest {
       whenWorkflowRootFinishesAndAdvanceAllTasksAndAchieveConclusionState_thenWorkflowIsFinished() {
     // given
     final var workflowRoot =
-            WorkflowRoot.createWorkflowRoot(kyleReese())
-                    .addWorkflowConfiguration(WorkflowModelFixture.sampleTwoTasksConfiguration())
-                    .createExecutionPlan()
-                    .configured();
+        WorkflowRoot.createWorkflowRoot(kyleReese())
+            .addWorkflowConfiguration(WorkflowModelFixture.sampleTwoTasksConfiguration())
+            .createExecutionPlan()
+            .configured();
 
     // when
     workflowRoot.triggerFirstTask();
     workflowRoot.finishTaskAndAdvance(TaskType.ANALYSIS, 1, PlannedTask.Result.RECOMMENDED);
     workflowRoot.registerTaskCriteriaEvaluationResults(
-            TaskType.ANALYSIS, 1, WorkflowModelFixture.johnConnorCriteriaEvaluation());
+        TaskType.ANALYSIS, 1, WorkflowModelFixture.johnConnorCriteriaEvaluation());
     workflowRoot.finishTaskAndAdvance(TaskType.DECISION, 2, PlannedTask.Result.APPROVED);
 
     // then
     assertThat(workflowRoot)
-            .isNotNull()
-            .hasFieldOrPropertyWithValue("customerRequest", kyleReese().toBuilder().build())
-            // TODO Cloningconfiguration.date issue on cloning
-            // .hasFieldOrPropertyWithValue("configuration",
-            // WorkflowConfigurationFixture.sampleTwoTasksConfiguration())
-            .hasFieldOrPropertyWithValue("status", WorkflowStatus.FINISHED)
+        .isNotNull()
+        .hasFieldOrPropertyWithValue("customerRequest", kyleReese().toBuilder().build())
+        // TODO Cloningconfiguration.date issue on cloning
+        // .hasFieldOrPropertyWithValue("configuration",
+        // WorkflowConfigurationFixture.sampleTwoTasksConfiguration())
+        .hasFieldOrPropertyWithValue("status", WorkflowStatus.FINISHED)
         .hasFieldOrPropertyWithValue("result", WorkflowResult.APPROVED)
         .hasNoNullFieldsOrProperties();
 
@@ -83,31 +83,31 @@ class WorkflowRootHappyPathsTest {
                 .value("8.5")
                 .result(PlannedTask.TaskCriteriaResult.Result.APPROVED)
                 .status(PlannedTask.TaskCriteriaResult.Status.MATCHED)
-                    .build(),
-                PlannedTask.TaskCriteriaResult.builder()
-                        .id("crit02")
-                        .value("2")
-                        .result(PlannedTask.TaskCriteriaResult.Result.APPROVED)
-                        .status(PlannedTask.TaskCriteriaResult.Status.MATCHED)
-                        .build());
+                .build(),
+            PlannedTask.TaskCriteriaResult.builder()
+                .id("crit02")
+                .value("2")
+                .result(PlannedTask.TaskCriteriaResult.Result.APPROVED)
+                .status(PlannedTask.TaskCriteriaResult.Status.MATCHED)
+                .build());
 
     assertThat(workflowRoot.getExecutionPlan().getPlannedTasks().get(1).getTaskCriteriaResult())
-            .isEmpty();
+        .isEmpty();
 
     assertThat(workflowRoot.aggregateDomainEvents())
-            .isNotEmpty()
-            .extracting(ApplicationEventWrapper::unwrap)
-            .extracting(domainEvent -> domainEvent)
-            .extracting(Object::getClass)
-            .extracting(Object::toString)
-            .containsExactly(
-                    "class " + WorkflowRootCreated.class.getName(),
-                    "class " + WorkflowRootTaskTriggered.class.getName(),
-                    "class " + WorkflowRootTaskFinished.class.getName(),
-                    "class " + WorkflowRootTaskTriggered.class.getName(),
-                    "class " + WorkflowRootTaskEvaluated.class.getName(),
-                    "class " + WorkflowRootTaskFinished.class.getName(),
-                    "class " + WorkflowRootFinished.class.getName());
+        .isNotEmpty()
+        .extracting(ApplicationEventWrapper::unwrap)
+        .extracting(domainEvent -> domainEvent)
+        .extracting(Object::getClass)
+        .extracting(Object::toString)
+        .containsExactly(
+            "class " + WorkflowRootCreated.class.getName(),
+            "class " + WorkflowRootTaskTriggered.class.getName(),
+            "class " + WorkflowRootTaskFinished.class.getName(),
+            "class " + WorkflowRootTaskTriggered.class.getName(),
+            "class " + WorkflowRootTaskEvaluated.class.getName(),
+            "class " + WorkflowRootTaskFinished.class.getName(),
+            "class " + WorkflowRootFinished.class.getName());
   }
 
   private CustomerRequest kyleReese() {

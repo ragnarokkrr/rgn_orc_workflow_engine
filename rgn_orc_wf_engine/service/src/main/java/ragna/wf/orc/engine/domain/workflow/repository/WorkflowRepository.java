@@ -8,6 +8,6 @@ import reactor.core.publisher.Mono;
 
 @Repository
 public interface WorkflowRepository extends ReactiveMongoRepository<WorkflowRoot, String> {
-    @Query(value = "{ 'customerRequest.id': ?0 }")
-    Mono<WorkflowRoot> findByCustomerRequest(final String customerRequestId);
+  @Query(value = "{ 'customerRequest.id': ?0 }")
+  Mono<WorkflowRoot> findByCustomerRequest(final String customerRequestId);
 }

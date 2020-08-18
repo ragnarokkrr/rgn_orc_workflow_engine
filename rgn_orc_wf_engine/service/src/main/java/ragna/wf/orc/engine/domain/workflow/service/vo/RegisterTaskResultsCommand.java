@@ -18,14 +18,10 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class RegisterTaskResultsCommand {
-  @NotBlank
-  private String workflowId;
-  @NotNull
-  private TaskType taskType;
-  @NotNull
-  private int order;
-  @NotNull
-  private List<TaskCriteriaResult> result;
+  @NotBlank private String workflowId;
+  @NotNull private TaskType taskType;
+  @NotNull private int order;
+  @NotNull private List<TaskCriteriaResult> result;
 
   public enum TaskType {
     ANALYSIS,
@@ -39,16 +35,11 @@ public class RegisterTaskResultsCommand {
   @AllArgsConstructor(access = AccessLevel.PRIVATE)
   public static class TaskCriteriaResult {
     public static final String NO_ERROR = StringUtils.EMPTY;
-    @NotNull
-    private String id;
-    @NotNull
-    private String value;
-    @NotNull
-    private TaskCriteriaResult.Result result;
-    @NotNull
-    private TaskCriteriaResult.Status status;
-    @Builder.Default
-    private String error = NO_ERROR;
+    @NotNull private String id;
+    @NotNull private String value;
+    @NotNull private TaskCriteriaResult.Result result;
+    @NotNull private TaskCriteriaResult.Status status;
+    @Builder.Default private String error = NO_ERROR;
 
     public enum Result {
       APPROVED,

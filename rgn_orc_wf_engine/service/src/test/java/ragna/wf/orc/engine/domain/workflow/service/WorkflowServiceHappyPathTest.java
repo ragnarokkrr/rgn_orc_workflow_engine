@@ -40,241 +40,239 @@ import static org.mockito.Mockito.doReturn;
 @SpringBootTest
 @Import(EmbeddedMongoWithTransactionsConfig.class)
 class WorkflowServiceHappyPathTest {
-    @MockBean
-    private WorkflowMetadataService workflowMetadataService;
+  @MockBean private WorkflowMetadataService workflowMetadataService;
 
-    @Autowired
-    private WorkflowCreationService workflowCreationService;
+  @Autowired private WorkflowCreationService workflowCreationService;
 
-    @Autowired
-    private WorkflowTaskManagementService workflowTaskManagementService;
+  @Autowired private WorkflowTaskManagementService workflowTaskManagementService;
 
-    @Autowired private ReactiveMongoOperations reactiveMongoOperations;
+  @Autowired private ReactiveMongoOperations reactiveMongoOperations;
 
-    @Autowired
-    private WorkflowRepository workflowRepository;
+  @Autowired private WorkflowRepository workflowRepository;
 
-    @BeforeEach
-    void before() {
+  @BeforeEach
+  void before() {
 
-        final var createCollectionFlux = MongoDbUtils.reCreateCollections(this.reactiveMongoOperations);
+    final var createCollectionFlux = MongoDbUtils.reCreateCollections(this.reactiveMongoOperations);
 
-        StepVerifier.create(createCollectionFlux).expectNextCount(MongoDbUtils.getCollectionNames().size()).verifyComplete();
-    }
+    StepVerifier.create(createCollectionFlux)
+        .expectNextCount(MongoDbUtils.getCollectionNames().size())
+        .verifyComplete();
+  }
 
-    @Test
-    void whenWorkflowRootFinishesAndAdvanceAllTasksAndAchieveConclusionState_thenWorkflowIsFinished()
-            throws InterruptedException {
-        // given
-        final var configuration = WorkflowModelFixture.sampleTwoTasksConfiguration();
-        doReturn(Mono.just(ConfigurationMapper.INSTANCE.toService(configuration)))
-                .when(workflowMetadataService)
-                .peekConfigurationForWorkflow(any());
-        final var createWorkflowCommand = ServiceFixtures.kyleReese();
+  @Test
+  void whenWorkflowRootFinishesAndAdvanceAllTasksAndAchieveConclusionState_thenWorkflowIsFinished()
+      throws InterruptedException {
+    // given
+    final var configuration = WorkflowModelFixture.sampleTwoTasksConfiguration();
+    doReturn(Mono.just(ConfigurationMapper.INSTANCE.toService(configuration)))
+        .when(workflowMetadataService)
+        .peekConfigurationForWorkflow(any());
+    final var createWorkflowCommand = ServiceFixtures.kyleReese();
 
-        // when
-        final var createWorkflowMono = workflowCreationService.createWorkflow(createWorkflowCommand);
-        final WorkflowVO[] createdWorkflowVoArray = new WorkflowVO[1];
-        StepVerifier.create(createWorkflowMono)
-                .expectNextMatches(
-                        workflowVO -> {
-                            createdWorkflowVoArray[0] = workflowVO;
-                            return true;
-                        })
-                .verifyComplete();
+    // when
+    final var createWorkflowMono = workflowCreationService.createWorkflow(createWorkflowCommand);
+    final WorkflowVO[] createdWorkflowVoArray = new WorkflowVO[1];
+    StepVerifier.create(createWorkflowMono)
+        .expectNextMatches(
+            workflowVO -> {
+              createdWorkflowVoArray[0] = workflowVO;
+              return true;
+            })
+        .verifyComplete();
 
-        final var createdWorkflowVO = createdWorkflowVoArray[0];
-        final var triggerFirstTaskCommand =
-                TriggerFirstTaskCommand.builder().workflowId(createdWorkflowVO.getId()).build();
+    final var createdWorkflowVO = createdWorkflowVoArray[0];
+    final var triggerFirstTaskCommand =
+        TriggerFirstTaskCommand.builder().workflowId(createdWorkflowVO.getId()).build();
 
-        final var triggerFirstTaskMono =
-                workflowTaskManagementService.triggerFirstTask(triggerFirstTaskCommand);
+    final var triggerFirstTaskMono =
+        workflowTaskManagementService.triggerFirstTask(triggerFirstTaskCommand);
 
-        StepVerifier.create(triggerFirstTaskMono)
-                .expectNextMatches(
-                        workflowVO -> {
-                            assertThat(workflowVO)
-                                    .hasFieldOrPropertyWithValue("id", createdWorkflowVO.getId())
-                                    .hasFieldOrPropertyWithValue("configurationId", configuration.getId())
-                                    .hasFieldOrPropertyWithValue("customerId", createWorkflowCommand.getCustomerId())
-                                    .hasFieldOrPropertyWithValue("customerRequestId", createWorkflowCommand.getId())
-                                    .hasFieldOrPropertyWithValue("result", WorkflowVO.Result.WORKFLOW_ONGOING)
-                                    .hasFieldOrPropertyWithValue("status", WorkflowVO.Status.ORCHESTRATING)
-                                    .hasNoNullFieldsOrProperties()
-                                    .isNotNull();
-                            return true;
-                        })
-                .verifyComplete();
+    StepVerifier.create(triggerFirstTaskMono)
+        .expectNextMatches(
+            workflowVO -> {
+              assertThat(workflowVO)
+                  .hasFieldOrPropertyWithValue("id", createdWorkflowVO.getId())
+                  .hasFieldOrPropertyWithValue("configurationId", configuration.getId())
+                  .hasFieldOrPropertyWithValue("customerId", createWorkflowCommand.getCustomerId())
+                  .hasFieldOrPropertyWithValue("customerRequestId", createWorkflowCommand.getId())
+                  .hasFieldOrPropertyWithValue("result", WorkflowVO.Result.WORKFLOW_ONGOING)
+                  .hasFieldOrPropertyWithValue("status", WorkflowVO.Status.ORCHESTRATING)
+                  .hasNoNullFieldsOrProperties()
+                  .isNotNull();
+              return true;
+            })
+        .verifyComplete();
 
-        final var finishFirstTaskCommand =
-                FinishTaskCommand.builder()
-                        .workflowId(createdWorkflowVO.getId())
-                        .taskType(FinishTaskCommand.TaskType.ANALYSIS)
-                        .order(1)
-                        .result(FinishTaskCommand.Result.RECOMMENDED)
-                        .build();
+    final var finishFirstTaskCommand =
+        FinishTaskCommand.builder()
+            .workflowId(createdWorkflowVO.getId())
+            .taskType(FinishTaskCommand.TaskType.ANALYSIS)
+            .order(1)
+            .result(FinishTaskCommand.Result.RECOMMENDED)
+            .build();
 
-        final var finishFirstTaskAndAdvanceMono =
-                workflowTaskManagementService.finishTaskAndAdvance(finishFirstTaskCommand);
-        StepVerifier.create(finishFirstTaskAndAdvanceMono)
-                .expectNextMatches(
-                        workflowVO -> {
-                            assertThat(workflowVO)
-                                    .hasFieldOrPropertyWithValue("id", createdWorkflowVO.getId())
-                                    .hasFieldOrPropertyWithValue("configurationId", configuration.getId())
-                                    .hasFieldOrPropertyWithValue("customerId", createWorkflowCommand.getCustomerId())
-                                    .hasFieldOrPropertyWithValue("customerRequestId", createWorkflowCommand.getId())
-                                    .hasFieldOrPropertyWithValue("result", WorkflowVO.Result.WORKFLOW_ONGOING)
-                                    .hasFieldOrPropertyWithValue("status", WorkflowVO.Status.ORCHESTRATING)
-                                    .hasNoNullFieldsOrProperties()
-                                    .isNotNull();
-                            return true;
-                        })
-                .verifyComplete();
+    final var finishFirstTaskAndAdvanceMono =
+        workflowTaskManagementService.finishTaskAndAdvance(finishFirstTaskCommand);
+    StepVerifier.create(finishFirstTaskAndAdvanceMono)
+        .expectNextMatches(
+            workflowVO -> {
+              assertThat(workflowVO)
+                  .hasFieldOrPropertyWithValue("id", createdWorkflowVO.getId())
+                  .hasFieldOrPropertyWithValue("configurationId", configuration.getId())
+                  .hasFieldOrPropertyWithValue("customerId", createWorkflowCommand.getCustomerId())
+                  .hasFieldOrPropertyWithValue("customerRequestId", createWorkflowCommand.getId())
+                  .hasFieldOrPropertyWithValue("result", WorkflowVO.Result.WORKFLOW_ONGOING)
+                  .hasFieldOrPropertyWithValue("status", WorkflowVO.Status.ORCHESTRATING)
+                  .hasNoNullFieldsOrProperties()
+                  .isNotNull();
+              return true;
+            })
+        .verifyComplete();
 
-        final var taskCriteriaResults =
-                WorkflowModelFixture.johnConnorCriteriaEvaluation().stream()
-                        .map(RegisterTaskResultsCommandMapper.INSTANCE::toService)
-                        .collect(Collectors.toList());
+    final var taskCriteriaResults =
+        WorkflowModelFixture.johnConnorCriteriaEvaluation().stream()
+            .map(RegisterTaskResultsCommandMapper.INSTANCE::toService)
+            .collect(Collectors.toList());
 
-        final var registerFirsTaskResultsCommand =
-                RegisterTaskResultsCommand.builder()
-                        .workflowId(createdWorkflowVO.getId())
-                        .taskType(RegisterTaskResultsCommand.TaskType.ANALYSIS)
-                        .order(1)
-                        .result(taskCriteriaResults)
-                        .build();
+    final var registerFirsTaskResultsCommand =
+        RegisterTaskResultsCommand.builder()
+            .workflowId(createdWorkflowVO.getId())
+            .taskType(RegisterTaskResultsCommand.TaskType.ANALYSIS)
+            .order(1)
+            .result(taskCriteriaResults)
+            .build();
 
-        final var registerFirstTaskResultsMono =
-                workflowTaskManagementService.registerTaskResult(registerFirsTaskResultsCommand);
-        StepVerifier.create(registerFirstTaskResultsMono)
-                .expectNextMatches(
-                        workflowVO -> {
-                            assertThat(workflowVO)
-                                    .hasFieldOrPropertyWithValue("id", createdWorkflowVO.getId())
-                                    .hasFieldOrPropertyWithValue("configurationId", configuration.getId())
-                                    .hasFieldOrPropertyWithValue("customerId", createWorkflowCommand.getCustomerId())
-                                    .hasFieldOrPropertyWithValue("customerRequestId", createWorkflowCommand.getId())
-                                    .hasFieldOrPropertyWithValue("result", WorkflowVO.Result.WORKFLOW_ONGOING)
-                                    .hasFieldOrPropertyWithValue("status", WorkflowVO.Status.ORCHESTRATING)
-                                    .hasNoNullFieldsOrProperties()
-                                    .isNotNull();
-                            return true;
-                        })
-                .verifyComplete();
+    final var registerFirstTaskResultsMono =
+        workflowTaskManagementService.registerTaskResult(registerFirsTaskResultsCommand);
+    StepVerifier.create(registerFirstTaskResultsMono)
+        .expectNextMatches(
+            workflowVO -> {
+              assertThat(workflowVO)
+                  .hasFieldOrPropertyWithValue("id", createdWorkflowVO.getId())
+                  .hasFieldOrPropertyWithValue("configurationId", configuration.getId())
+                  .hasFieldOrPropertyWithValue("customerId", createWorkflowCommand.getCustomerId())
+                  .hasFieldOrPropertyWithValue("customerRequestId", createWorkflowCommand.getId())
+                  .hasFieldOrPropertyWithValue("result", WorkflowVO.Result.WORKFLOW_ONGOING)
+                  .hasFieldOrPropertyWithValue("status", WorkflowVO.Status.ORCHESTRATING)
+                  .hasNoNullFieldsOrProperties()
+                  .isNotNull();
+              return true;
+            })
+        .verifyComplete();
 
-        final var finishSecondTaskCommand =
-                FinishTaskCommand.builder()
-                        .workflowId(createdWorkflowVO.getId())
-                        .taskType(FinishTaskCommand.TaskType.DECISION)
-                        .order(2)
-                        .result(FinishTaskCommand.Result.APPROVED)
-                        .build();
+    final var finishSecondTaskCommand =
+        FinishTaskCommand.builder()
+            .workflowId(createdWorkflowVO.getId())
+            .taskType(FinishTaskCommand.TaskType.DECISION)
+            .order(2)
+            .result(FinishTaskCommand.Result.APPROVED)
+            .build();
 
-        final var finishSecondTaskAndAdvanceMono =
-                workflowTaskManagementService.finishTaskAndAdvance(finishSecondTaskCommand);
-        StepVerifier.create(finishSecondTaskAndAdvanceMono)
-                .expectNextMatches(
-                        workflowVO -> {
-                            assertThat(workflowVO)
-                                    .hasFieldOrPropertyWithValue("id", createdWorkflowVO.getId())
-                                    .hasFieldOrPropertyWithValue("configurationId", configuration.getId())
-                                    .hasFieldOrPropertyWithValue("customerId", createWorkflowCommand.getCustomerId())
-                                    .hasFieldOrPropertyWithValue("customerRequestId", createWorkflowCommand.getId())
-                                    .hasFieldOrPropertyWithValue("result", WorkflowVO.Result.APPROVED)
-                                    .hasFieldOrPropertyWithValue("status", WorkflowVO.Status.FINISHED)
-                                    .hasNoNullFieldsOrProperties()
-                                    .isNotNull();
-                            return true;
-                        })
-                .verifyComplete();
+    final var finishSecondTaskAndAdvanceMono =
+        workflowTaskManagementService.finishTaskAndAdvance(finishSecondTaskCommand);
+    StepVerifier.create(finishSecondTaskAndAdvanceMono)
+        .expectNextMatches(
+            workflowVO -> {
+              assertThat(workflowVO)
+                  .hasFieldOrPropertyWithValue("id", createdWorkflowVO.getId())
+                  .hasFieldOrPropertyWithValue("configurationId", configuration.getId())
+                  .hasFieldOrPropertyWithValue("customerId", createWorkflowCommand.getCustomerId())
+                  .hasFieldOrPropertyWithValue("customerRequestId", createWorkflowCommand.getId())
+                  .hasFieldOrPropertyWithValue("result", WorkflowVO.Result.APPROVED)
+                  .hasFieldOrPropertyWithValue("status", WorkflowVO.Status.FINISHED)
+                  .hasNoNullFieldsOrProperties()
+                  .isNotNull();
+              return true;
+            })
+        .verifyComplete();
 
-        final var workflowRepositoryByIdMono = workflowRepository.findById(createdWorkflowVO.getId());
-        StepVerifier.create(workflowRepositoryByIdMono)
-                .expectNextMatches(
-                        workflowRoot -> {
-                            // TODO assertions
-                            System.out.println(workflowRoot);
-                            assertThat(workflowRoot)
-                                    .isNotNull()
-                                    // .hasFieldOrPropertyWithValue("customerRequest", WorkflowModelFixture.)
-                                    // TODO Cloningconfiguration.date issue on cloning
-                                    // .hasFieldOrPropertyWithValue("configuration",
-                                    // WorkflowConfigurationFixture.sampleTwoTasksConfiguration())
-                                    .hasFieldOrPropertyWithValue("status", WorkflowStatus.FINISHED)
-                                    .hasFieldOrPropertyWithValue("result", WorkflowResult.APPROVED)
-                                    .hasNoNullFieldsOrProperties();
+    final var workflowRepositoryByIdMono = workflowRepository.findById(createdWorkflowVO.getId());
+    StepVerifier.create(workflowRepositoryByIdMono)
+        .expectNextMatches(
+            workflowRoot -> {
+              // TODO assertions
+              System.out.println(workflowRoot);
+              assertThat(workflowRoot)
+                  .isNotNull()
+                  // .hasFieldOrPropertyWithValue("customerRequest", WorkflowModelFixture.)
+                  // TODO Cloningconfiguration.date issue on cloning
+                  // .hasFieldOrPropertyWithValue("configuration",
+                  // WorkflowConfigurationFixture.sampleTwoTasksConfiguration())
+                  .hasFieldOrPropertyWithValue("status", WorkflowStatus.FINISHED)
+                  .hasFieldOrPropertyWithValue("result", WorkflowResult.APPROVED)
+                  .hasNoNullFieldsOrProperties();
 
-                            assertThat(workflowRoot.getExecutionPlan()).hasNoNullFieldsOrProperties();
+              assertThat(workflowRoot.getExecutionPlan()).hasNoNullFieldsOrProperties();
 
-                            assertThat(workflowRoot.getExecutionPlan().getPlannedTasks())
-                                    .extracting(PlannedTask::getEvaluatedOn)
-                                    .filteredOn(Objects::isNull)
-                                    .hasSize(1);
+              assertThat(workflowRoot.getExecutionPlan().getPlannedTasks())
+                  .extracting(PlannedTask::getEvaluatedOn)
+                  .filteredOn(Objects::isNull)
+                  .hasSize(1);
 
-                            assertThat(workflowRoot.getExecutionPlan().getPlannedTasks())
-                                    .extracting(PlannedTask::getEvaluatedOn)
-                                    .filteredOn(Objects::nonNull)
-                                    .hasSize(1);
+              assertThat(workflowRoot.getExecutionPlan().getPlannedTasks())
+                  .extracting(PlannedTask::getEvaluatedOn)
+                  .filteredOn(Objects::nonNull)
+                  .hasSize(1);
 
-                            assertThat(workflowRoot.getExecutionPlan().getPlannedTasks())
-                                    .extracting(PlannedTask::getFinishedOn)
-                                    .filteredOn(Objects::nonNull)
-                                    .hasSize(2);
+              assertThat(workflowRoot.getExecutionPlan().getPlannedTasks())
+                  .extracting(PlannedTask::getFinishedOn)
+                  .filteredOn(Objects::nonNull)
+                  .hasSize(2);
 
-                            assertThat(workflowRoot.getExecutionPlan().getPlannedTasks())
-                                    .extracting(PlannedTask::getStatus)
-                                    .contains(PlannedTask.Status.CONCLUDED, PlannedTask.Status.CONCLUDED);
+              assertThat(workflowRoot.getExecutionPlan().getPlannedTasks())
+                  .extracting(PlannedTask::getStatus)
+                  .contains(PlannedTask.Status.CONCLUDED, PlannedTask.Status.CONCLUDED);
 
-                            assertThat(workflowRoot.getExecutionPlan().getPlannedTasks())
-                                    .extracting(PlannedTask::getResult)
-                                    .contains(PlannedTask.Result.RECOMMENDED, PlannedTask.Result.APPROVED);
+              assertThat(workflowRoot.getExecutionPlan().getPlannedTasks())
+                  .extracting(PlannedTask::getResult)
+                  .contains(PlannedTask.Result.RECOMMENDED, PlannedTask.Result.APPROVED);
 
-                            assertThat(workflowRoot.getExecutionPlan().getPlannedTasks())
-                                    .extracting(PlannedTask::getTaskType)
-                                    .contains(TaskType.ANALYSIS, TaskType.DECISION);
+              assertThat(workflowRoot.getExecutionPlan().getPlannedTasks())
+                  .extracting(PlannedTask::getTaskType)
+                  .contains(TaskType.ANALYSIS, TaskType.DECISION);
 
-                            assertThat(workflowRoot.getExecutionPlan().getPlannedTasks())
-                                    .extracting(PlannedTask::getOrder)
-                                    .contains(1, 2);
+              assertThat(workflowRoot.getExecutionPlan().getPlannedTasks())
+                  .extracting(PlannedTask::getOrder)
+                  .contains(1, 2);
 
-                            assertThat(
-                                    workflowRoot
-                                            .getExecutionPlan()
-                                            .getPlannedTasks()
-                                            .get(0)
-                                            .getTaskCriteriaResult())
-                                    .containsKeys("crit01", "crit02");
-                            assertThat(
-                                    workflowRoot
-                                            .getExecutionPlan()
-                                            .getPlannedTasks()
-                                            .get(0)
-                                            .getTaskCriteriaResult())
-                                    .containsValues(
-                                            PlannedTask.TaskCriteriaResult.builder()
-                                                    .id("crit01")
-                                                    .value("8.5")
-                                                    .result(PlannedTask.TaskCriteriaResult.Result.APPROVED)
-                                                    .status(PlannedTask.TaskCriteriaResult.Status.MATCHED)
-                                                    .build(),
-                                            PlannedTask.TaskCriteriaResult.builder()
-                                                    .id("crit02")
-                                                    .value("2")
-                                                    .result(PlannedTask.TaskCriteriaResult.Result.APPROVED)
-                                                    .status(PlannedTask.TaskCriteriaResult.Status.MATCHED)
-                                                    .build());
+              assertThat(
+                      workflowRoot
+                          .getExecutionPlan()
+                          .getPlannedTasks()
+                          .get(0)
+                          .getTaskCriteriaResult())
+                  .containsKeys("crit01", "crit02");
+              assertThat(
+                      workflowRoot
+                          .getExecutionPlan()
+                          .getPlannedTasks()
+                          .get(0)
+                          .getTaskCriteriaResult())
+                  .containsValues(
+                      PlannedTask.TaskCriteriaResult.builder()
+                          .id("crit01")
+                          .value("8.5")
+                          .result(PlannedTask.TaskCriteriaResult.Result.APPROVED)
+                          .status(PlannedTask.TaskCriteriaResult.Status.MATCHED)
+                          .build(),
+                      PlannedTask.TaskCriteriaResult.builder()
+                          .id("crit02")
+                          .value("2")
+                          .result(PlannedTask.TaskCriteriaResult.Result.APPROVED)
+                          .status(PlannedTask.TaskCriteriaResult.Status.MATCHED)
+                          .build());
 
-                            assertThat(
-                                    workflowRoot
-                                            .getExecutionPlan()
-                                            .getPlannedTasks()
-                                            .get(1)
-                                            .getTaskCriteriaResult())
-                                    .isEmpty();
+              assertThat(
+                      workflowRoot
+                          .getExecutionPlan()
+                          .getPlannedTasks()
+                          .get(1)
+                          .getTaskCriteriaResult())
+                  .isEmpty();
 
-                            return true;
-                        })
-                .verifyComplete();
-    }
+              return true;
+            })
+        .verifyComplete();
+  }
 }

@@ -7,18 +7,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 public final class WorkflowModelFixture {
-    private WorkflowModelFixture() {
-    }
+  private WorkflowModelFixture() {}
 
-    public static Configuration sampleTwoTasksConfiguration() {
-        return Configuration.builder()
-                .id("configId-1")
-                // Kryo serialization problems with immutable collections
-                .configuredTasks(
-                        new ArrayList<>(
-                                List.of(
-                                        ConfiguredTask.builder()
-                                                .order(1)
+  public static Configuration sampleTwoTasksConfiguration() {
+    return Configuration.builder()
+        .id("configId-1")
+        // Kryo serialization problems with immutable collections
+        .configuredTasks(
+            new ArrayList<>(
+                List.of(
+                    ConfiguredTask.builder()
+                        .order(1)
                         .taskType(TaskType.ANALYSIS)
                         .description("John Connor analysis")
                         .taskResponsible(

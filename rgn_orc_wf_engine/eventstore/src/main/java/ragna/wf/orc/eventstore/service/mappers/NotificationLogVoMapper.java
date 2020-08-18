@@ -13,5 +13,5 @@ public interface NotificationLogVoMapper {
   NotificationLogVo.NotificationVo.StoredEventStatus toService(StoredEventStatus storedEventStatus);
 
   NotificationLogVo.NotificationVo.SerializationEngine toService(
-          SerializationEngine serializationEngine);
+      SerializationEngine serializationEngine);
 }

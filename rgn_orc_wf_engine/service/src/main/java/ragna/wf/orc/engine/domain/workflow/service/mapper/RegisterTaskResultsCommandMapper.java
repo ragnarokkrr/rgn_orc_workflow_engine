@@ -9,12 +9,12 @@ import ragna.wf.orc.engine.domain.workflow.service.vo.RegisterTaskResultsCommand
 @Mapper
 public interface RegisterTaskResultsCommandMapper {
   RegisterTaskResultsCommandMapper INSTANCE =
-          Mappers.getMapper(RegisterTaskResultsCommandMapper.class);
+      Mappers.getMapper(RegisterTaskResultsCommandMapper.class);
 
   TaskType toModel(RegisterTaskResultsCommand.TaskType taskType);
 
   TaskCriteriaEvaluationCommand toModel(RegisterTaskResultsCommand.TaskCriteriaResult result);
 
   RegisterTaskResultsCommand.TaskCriteriaResult toService(
-          TaskCriteriaEvaluationCommand taskCriteriaEvaluationCommand);
+      TaskCriteriaEvaluationCommand taskCriteriaEvaluationCommand);
 }

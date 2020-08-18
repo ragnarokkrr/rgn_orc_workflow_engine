@@ -5,5 +5,4 @@ import org.springframework.context.annotation.Import;
 
 @Configuration
 @Import(ragna.wf.orc.eventstore.config.EventStoreConfiguration.class)
-public class EventStoreConfiguration {
-}
+public class EventStoreConfiguration {}

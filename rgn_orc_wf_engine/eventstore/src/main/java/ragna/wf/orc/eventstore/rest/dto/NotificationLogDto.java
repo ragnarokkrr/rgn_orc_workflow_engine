@@ -15,8 +15,7 @@ import java.util.List;
 @Builder
 public class NotificationLogDto {
   private String notificationId;
-  @Builder.Default
-  private List<NotificationDto> notifications = new ArrayList<>();
+  @Builder.Default private List<NotificationDto> notifications = new ArrayList<>();
   private String next;
   private String previous;
   private Boolean archived;

@@ -12,6 +12,5 @@ import javax.validation.constraints.NotBlank;
 @NoArgsConstructor
 @Builder
 public class TriggerFirstTaskCommand {
-  @NotBlank
-  private String workflowId;
+  @NotBlank private String workflowId;
 }

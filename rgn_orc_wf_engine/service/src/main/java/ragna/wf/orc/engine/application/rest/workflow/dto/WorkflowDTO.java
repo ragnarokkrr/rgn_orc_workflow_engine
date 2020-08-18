@@ -11,29 +11,28 @@ import java.time.LocalDateTime;
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
 @AllArgsConstructor(access = AccessLevel.PUBLIC)
 public class WorkflowDTO {
-    private String id;
-    private String configurationId;
-    private String customerId;
-    private String customerRequestId;
-    private Result result;
-    private Status status;
-    private LocalDateTime createdOn;
-    private LocalDateTime updatedOn;
+  private String id;
+  private String configurationId;
+  private String customerId;
+  private String customerRequestId;
+  private Result result;
+  private Status status;
+  private LocalDateTime createdOn;
+  private LocalDateTime updatedOn;
 
-    public enum Result {
-        WORKFLOW_ONGOING,
-        APPROVED,
-        DISAPPROVED,
-        UNKNOWN_RESULT,
-        ERROR
-    }
+  public enum Result {
+    WORKFLOW_ONGOING,
+    APPROVED,
+    DISAPPROVED,
+    UNKNOWN_RESULT,
+    ERROR
+  }
 
-    public enum Status {
-        INSTANTIATED,
-        CONFIGURED,
-        ORCHESTRATING,
-        FINISHED,
-        CANCELLED
-    }
-
+  public enum Status {
+    INSTANTIATED,
+    CONFIGURED,
+    ORCHESTRATING,
+    FINISHED,
+    CANCELLED
+  }
 }
