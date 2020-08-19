@@ -10,6 +10,8 @@ import org.springframework.transaction.reactive.TransactionalOperator;
 import ragna.wf.orc.common.events.DomainEvent;
 import ragna.wf.orc.eventstore.model.StoredEvent;
 import ragna.wf.orc.eventstore.repository.StoredEventRepository;
+import ragna.wf.orc.eventstore.service.mappers.StoredEventMapper;
+import ragna.wf.orc.eventstore.service.vo.StoredEventVo;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -22,7 +24,7 @@ public class EventStoreService {
   private final TransactionalOperator transactionalOperator;
 
   @Transactional
-  public Mono<StoredEvent> append(final DomainEvent domainEvent) {
+  public Mono<StoredEventVo> append(final DomainEvent domainEvent) {
     LOGGER.info().log("appending to event store: {}", domainEvent);
     final var objectId = domainEvent.getObjectId();
     final var typeName = domainEvent.getEventName();
@@ -37,6 +39,7 @@ public class EventStoreService {
                     payload,
                     domainEvent.getTimestamp(),
                     eventSerializationDelegate.getSerializationEngine()))
+            .map(StoredEventMapper.INSTANCE::toService)
             .doOnError(throwable -> LOGGER.error().log("Error on StoredEvent stored!", throwable))
             .doOnNext(
                 storedEvent ->

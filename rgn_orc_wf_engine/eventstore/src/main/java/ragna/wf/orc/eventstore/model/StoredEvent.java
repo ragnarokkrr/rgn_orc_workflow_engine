@@ -55,6 +55,18 @@ public class StoredEvent {
     return new StoredEvent(objectId, typedName, payload, occurredOn, serializationEngine);
   }
 
+  public StoredEvent processing() {
+    this.processingOn = LocalDateTime.now();
+    this.eventStatus = StoredEventStatus.PROCESSING;
+    return this;
+  }
+
+  public StoredEvent processed() {
+    this.processingOn = LocalDateTime.now();
+    this.eventStatus = StoredEventStatus.PROCESSED;
+    return this;
+  }
+
   public String shortToString() {
     return new StringJoiner(", ", StoredEvent.class.getSimpleName() + "[", "]")
         .add("id=" + id)

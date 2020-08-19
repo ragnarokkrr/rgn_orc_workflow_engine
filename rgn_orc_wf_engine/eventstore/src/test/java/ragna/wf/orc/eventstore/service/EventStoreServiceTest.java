@@ -17,9 +17,9 @@ import ragna.wf.orc.common.data.mongodb.utils.MongoDbUtils;
 import ragna.wf.orc.common.events.DomainEvent;
 import ragna.wf.orc.eventstore.EventStoreTestApplication;
 import ragna.wf.orc.eventstore.config.EmbeddedMongoWithTransactionsConfig;
-import ragna.wf.orc.eventstore.model.StoredEvent;
 import ragna.wf.orc.eventstore.model.StoredEventStatus;
 import ragna.wf.orc.eventstore.repository.StoredEventRepository;
+import ragna.wf.orc.eventstore.service.vo.StoredEventVo;
 import reactor.test.StepVerifier;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -53,7 +53,7 @@ public class EventStoreServiceTest {
     final var serializedEvent = eventSerializationDelegate.serializeEvent(personEvent);
 
     // when
-    final var savedStoredEvent = new StoredEvent[1];
+    final var savedStoredEvent = new StoredEventVo[1];
     final var storedEventSaveMono = eventStoreService.append(personEvent);
     StepVerifier.create(storedEventSaveMono)
         .expectNextMatches(

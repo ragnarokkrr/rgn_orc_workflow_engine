@@ -3,17 +3,15 @@ package ragna.wf.orc.eventstore.service.vo;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.Id;
-import ragna.wf.orc.eventstore.model.SerializationEngine;
-import ragna.wf.orc.eventstore.model.StoredEventStatus;
 
 import java.time.LocalDateTime;
+import java.util.StringJoiner;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class StoredEventVo {
-  @Id private Long id;
+  private Long id;
   private String objectId;
   private String typedName;
   private byte[] payload;
@@ -22,4 +20,29 @@ public class StoredEventVo {
   private LocalDateTime processedOn;
   private StoredEventStatus eventStatus;
   private SerializationEngine serializationEngine;
+
+  public String shortToString() {
+    return new StringJoiner(", ", StoredEventVo.class.getSimpleName() + "[", "]")
+        .add("id=" + id)
+        .add("objectId='" + objectId + "'")
+        .add("typedName='" + typedName + "'")
+        .add("eventStatus=" + eventStatus)
+        .add("occurredOn=" + occurredOn)
+        .add("processingOn=" + processingOn)
+        .add("processedOn=" + processedOn)
+        .toString();
+  }
+
+  public enum StoredEventStatus {
+    UNPROCESSED,
+    PROCESSING,
+    PROCESSED,
+    PUBLISHED,
+    UNPUBLISHED,
+    FAILED
+  }
+
+  public enum SerializationEngine {
+    KRYO
+  }
 }
