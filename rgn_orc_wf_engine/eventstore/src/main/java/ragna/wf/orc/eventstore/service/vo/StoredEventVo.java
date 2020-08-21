@@ -33,6 +33,12 @@ public class StoredEventVo {
         .toString();
   }
 
+  public StoredEventVo processed() {
+    this.eventStatus = StoredEventStatus.PROCESSED;
+    this.processedOn = LocalDateTime.now();
+    return this;
+  }
+
   public enum StoredEventStatus {
     UNPROCESSED,
     PROCESSING,

@@ -6,10 +6,11 @@ import org.fissore.slf4j.FluentLoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ragna.wf.orc.common.events.DomainEvent;
-import ragna.wf.orc.eventstore.model.StoredEvent;
 import ragna.wf.orc.eventstore.service.EventStoreService;
+import ragna.wf.orc.eventstore.service.vo.StoredEventVo;
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.ReplayProcessor;
+import reactor.core.scheduler.Schedulers;
 
 import javax.annotation.PostConstruct;
 
@@ -28,6 +29,7 @@ public class EventStoreAppenderHandler {
     domainEventReplayProcessor
         .doOnNext(domainEvent -> LOGGER.info().log("Appending event to EventStore {}", domainEvent))
         .flatMap(this::handleDomainEvent)
+        .subscribeOn(Schedulers.newElastic("DomainEventDispatcher", 3))
         .subscribe(
             domainEvent ->
                 LOGGER.info().log("Finish appending event to EventStore {}", domainEvent));
@@ -52,7 +54,7 @@ public class EventStoreAppenderHandler {
                         throwable.getMessage()));
   }
 
-  private Mono<StoredEvent> appendToEventStore(final DomainEvent domainEvent) {
+  private Mono<StoredEventVo> appendToEventStore(final DomainEvent domainEvent) {
     return this.eventStoreService
         .append(domainEvent)
         .doOnSuccess(event -> LOGGER.debug().log("Domain event stored: {}", event.shortToString()));

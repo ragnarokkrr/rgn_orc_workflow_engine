@@ -61,16 +61,21 @@ http://localhost:8080/swagger-ui/index.html
 ### docker compose
 
 ```
-$ docker-compose up 
+$ docker-compose up
+$ docker-compose restart orc_mongo_express
+ 
 ```
+
 
 #### mongodb init
-```
-$ winpty docker exec -it orc_mongodb mongo
+Mongo init script is not running in docker desktop. It should be run in a bash terminal.
 
-# rs.initiate({_id: 'repDB', member: [{_id:0, host:'orc_mongodb', arbiterOnly:true}]})
-# rs.slaveOk()
-# rs.initiate()
+```
+$ docker-compose up --build orc_mongodb
+$ winpty docker exec -it orc_mongodb bash
+
+# cd docker-entrypoint-initdb.d/
+# ./mongo-init.sh
 
 ```
 #### Mongo Express
@@ -101,8 +106,12 @@ In application startup params
     * [Spring Boot Auto-configuration for Embedded MongoDB with Support for Transactions](https://apisimulator.io/spring-boot-auto-configuration-embedded-mongodb-transactions/)
 * Spring Webflux / Reactor
     * [Project Reactor expand method](https://www.javacodegeeks.com/2020/02/project-reactor-expand-method.html)
+    * [How to use Processor in Java's Reactor](https://ducmanhphan.github.io/2019-08-25-How-to-use-Processor-in-Reactor-Java/#topicprocessor)
 * Gradle
     * [easy reuse of test artifacts](https://stackoverflow.com/questions/5644011/multi-project-test-dependencies-with-gradle/60138176#60138176)
+* Microservices / DDD
+    * [Microservices Patterns: With examples in Java](https://www.amazon.com/Microservices-Patterns-examples-Chris-Richardson/dp/1617294543/ref=sr_1_1?crid=3M34XT81XSEAB&dchild=1&keywords=microservices+patterns&qid=1597881668&s=books&sprefix=microservices+p%2Caps%2C233&sr=1-1)
+    * [Implementing Domain-Driven Design](https://www.amazon.com/Implementing-Domain-Driven-Design-Vaughn-Vernon-ebook/dp/B00BCLEBN8/ref=sr_1_2?crid=2HLI0BW7SN70O&dchild=1&keywords=domain+driven+design&qid=1597881752&s=books&sprefix=domain+%2Cstripbooks-intl-ship%2C250&sr=1-2)
 * CDC
     * https://hub.docker.com/r/debezium/example-mongodb
     * https://github.com/debezium/docker-images/blob/master/examples/mongodb/0.10/init-inventory.sh

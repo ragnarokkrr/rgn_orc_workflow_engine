@@ -54,4 +54,11 @@ public class EventStoreService {
   private byte[] serializeEvent(final DomainEvent sourceObject) {
     return eventSerializationDelegate.serializeEvent(sourceObject);
   }
+
+  public Mono<StoredEventVo> processed(final StoredEventVo storedEventVo) {
+    return Mono.just(storedEventVo.processed())
+        .map(StoredEventMapper.INSTANCE::toModel)
+        .flatMap(storedEventRepository::save)
+        .map(StoredEventMapper.INSTANCE::toService);
+  }
 }
