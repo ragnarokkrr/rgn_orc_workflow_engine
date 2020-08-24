@@ -5,7 +5,7 @@ import org.fissore.slf4j.FluentLogger;
 import org.fissore.slf4j.FluentLoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import ragna.wf.orc.engine.infrastructure.storedevents.replay.vo.SecondaryReplayContextVo;
+import ragna.wf.orc.engine.infrastructure.storedevents.replay.secondary.vo.SecondaryReplayContextVo;
 import reactor.core.publisher.ReplayProcessor;
 import reactor.core.scheduler.Schedulers;
 

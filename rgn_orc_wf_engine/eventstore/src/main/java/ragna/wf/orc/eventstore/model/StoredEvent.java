@@ -20,6 +20,7 @@ public class StoredEvent {
   private String objectId;
   private String typedName;
   private byte[] payload;
+  private String errorMessage;
   private LocalDateTime occurredOn;
   private LocalDateTime processingOn;
   private LocalDateTime processedOn;
@@ -64,6 +65,25 @@ public class StoredEvent {
   public StoredEvent processed() {
     this.processingOn = LocalDateTime.now();
     this.eventStatus = StoredEventStatus.PROCESSED;
+    return this;
+  }
+
+  public StoredEvent published() {
+    this.processedOn = LocalDateTime.now();
+    this.eventStatus = StoredEventStatus.PUBLISHED;
+    return this;
+  }
+
+  public StoredEvent unpublished() {
+    this.processedOn = LocalDateTime.now();
+    this.eventStatus = StoredEventStatus.UNPUBLISHED;
+    return this;
+  }
+
+  public StoredEvent failed(final String message) {
+    this.errorMessage = message;
+    this.processedOn = LocalDateTime.now();
+    this.eventStatus = StoredEventStatus.FAILED;
     return this;
   }
 

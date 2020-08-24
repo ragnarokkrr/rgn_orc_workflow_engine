@@ -3,6 +3,7 @@ package ragna.wf.orc.eventstore.service.vo;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import ragna.wf.orc.common.events.DomainEvent;
 
 import java.time.LocalDateTime;
 import java.util.StringJoiner;
@@ -15,6 +16,7 @@ public class StoredEventVo {
   private String objectId;
   private String typedName;
   private byte[] payload;
+  private DomainEvent domainEvent;
   private LocalDateTime occurredOn;
   private LocalDateTime processingOn;
   private LocalDateTime processedOn;

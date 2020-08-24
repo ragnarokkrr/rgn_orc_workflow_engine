@@ -1,4 +1,4 @@
-package ragna.wf.orc.engine.infrastructure.storedevents.replay.vo;
+package ragna.wf.orc.engine.infrastructure.storedevents.replay.secondary.vo;
 
 import lombok.AccessLevel;
 import lombok.Data;

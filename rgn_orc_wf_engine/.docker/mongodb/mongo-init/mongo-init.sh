@@ -7,6 +7,7 @@ mongo localhost:27017/$MONGO_INITDB_DATABASE <<-EOF
         _id: "repDB",
         members: [ { _id: 0, host: "${HOSTNAME}:27017" } ]
     });
+    rs.slaveOk();
 EOF
 echo "Initiated replica set"
 

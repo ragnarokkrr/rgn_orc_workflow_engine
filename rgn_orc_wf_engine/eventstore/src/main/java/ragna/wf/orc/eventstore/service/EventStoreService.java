@@ -1,6 +1,7 @@
 package ragna.wf.orc.eventstore.service;
 
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.fissore.slf4j.FluentLogger;
 import org.fissore.slf4j.FluentLoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,12 +9,17 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.reactive.TransactionalOperator;
 import ragna.wf.orc.common.events.DomainEvent;
+import ragna.wf.orc.common.exceptions.eventstore.EventStoreException;
 import ragna.wf.orc.eventstore.model.StoredEvent;
+import ragna.wf.orc.eventstore.model.StoredEventStatus;
 import ragna.wf.orc.eventstore.repository.StoredEventRepository;
 import ragna.wf.orc.eventstore.service.mappers.StoredEventMapper;
 import ragna.wf.orc.eventstore.service.vo.StoredEventVo;
+import ragna.wf.orc.eventstore.service.vo.UpdateStoredEventCommand;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import java.util.Arrays;
 
 @Service
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
@@ -55,10 +61,26 @@ public class EventStoreService {
     return eventSerializationDelegate.serializeEvent(sourceObject);
   }
 
-  public Mono<StoredEventVo> processed(final StoredEventVo storedEventVo) {
-    return Mono.just(storedEventVo.processed())
-        .map(StoredEventMapper.INSTANCE::toModel)
+  @Transactional
+  public Mono<StoredEventVo> updateStatus(final UpdateStoredEventCommand updateStoredEventCommand) {
+
+    return storedEventRepository
+        .findById(updateStoredEventCommand.getId())
+        .map(
+            storedEvent ->
+                this.updateStoredEventStatus(storedEvent, updateStoredEventCommand))
         .flatMap(storedEventRepository::save)
         .map(StoredEventMapper.INSTANCE::toService);
+  }
+
+  private StoredEvent updateStoredEventStatus(
+      final StoredEvent storedEvent, final UpdateStoredEventCommand updateStoredEventCommand) {
+
+    return switch (updateStoredEventCommand.getTargetState()) {
+      case PROCESSED -> storedEvent.processed();
+      case PUBLISHED -> storedEvent.published();
+      case UNPUBLISHED -> storedEvent.unpublished();
+      case FAILED -> storedEvent.failed(updateStoredEventCommand.getMessage());
+    };
   }
 }

@@ -68,7 +68,7 @@ $ docker-compose restart orc_mongo_express
 
 
 #### mongodb init
-Mongo init script is not running in docker desktop. It should be run in a bash terminal.
+Mongo init script is not running in docker desktop. It should be run in a bash terminal. (https://github.com/docker-library/mongo/issues/291)
 
 ```
 $ docker-compose up --build orc_mongodb
