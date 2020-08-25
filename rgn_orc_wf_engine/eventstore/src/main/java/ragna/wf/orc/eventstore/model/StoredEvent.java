@@ -87,7 +87,7 @@ public class StoredEvent {
     return this;
   }
 
-  public String shortToString() {
+  public String toString() {
     return new StringJoiner(", ", StoredEvent.class.getSimpleName() + "[", "]")
         .add("id=" + id)
         .add("objectId='" + objectId + "'")

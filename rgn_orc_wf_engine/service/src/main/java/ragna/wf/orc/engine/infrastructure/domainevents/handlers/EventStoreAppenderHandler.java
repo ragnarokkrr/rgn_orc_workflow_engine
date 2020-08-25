@@ -57,6 +57,6 @@ public class EventStoreAppenderHandler {
   private Mono<StoredEventVo> appendToEventStore(final DomainEvent domainEvent) {
     return this.eventStoreService
         .append(domainEvent)
-        .doOnSuccess(event -> LOGGER.debug().log("Domain event stored: {}", event.shortToString()));
+        .doOnSuccess(event -> LOGGER.debug().log("Domain event stored: {}", event));
   }
 }

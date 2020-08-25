@@ -73,10 +73,7 @@ public class StoredEventPollingMongoRepository implements StoreEventPollingRepos
         .doOnSubscribe(subscription -> LOGGER.trace().log("Stored Event TX poll: subscribed!"))
         .doOnNext(
             storedEvent ->
-                LOGGER
-                    .trace()
-                    .log(
-                        "Stored Event TX poll: Found StoredEvent: {}", storedEvent.shortToString()))
+                LOGGER.trace().log("Stored Event TX poll: Found StoredEvent: {}", storedEvent))
         .doOnError(throwable -> LOGGER.error().log("Stored Event TX poll ERROR", throwable));
   }
 }

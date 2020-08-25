@@ -34,11 +34,7 @@ public class StoredEventReplayService {
 
   private StoredEventVo dispatchEvent(final StoredEventVo storedEventVo) {
     mainReplayContextVoReplay.onNext(MainReplayContextVo.createContext(storedEventVo));
-    LOGGER
-        .info()
-        .log(
-            "Stored Event {} dispatched to [mainReplayContextVoReplay]",
-            storedEventVo.shortToString());
+    LOGGER.info().log("Stored Event {} dispatched to [mainReplayContextVoReplay]", storedEventVo);
     return storedEventVo;
   }
 }

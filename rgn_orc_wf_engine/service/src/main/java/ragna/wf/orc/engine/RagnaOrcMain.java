@@ -27,7 +27,7 @@ public class RagnaOrcMain {
   @Bean
   CommandLineRunner preLoadMongo() throws Exception {
     return args -> {
-      LOGGER.info().log("INITILIZING DB");
+      LOGGER.info().log("INITIALIZING DB");
       final MongoDatabase adminDatabase = mongoClient.getDatabase("admin");
       adminDatabase
           .runCommand(new Document("setFeatureCompatibilityVersion", "4.0"))
@@ -37,7 +37,7 @@ public class RagnaOrcMain {
           .runCommand(
               new Document().append("featureCompatibilityVersion", 1).append("getParameter", 1))
           .subscribe(new SubscriberHelpers.PrintDocumentSubscriber());
-      LOGGER.info().log("INITILIZING DB - done!");
+      LOGGER.info().log("INITIALIZING DB - done!");
       TimeUnit.SECONDS.sleep(3);
     };
   }

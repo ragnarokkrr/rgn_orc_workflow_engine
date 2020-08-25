@@ -14,7 +14,8 @@ import javax.annotation.PostConstruct;
 @Component
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class SecondaryReplayService {
-  private static final FluentLogger LOGGER = FluentLoggerFactory.getLogger(SecondaryReplayService.class);
+  private static final FluentLogger LOGGER =
+      FluentLoggerFactory.getLogger(SecondaryReplayService.class);
   final ReplayProcessor<SecondaryReplayContextVo> secondaryReplayContextVoReplayProcessor;
 
   @PostConstruct
@@ -24,9 +25,7 @@ public class SecondaryReplayService {
             secondaryReplayContextVo ->
                 LOGGER
                     .info()
-                    .log(
-                        "SecondaryReplay => {}",
-                        secondaryReplayContextVo.getStoredEventVo().shortToString()))
+                    .log("SecondaryReplay => {}", secondaryReplayContextVo.getStoredEventVo()))
         .subscribeOn(Schedulers.newElastic("SecondaryReplay", 3))
         .subscribe();
   }

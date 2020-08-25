@@ -16,6 +16,7 @@ public class StoredEventVo {
   private String objectId;
   private String typedName;
   private byte[] payload;
+  private String errorMessage;
   private DomainEvent domainEvent;
   private LocalDateTime occurredOn;
   private LocalDateTime processingOn;
@@ -23,7 +24,7 @@ public class StoredEventVo {
   private StoredEventStatus eventStatus;
   private SerializationEngine serializationEngine;
 
-  public String shortToString() {
+  public String toString() {
     return new StringJoiner(", ", StoredEventVo.class.getSimpleName() + "[", "]")
         .add("id=" + id)
         .add("objectId='" + objectId + "'")

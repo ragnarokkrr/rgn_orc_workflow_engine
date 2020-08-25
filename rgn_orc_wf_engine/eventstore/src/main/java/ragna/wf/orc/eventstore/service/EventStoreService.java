@@ -49,7 +49,7 @@ public class EventStoreService {
             .doOnError(throwable -> LOGGER.error().log("Error on StoredEvent stored!", throwable))
             .doOnNext(
                 storedEvent ->
-                    LOGGER.info().log("StoredEvent stored! {}", storedEvent.shortToString()));
+                    LOGGER.info().log("StoredEvent stored! {}", storedEvent));
     return this.transactionalOperator.transactional(saveStoredEventMono);
   }
 
