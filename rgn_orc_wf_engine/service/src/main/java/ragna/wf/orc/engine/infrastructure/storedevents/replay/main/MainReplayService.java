@@ -30,18 +30,23 @@ public class MainReplayService {
   @PostConstruct
   void init() {
     mainReplayContextVoReplayProcessor
-        .doOnNext(
-            mainReplayContextVo ->
-                LOGGER
-                    .info()
-                    .log(
-                        "MainReplay => {}", mainReplayContextVo.getStoredEventVo()))
-        .flatMap(this::findHandler)
-        .flatMap(this::replay)
-        .flatMap(this::markStoredEventProcessingStatus)
-        .map(this::dispatch)
-        .subscribeOn(Schedulers.newElastic("MainReplay", 3))
-        .subscribe();
+            .doOnNext(
+                    mainReplayContextVo ->
+                            LOGGER
+                                    .info()
+                                    .log(
+                                            "MainReplay => {}", mainReplayContextVo.getStoredEventVo()))
+            .flatMap(this::evaluateTaskActivationCriteria)
+            .flatMap(this::findHandler)
+            .flatMap(this::replay)
+            .flatMap(this::markStoredEventProcessingStatus)
+            .map(this::dispatch)
+            .subscribeOn(Schedulers.newElastic("MainReplay", 3))
+            .subscribe();
+  }
+
+  private Mono<MainReplayContextVo> evaluateTaskActivationCriteria(final MainReplayContextVo mainReplayContextVo) {
+    return Mono.just(mainReplayContextVo);
   }
 
   private Mono<MainReplayContextVo> findHandler(final MainReplayContextVo mainReplayContextVo) {

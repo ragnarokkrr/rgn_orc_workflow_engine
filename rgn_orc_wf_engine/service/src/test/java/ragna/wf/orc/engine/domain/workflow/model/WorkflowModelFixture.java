@@ -1,6 +1,6 @@
 package ragna.wf.orc.engine.domain.workflow.model;
 
-import ragna.wf.orc.engine.domain.workflow.service.ConfiguredTaskCriteriaFactory;
+import ragna.wf.orc.engine.infrastructure.clients.metadata.ConfiguredTaskCriteriaMockFactory;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -30,8 +30,8 @@ public final class WorkflowModelFixture {
                         .addAllCriteria(
                             new ArrayList<>(
                                 List.of(
-                                    ConfiguredTaskCriteriaFactory.TASK_CRITERIA_ASC.get(),
-                                    ConfiguredTaskCriteriaFactory.TASK_CRITERIA_DESC.get())))
+                                    ConfiguredTaskCriteriaMockFactory.TASK_CRITERIA_ASC.get(),
+                                    ConfiguredTaskCriteriaMockFactory.TASK_CRITERIA_DESC.get())))
                         .build(),
                     ConfiguredTask.builder()
                         .order(2)
@@ -55,13 +55,13 @@ public final class WorkflowModelFixture {
     return new ArrayList<>(
         List.of(
             TaskCriteriaEvaluationCommand.builder()
-                .id(ConfiguredTaskCriteriaFactory.TASK_CRITERIA_ASC.get().getId())
+                .id(ConfiguredTaskCriteriaMockFactory.TASK_CRITERIA_ASC.get().getId())
                 .value("8.5")
                 .result(TaskCriteriaEvaluationCommand.Result.APPROVED)
                 .status(TaskCriteriaEvaluationCommand.Status.MATCHED)
                 .build(),
             TaskCriteriaEvaluationCommand.builder()
-                .id(ConfiguredTaskCriteriaFactory.TASK_CRITERIA_DESC.get().getId())
+                .id(ConfiguredTaskCriteriaMockFactory.TASK_CRITERIA_DESC.get().getId())
                 .value("2")
                 .result(TaskCriteriaEvaluationCommand.Result.APPROVED)
                 .status(TaskCriteriaEvaluationCommand.Status.MATCHED)

@@ -24,20 +24,20 @@ public class ConfiguredTask {
   private int order;
   private TaskResponsible taskResponsible;
 
-  private List<TaskCriteria> configuredTaskCriteriaList;
+  private List<TaskCriterion> configuredTaskCriteriaList;
 
   public static class ConfiguredTaskBuilder {
     public ConfiguredTaskBuilder addAllCriteria(
-        final List<TaskCriteria> configuredTaskCriteriaList) {
+            final List<TaskCriterion> configuredTaskCriteriaList) {
 
       if (CollectionUtils.isEmpty(configuredTaskCriteriaList)) {
         this.configuredTaskCriteriaList = new ArrayList<>();
       }
 
       this.configuredTaskCriteriaList =
-          configuredTaskCriteriaList.stream()
-              .map(configuredTaskCriteria -> configuredTaskCriteria.toBuilder().build())
-              .collect(Collectors.toList());
+              configuredTaskCriteriaList.stream()
+                      .map(configuredTaskCriteria -> configuredTaskCriteria.toBuilder().build())
+                      .collect(Collectors.toList());
 
       return this;
     }
@@ -48,7 +48,7 @@ public class ConfiguredTask {
   @Builder(toBuilder = true)
   @NoArgsConstructor(access = AccessLevel.PRIVATE)
   @AllArgsConstructor(access = AccessLevel.PRIVATE)
-  public static class TaskCriteria {
+  public static class TaskCriterion {
     private String id;
     private String name;
     private Long lowerBound;

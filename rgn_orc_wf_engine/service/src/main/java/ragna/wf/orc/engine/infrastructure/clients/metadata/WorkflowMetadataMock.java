@@ -7,7 +7,6 @@ import ragna.wf.orc.engine.domain.metadata.service.vo.ConfigurationVO;
 import ragna.wf.orc.engine.domain.workflow.model.Configuration;
 import ragna.wf.orc.engine.domain.workflow.model.ConfiguredTask;
 import ragna.wf.orc.engine.domain.workflow.model.TaskType;
-import ragna.wf.orc.engine.domain.workflow.service.ConfiguredTaskCriteriaFactory;
 import ragna.wf.orc.engine.domain.workflow.service.mapper.ConfigurationMapper;
 import reactor.core.publisher.Mono;
 
@@ -44,10 +43,10 @@ public class WorkflowMetadataMock implements WorkflowMetadataService {
                                     .build())
                             // Kryo serialization problems with immutable collections
                             .addAllCriteria(
-                                new ArrayList<>(
-                                    List.of(
-                                        ConfiguredTaskCriteriaFactory.TASK_CRITERIA_ASC.get(),
-                                        ConfiguredTaskCriteriaFactory.TASK_CRITERIA_DESC.get())))
+                                    new ArrayList<>(
+                                            List.of(
+                                                    ConfiguredTaskCriteriaMockFactory.TASK_CRITERIA_ASC.get(),
+                                                    ConfiguredTaskCriteriaMockFactory.TASK_CRITERIA_DESC.get())))
                             .build(),
                         ConfiguredTask.builder()
                             .order(2)
