@@ -2,11 +2,6 @@
 set -e;
 HOSTNAME=`hostname`
 
-mongo localhost:27017 <<- EOF
-  use $MONGO_INITDB_DATABASE;
-  db.createCollection("delete_me");
-EOF
-
 mongo localhost:27017/$MONGO_INITDB_DATABASE <<-EOF
     rs.initiate({
         _id: "repDB",
@@ -18,9 +13,25 @@ echo "Initiated replica set"
 
 sleep 3
 
-#mongo localhost:27017/admin <<-EOF
-#  db.adminCommand( { setFeatureCompatibilityVersion: "4.2" } );
-#EOF
+mongo localhost:27017/admin <<-EOF
+  db.adminCommand( { setFeatureCompatibilityVersion: "4.2" } );
+  db.adminCommand( { setParameter: 1, transactionLifetimeLimitSeconds: 120 } );
+EOF
+
+sleep 1
+
+mongo localhost:27017 <<- EOF
+  use $MONGO_INITDB_DATABASE;
+  db.createCollection("delete_me");
+  session=db.getMongo().startSession();
+  delete_me=session.getDatabase("$MONGO_INITDB_DATABASE").delete_me
+  delete_me.insertOne({"delete": true});
+EOF
+
+sleep 2
+
+
+
 
 # a default non-root role
 # MONGO_NON_ROOT_ROLE="${MONGO_NON_ROOT_ROLE:-readWrite}"

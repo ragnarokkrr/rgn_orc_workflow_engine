@@ -2,7 +2,7 @@ spring:
   reactor.debug-agent.enabled: false
 
 spring.data.mongodb:
-  database: orc-wf # Database name.
+  database: orc_wf # Database name.
   host: orc_mongodb # Mongo server host.
   replicaSet: repDB # Mongo server host.
   port: 27017 # Mongo server port.
