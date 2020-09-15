@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -145,16 +146,24 @@ public class WorkflowRoot {
   }
 
   public WorkflowRoot finishTaskAndAdvance(
-      TaskType taskType, int order, PlannedTask.Result result) {
+          TaskType taskType, int order, PlannedTask.Result result) {
     LOGGER.debug().log(WorkflowUtils.fornatedMessage(this, "Finishing task and then advance"));
     finishTask(taskType, order, result);
     return advanceIfAnyTaskRemains();
   }
 
+  public Optional<PlannedTask> findLastTriggeredTask() {
+    return WorkflowPlannedTaskService.findLastTriggeredTask(this);
+  }
+
+  public Optional<ConfiguredTask> findTaskConfiguration(final PlannedTask plannedTask) {
+    return WorkflowPlannedTaskService.findTaskConfiguration(this, plannedTask);
+  }
+
   WorkflowRoot triggerTask(TaskType taskType, int order) {
     // TODO status assertion
     final var taskToTrigger =
-        WorkflowPlannedTaskService.findTaskToTrigger(this, taskType, order, "triggerTask()");
+            WorkflowPlannedTaskService.findTaskToTrigger(this, taskType, order, "triggerTask()");
     if (!Objects.equals(taskToTrigger.getStatus(), PlannedTask.Status.PLANNED)) {
       final var message = WorkflowUtils.fornatedMessage(this, "triggerTask()");
       throw new OrcIllegalStateException(message, ErrorCode.INVALID_STATE_TO_RIGGER_TASK);

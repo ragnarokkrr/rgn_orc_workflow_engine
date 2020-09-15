@@ -6,5 +6,5 @@ import lombok.Data;
 @Data
 @Builder
 public class Criterion1Query {
-  private Long customerId;
+  private String customerId;
 }

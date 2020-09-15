@@ -48,7 +48,7 @@ class TaskActivationCriteriaServiceTest {
     final var taskCriteria2 = ConfiguredTaskCriteriaMockFactory.TASK_CRITERIA_DESC.get();
     final var criteriaEvaluationQuery =
         CriteriaEvaluationQuery.builder()
-            .customerId(1L)
+                .customerId("1")
             .addCriterion(CriterionMapper.INSTANCE.mapToService(taskCriteria1))
             .addCriterion(CriterionMapper.INSTANCE.mapToService(taskCriteria2))
             .build();
@@ -62,8 +62,8 @@ class TaskActivationCriteriaServiceTest {
         .expectNextMatches(
             criteriaEvaluationResult -> {
               assertThat(criteriaEvaluationResult).isNotNull();
-              assertThat(criteriaEvaluationResult)
-                  .hasFieldOrPropertyWithValue("customerId", 1L)
+                assertThat(criteriaEvaluationResult)
+                        .hasFieldOrPropertyWithValue("customerId", "1")
                   .hasFieldOrPropertyWithValue(
                       "criteriaResultType", CriteriaEvaluationResult.CriteriaResultType.MATCHED);
 
@@ -89,8 +89,6 @@ class TaskActivationCriteriaServiceTest {
               return true;
             })
         .verifyComplete();
-
-    //
 
   }
 }

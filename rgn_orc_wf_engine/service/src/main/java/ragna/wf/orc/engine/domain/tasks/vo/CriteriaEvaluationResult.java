@@ -12,7 +12,7 @@ import java.util.function.Predicate;
 @Builder
 public class CriteriaEvaluationResult {
   private List<CriterionResult> criteriaResultList;
-  private Long customerId;
+  private String customerId;
 
   public CriteriaResultType getCriteriaResultType() {
     if (CollectionUtils.isEmpty(criteriaResultList)) {

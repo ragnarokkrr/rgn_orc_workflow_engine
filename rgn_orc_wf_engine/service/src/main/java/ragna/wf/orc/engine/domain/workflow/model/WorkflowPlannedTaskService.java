@@ -1,5 +1,6 @@
 package ragna.wf.orc.engine.domain.workflow.model;
 
+import org.apache.commons.lang3.StringUtils;
 import ragna.wf.orc.common.exceptions.ErrorCode;
 import ragna.wf.orc.common.exceptions.OrcIllegalStateException;
 
@@ -91,22 +92,36 @@ final class WorkflowPlannedTaskService {
 
   static PlannedTask findLastTask(final WorkflowRoot workflowRoot, final String action) {
     final var message =
-        WorkflowUtils.fornatedMessage(workflowRoot, "Can't find planned task to trigger", action);
+            WorkflowUtils.fornatedMessage(workflowRoot, "Can't find planned task to trigger", action);
 
     return workflowRoot.getExecutionPlan().getPlannedTasks().stream()
-        .max(Comparator.comparing(PlannedTask::getOrder))
-        .orElseThrow(() -> new OrcIllegalStateException(message, ErrorCode.TASK_NOT_FOUND));
+            .max(Comparator.comparing(PlannedTask::getOrder))
+            .orElseThrow(() -> new OrcIllegalStateException(message, ErrorCode.TASK_NOT_FOUND));
+  }
+
+  static Optional<PlannedTask> findLastTriggeredTask(final WorkflowRoot workflowRoot) {
+    return workflowRoot.getExecutionPlan().getPlannedTasks().stream()
+            .sorted(Comparator.comparing(PlannedTask::getOrder))
+            .filter(plannedTask -> Objects.equals(plannedTask.getStatus(), PlannedTask.Status.TRIGGERED))
+            .findFirst();
+  }
+
+  static Optional<ConfiguredTask> findTaskConfiguration(final WorkflowRoot workflowRootSnapshot, PlannedTask plannedTask) {
+    return workflowRootSnapshot.getConfiguration().getConfiguredTasks()
+            .stream()
+            .filter(task -> StringUtils.equals(task.getTaskType().name(), plannedTask.getTaskType().name()))
+            .findFirst();
   }
 
   static boolean anyTaskDisapproved(final WorkflowRoot workflowRoot) {
     return workflowRoot.getExecutionPlan().getPlannedTasks().stream()
-        .map(PlannedTask::getResult)
-        .anyMatch(PlannedTask.Result::isDisapproved);
+            .map(PlannedTask::getResult)
+            .anyMatch(PlannedTask.Result::isDisapproved);
   }
 
   static boolean allTasksApproved(final WorkflowRoot workflowRoot) {
     return workflowRoot.getExecutionPlan().getPlannedTasks().stream()
-        .map(PlannedTask::getResult)
+            .map(PlannedTask::getResult)
         .allMatch(PlannedTask.Result::isApproved);
   }
 

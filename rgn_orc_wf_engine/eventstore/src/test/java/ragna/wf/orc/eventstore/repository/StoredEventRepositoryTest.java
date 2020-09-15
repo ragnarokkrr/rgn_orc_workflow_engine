@@ -55,7 +55,7 @@ public class StoredEventRepositoryTest {
         .expectNextMatches(
             storedEvent -> {
               assertThat(storedEvent)
-                  .hasNoNullFieldsOrPropertiesExcept("processingOn", "processedOn");
+                  .hasNoNullFieldsOrPropertiesExcept("processingOn", "processedOn", "errorMessage");
               savedStoredEvent[0] = storedEvent;
               return true;
             })
@@ -72,7 +72,7 @@ public class StoredEventRepositoryTest {
                   .hasFieldOrPropertyWithValue("typedName", typedName)
                   .hasFieldOrPropertyWithValue("eventStatus", StoredEventStatus.UNPROCESSED)
                   .hasFieldOrPropertyWithValue("serializationEngine", SerializationEngine.KRYO)
-                  .hasNoNullFieldsOrPropertiesExcept("processingOn", "processedOn");
+                  .hasNoNullFieldsOrPropertiesExcept("processingOn", "processedOn", "errorMessage");
 
               return true;
             })

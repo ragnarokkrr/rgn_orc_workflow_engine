@@ -33,6 +33,8 @@ public class StoredEventVo {
         .add("occurredOn=" + occurredOn)
         .add("processingOn=" + processingOn)
         .add("processedOn=" + processedOn)
+        .add("domainEventExists=" + (domainEvent != null))
+        .add("payloadExists=" + (payload != null))
         .toString();
   }
 

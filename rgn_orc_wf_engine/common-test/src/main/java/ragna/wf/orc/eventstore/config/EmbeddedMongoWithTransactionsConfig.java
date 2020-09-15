@@ -105,6 +105,12 @@ public class EmbeddedMongoWithTransactionsConfig {
         adminDatabase
             .runCommand(new Document("setFeatureCompatibilityVersion", "4.0"))
             .subscribe(new SubscriberHelpers.PrintDocumentSubscriber());
+
+        adminDatabase
+                .runCommand(new Document("setParameter", 1)
+                .append("maxTransactionLockRequestTimeoutMillis", 5000))
+                .subscribe(new SubscriberHelpers.PrintDocumentSubscriber());
+
         TimeUnit.SECONDS.sleep(3);
       } finally {
         if (mongoClient != null) {

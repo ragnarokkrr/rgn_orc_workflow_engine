@@ -2,7 +2,6 @@ package ragna.wf.orc.engine.domain.tasks.vo;
 
 import lombok.Builder;
 import lombok.Data;
-import ragna.wf.orc.engine.domain.workflow.model.ConfiguredTask;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,7 +10,7 @@ import java.util.List;
 @Builder
 public class CriteriaEvaluationQuery {
   private List<Criterion> criteriaList;
-  private Long customerId;
+  private String customerId;
 
   @Data
   @Builder
@@ -21,7 +20,7 @@ public class CriteriaEvaluationQuery {
     private Long lowerBound;
     private Long upperBound;
     private Long acceptedValue;
-    private ConfiguredTask.TaskCriterion.Order order;
+    private Order order;
 
     public enum Order {
       ASC,

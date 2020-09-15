@@ -14,6 +14,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.data.mongodb.core.ReactiveMongoOperations;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import ragna.wf.orc.common.data.mongodb.utils.MongoDbUtils;
+import ragna.wf.orc.common.events.DomainEvent;
 import ragna.wf.orc.common.serialization.DefaultKryoContext;
 import ragna.wf.orc.common.serialization.KryoContext;
 import ragna.wf.orc.eventstore.EventStoreTestApplication;
@@ -103,7 +104,7 @@ class EventStoreStreamingServiceTest {
   @Builder
   @AllArgsConstructor
   @NoArgsConstructor
-  static class Person {
+  static class Person extends DomainEvent {
     private String id;
     private String name;
   }

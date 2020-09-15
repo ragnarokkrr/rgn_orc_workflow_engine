@@ -6,12 +6,19 @@ import ragna.wf.orc.common.events.DomainEvent;
 import ragna.wf.orc.engine.infrastructure.storedevents.replay.main.vo.MainReplayContextVo;
 import reactor.core.publisher.Mono;
 
-public interface MainStoredEventReplayerCallback<T extends DomainEvent> {
-  Class<T> domainEvent();
+import java.lang.reflect.ParameterizedType;
 
-  default MainReplayContextVo.MatchResultEnum match(final MainReplayContextVo mainReplayContextVo) {
+public interface MainStoredEventReplayerCallback<T extends DomainEvent> {
+  default Class<T> domainEventType() {
+    return (Class<T>) ((ParameterizedType) getClass()
+            .getGenericSuperclass()).getActualTypeArguments()[0];
+  }
+
+  default Mono<MainReplayContextVo> activateTaskIfConfigured(final MainReplayContextVo mainReplayContextVo) {
     LogHolder.LOGGER.info().log("Default no-op match {}", mainReplayContextVo.getStoredEventVo());
-    return MainReplayContextVo.MatchResultEnum.DEFAULT;
+    return Mono.just(mainReplayContextVo.matchResult(MainReplayContextVo.MatchResult.builder()
+            .matchResultType(MainReplayContextVo.MatchResultEnum.DEFAULT)
+            .build()));
   }
 
   default Mono<MainReplayContextVo> doMatch(final MainReplayContextVo mainReplayContextVo) {

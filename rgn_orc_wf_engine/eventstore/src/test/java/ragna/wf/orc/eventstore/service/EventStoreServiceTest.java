@@ -59,7 +59,7 @@ public class EventStoreServiceTest {
         .expectNextMatches(
             storedEvent -> {
               assertThat(storedEvent)
-                  .hasNoNullFieldsOrPropertiesExcept("processingOn", "processedOn");
+                  .hasNoNullFieldsOrPropertiesExcept("processingOn", "processedOn", "errorMessage");
               savedStoredEvent[0] = storedEvent;
               return true;
             })
@@ -74,7 +74,7 @@ public class EventStoreServiceTest {
                   .hasFieldOrPropertyWithValue("eventStatus", StoredEventStatus.UNPROCESSED)
                   .hasFieldOrPropertyWithValue("typedName", PersonCreated.class.getName())
                   .hasNoNullFieldsOrPropertiesExcept(
-                      "processingOn", "processedOn", "replayTracking");
+                      "processingOn", "processedOn", "replayTracking", "errorMessage");
 
               assertThat(storedEvent.getPayload()).containsExactly(serializedEvent);
 

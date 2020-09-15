@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 import ragna.wf.orc.engine.application.replay.WorkflowRootCreatedReplayer;
+import ragna.wf.orc.engine.domain.tasks.vo.CriteriaEvaluationResult;
 import ragna.wf.orc.eventstore.service.vo.StoredEventVo;
 
 import java.util.Optional;
@@ -19,6 +20,7 @@ public class MainReplayContextVo {
   private final StoredEventVo storedEventVo;
   private ReplayResult replayResult;
   private MatchResult matchResult;
+  private CriteriaEvaluationResult criteriaEvaluationResult;
   private Optional<? extends WorkflowRootCreatedReplayer> mainStoredEventReplayerCallback;
 
   public static MainReplayContextVo createContext(final StoredEventVo storedEventVo) {
@@ -54,6 +56,16 @@ public class MainReplayContextVo {
     return this;
   }
 
+  public MainReplayContextVo matchResult(final MatchResult matchResult) {
+    this.matchResult = matchResult;
+    return this;
+  }
+
+  public MainReplayContextVo criteriaEvaluationResult(final CriteriaEvaluationResult criteriaEvaluationResult) {
+    this.criteriaEvaluationResult = criteriaEvaluationResult;
+    return this;
+  }
+
   public MainReplayContextVo noHandlerFound(final String message) {
     this.replayResult =
         ReplayResult.builder()
@@ -68,7 +80,9 @@ public class MainReplayContextVo {
     MATCHED,
     UNMATCHED,
     DEFAULT,
-    PROCESSING
+    TASK_NOT_FOUND,
+    TASK_CONFIGURATION_NOT_FOUND,
+    ERROR, PROCESSING
   }
 
   public enum ReplayResultEnum {

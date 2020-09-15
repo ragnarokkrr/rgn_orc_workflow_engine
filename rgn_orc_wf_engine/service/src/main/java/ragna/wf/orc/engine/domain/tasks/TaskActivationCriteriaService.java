@@ -33,8 +33,8 @@ public class TaskActivationCriteriaService {
     final var criterionResultCallMonoList = criteriaEvaluationQuery.getCriteriaList().stream()
             .map(criterion ->
                     switch (CriteriaServices.fromStringOrDefault(criterion.getId())) {
-                      case CRITERION_01 -> callCriterion1ServiceMono(criterion);
-                      case CRITERION_02 -> callCriterion2ServiceMono(criterion);
+                      case CRITERION_01 -> callCriterion1ServiceFunctionMono(criterion);
+                      case CRITERION_02 -> callCriterion2ServiceFunctionMono(criterion);
                       default -> invalidCriterion(criterion);
                     })
             .map(criterionMonoFunction -> criterionMonoFunction.apply(criteriaEvaluationQuery.getCustomerId()))
@@ -51,7 +51,7 @@ public class TaskActivationCriteriaService {
                     .build());
   }
 
-  final Function<Long, Mono<CriteriaEvaluationResult.CriterionResult>> callCriterion1ServiceMono(final CriteriaEvaluationQuery.Criterion criterion) {
+  final Function<String, Mono<CriteriaEvaluationResult.CriterionResult>> callCriterion1ServiceFunctionMono(final CriteriaEvaluationQuery.Criterion criterion) {
     return (customerId) ->
             taskActivationCriterion1Service.findByCustomerId(
                     Criterion1Query.builder().customerId(customerId).build())
@@ -60,7 +60,7 @@ public class TaskActivationCriteriaService {
                     .onErrorResume(throwable -> Mono.just(newCriterionResultError(criterion)));
   }
 
-  final Function<Long, Mono<CriteriaEvaluationResult.CriterionResult>> callCriterion2ServiceMono(final CriteriaEvaluationQuery.Criterion criterion) {
+  final Function<String, Mono<CriteriaEvaluationResult.CriterionResult>> callCriterion2ServiceFunctionMono(final CriteriaEvaluationQuery.Criterion criterion) {
     return (customerId) -> taskActivationCriterion2Service.findByCustomerId(
             Criterion2Query.builder().customerId(customerId).build())
             .map(Criterion2ResponseVo::getValue)
@@ -86,7 +86,7 @@ public class TaskActivationCriteriaService {
             .build();
   }
 
-  final Function<Long, Mono<CriteriaEvaluationResult.CriterionResult>> invalidCriterion(final CriteriaEvaluationQuery.Criterion criterion) {
+  final Function<String, Mono<CriteriaEvaluationResult.CriterionResult>> invalidCriterion(final CriteriaEvaluationQuery.Criterion criterion) {
     return (customerId) -> Mono.just(CriteriaEvaluationResult.CriterionResult.builder()
             .id(criterion.getId())
             .name(criterion.getName())

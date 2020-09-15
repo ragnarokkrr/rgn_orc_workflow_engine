@@ -48,8 +48,9 @@ public class EventStoreService {
             .map(StoredEventMapper.INSTANCE::toService)
             .doOnError(throwable -> LOGGER.error().log("Error on StoredEvent stored!", throwable))
             .doOnNext(
-                storedEvent ->
-                    LOGGER.info().log("StoredEvent stored! {}", storedEvent));
+                storedEventVo -> storedEventVo.setDomainEvent(domainEvent))
+            .doOnNext(storedEventVo ->
+                    LOGGER.info().log("StoredEvent stored! {}", storedEventVo));
     return this.transactionalOperator.transactional(saveStoredEventMono);
   }
 

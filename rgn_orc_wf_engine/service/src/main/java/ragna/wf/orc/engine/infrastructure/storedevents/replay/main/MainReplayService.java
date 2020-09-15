@@ -36,13 +36,18 @@ public class MainReplayService {
                                     .info()
                                     .log(
                                             "MainReplay => {}", mainReplayContextVo.getStoredEventVo()))
-            .flatMap(this::evaluateTaskActivationCriteria)
             .flatMap(this::findHandler)
+            .flatMap(this::evaluateTaskActivationCriteria)
             .flatMap(this::replay)
+            .flatMap(this::publishEventIfNecessary)
             .flatMap(this::markStoredEventProcessingStatus)
             .map(this::dispatch)
             .subscribeOn(Schedulers.newElastic("MainReplay", 3))
             .subscribe();
+  }
+
+  private Mono<MainReplayContextVo> publishEventIfNecessary(final MainReplayContextVo mainReplayContextVo) {
+    return Mono.just(mainReplayContextVo);
   }
 
   private Mono<MainReplayContextVo> evaluateTaskActivationCriteria(final MainReplayContextVo mainReplayContextVo) {
@@ -70,7 +75,8 @@ public class MainReplayService {
   }
 
   private Mono<MainReplayContextVo> replay(final MainReplayContextVo mainReplayContextVo) {
-    if(mainReplayContextVo.getMainStoredEventReplayerCallback().isEmpty()) {
+    if (mainReplayContextVo.getMainStoredEventReplayerCallback().isEmpty()
+            || mainReplayContextVo.getReplayResult().getReplayResultType() == MainReplayContextVo.ReplayResultEnum.NO_HANDLER_FOUND) {
       LOGGER.warn().log("No MainStoredEventReplayerCallback found '{}', skipping {}", mainReplayContextVo.getReplayResult(),
               mainReplayContextVo.getStoredEventVo());
       return Mono.just(mainReplayContextVo);

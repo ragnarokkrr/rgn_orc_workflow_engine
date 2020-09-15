@@ -22,11 +22,6 @@ public class WorkflowRootCreatedReplayer
   private final WorkflowTaskManagementService workflowTaskManagementService;
 
   @Override
-  public Class<WorkflowRootCreated> domainEvent() {
-    return WorkflowRootCreated.class;
-  }
-
-  @Override
   public Mono<MainReplayContextVo> doReplay(final MainReplayContextVo mainReplayContextVo) {
     final var workflowRootCreated =
         (WorkflowRootCreated) mainReplayContextVo.getStoredEventVo().getDomainEvent();
