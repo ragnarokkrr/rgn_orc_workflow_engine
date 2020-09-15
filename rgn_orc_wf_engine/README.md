@@ -57,13 +57,11 @@ Include profile ``spring_profiles_active=embedMongoWithTx``
 ### Swagger UI
 http://localhost:8080/swagger-ui/index.html
 
-
 ### docker compose
 
 ```
 $ docker-compose up
 $ docker-compose restart orc_mongo_express
- 
 ```
 
 
@@ -78,6 +76,21 @@ $ winpty docker exec -it orc_mongodb bash
 # ./mongo-init.sh
 
 ```
+#### useful commands
+
+```
+# rs.initiate({_id: 'repDB', member: [{_id:0, host:'orc_mongodb', arbiterOnly:true}]})
+# rs.slaveOk()
+# rs.initiate()
+# db.adminCommand( { setFeatureCompatibilityVersion: "4.4" } );
+# db.adminCommand( { getParameter: 1, "featureCompatibilityVersion":1 } );
+# db.adminCommand( { setParameter: 1, "featureCompatibilityVersion": "4.2" } );
+
+
+docker volume rm -f mongodb_data
+docker volume rm -f rgn_orc_wf_engine_mongodb_data
+```
+
 #### Mongo Express
 
 http://localhost:8888/

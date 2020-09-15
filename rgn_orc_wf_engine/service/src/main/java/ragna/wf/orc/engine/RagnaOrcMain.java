@@ -30,7 +30,7 @@ public class RagnaOrcMain {
       LOGGER.info().log("INITIALIZING DB");
       final MongoDatabase adminDatabase = mongoClient.getDatabase("admin");
       adminDatabase
-          .runCommand(new Document("setFeatureCompatibilityVersion", "4.0"))
+          .runCommand(new Document("setFeatureCompatibilityVersion", "4.2"))
           .subscribe(new SubscriberHelpers.PrintDocumentSubscriber());
 
       adminDatabase

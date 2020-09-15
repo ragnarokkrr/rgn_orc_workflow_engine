@@ -2,6 +2,11 @@
 set -e;
 HOSTNAME=`hostname`
 
+mongo localhost:27017 <<- EOF
+  use $MONGO_INITDB_DATABASE;
+  db.createCollection("delete_me");
+EOF
+
 mongo localhost:27017/$MONGO_INITDB_DATABASE <<-EOF
     rs.initiate({
         _id: "repDB",
@@ -13,9 +18,9 @@ echo "Initiated replica set"
 
 sleep 3
 
-mongo localhost:27017/admin <<-EOF
-  db.adminCommand( { setFeatureCompatibilityVersion: "4.4" } );
-EOF
+#mongo localhost:27017/admin <<-EOF
+#  db.adminCommand( { setFeatureCompatibilityVersion: "4.2" } );
+#EOF
 
 # a default non-root role
 # MONGO_NON_ROOT_ROLE="${MONGO_NON_ROOT_ROLE:-readWrite}"

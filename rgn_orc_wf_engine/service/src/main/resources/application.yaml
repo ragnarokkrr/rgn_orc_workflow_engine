@@ -3,7 +3,7 @@ spring:
 
 spring.data.mongodb:
   database: orc-wf # Database name.
-  host: localhost # Mongo server host.
+  host: orc_mongodb # Mongo server host.
   replicaSet: repDB # Mongo server host.
   port: 27017 # Mongo server port.
   repositories.enabled: true # Enable Mongo repositories.
