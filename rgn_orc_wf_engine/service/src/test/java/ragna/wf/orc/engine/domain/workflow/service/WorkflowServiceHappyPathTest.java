@@ -4,6 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
@@ -37,7 +38,7 @@ import static org.mockito.Mockito.doReturn;
 
 @Profile("embedMongoWithTx")
 @ExtendWith(SpringExtension.class)
-@SpringBootTest
+@SpringBootTest(properties = {"orc.feature.toggles.replay-enabled=false"})
 @Import(EmbeddedMongoWithTransactionsConfig.class)
 class WorkflowServiceHappyPathTest {
   @MockBean private WorkflowMetadataService workflowMetadataService;
@@ -68,7 +69,7 @@ class WorkflowServiceHappyPathTest {
     doReturn(Mono.just(ConfigurationMapper.INSTANCE.toService(configuration)))
         .when(workflowMetadataService)
         .peekConfigurationForWorkflow(any());
-    final var createWorkflowCommand = ServiceFixtures.kyleReese();
+    final var createWorkflowCommand = ServiceFixtures.kyleReeseCreateWorkflowCommand();
 
     // when
     final var createWorkflowMono = workflowCreationService.createWorkflow(createWorkflowCommand);

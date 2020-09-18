@@ -2,10 +2,10 @@ package ragna.wf.orc.engine.domain.workflow.service;
 
 import ragna.wf.orc.engine.domain.workflow.service.vo.CreateWorkflowCommand;
 
-class ServiceFixtures {
+public class ServiceFixtures {
   private ServiceFixtures() {}
 
-  static CreateWorkflowCommand kyleReese() {
+  public static CreateWorkflowCommand kyleReeseCreateWorkflowCommand() {
     return CreateWorkflowCommand.builder()
         .id("1")
         .customerId("1")

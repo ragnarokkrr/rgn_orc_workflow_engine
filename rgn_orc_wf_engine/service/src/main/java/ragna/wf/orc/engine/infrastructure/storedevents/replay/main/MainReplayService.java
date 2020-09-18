@@ -7,6 +7,7 @@ import org.fissore.slf4j.FluentLoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
+import ragna.wf.orc.engine.infrastructure.config.FeatureTogglesConfigProperties;
 import ragna.wf.orc.engine.infrastructure.storedevents.replay.main.vo.MainReplayContextVo;
 import ragna.wf.orc.engine.infrastructure.storedevents.replay.secondary.vo.SecondaryReplayContextVo;
 import ragna.wf.orc.eventstore.service.EventStoreService;
@@ -26,9 +27,15 @@ public class MainReplayService {
   private final ReplayProcessor<MainReplayContextVo> mainReplayContextVoReplayProcessor;
   private final ReplayProcessor<SecondaryReplayContextVo> sideReplayContextVoReplayProcessor;
   private final ApplicationContext applicationContext;
+  private final FeatureTogglesConfigProperties featureTogglesConfig;
 
   @PostConstruct
   void init() {
+    if (!featureTogglesConfig.isReplayEngineEnabled()) {
+      LOGGER.info().log("MAIN REPLAY ENGINE: DISABLED!");
+      return;
+    }
+    LOGGER.info().log("MAIN REPLAY ENGINE: ENABLED!");
     mainReplayContextVoReplayProcessor
             .doOnNext(
                     mainReplayContextVo ->

@@ -1,6 +1,5 @@
-package ragna.wf.orc.engine.domain.workflow.service;
+package ragna.wf.orc.engine.application.replay;
 
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -14,27 +13,39 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import ragna.wf.orc.common.data.mongodb.utils.MongoDbUtils;
 import ragna.wf.orc.engine.domain.metadata.service.WorkflowMetadataService;
 import ragna.wf.orc.engine.domain.workflow.model.WorkflowModelFixture;
+import ragna.wf.orc.engine.domain.workflow.repository.WorkflowRepository;
+import ragna.wf.orc.engine.domain.workflow.service.ServiceFixtures;
+import ragna.wf.orc.engine.domain.workflow.service.WorkflowCreationService;
+import ragna.wf.orc.engine.domain.workflow.service.WorkflowTaskManagementService;
 import ragna.wf.orc.engine.domain.workflow.service.mapper.ConfigurationMapper;
 import ragna.wf.orc.engine.domain.workflow.service.vo.WorkflowVO;
 import ragna.wf.orc.eventstore.config.EmbeddedMongoWithTransactionsConfig;
+import ragna.wf.orc.eventstore.repository.StoredEventRepository;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import java.util.concurrent.TimeUnit;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 
 @Profile("embedMongoWithTx")
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(properties = {"orc.feature.toggles.replay-enabled=false"})
+@SpringBootTest(properties = {"orc.feature.toggles.replay-enabled=true",
+        "orc.events.replayInitialDelaySecs=1"})
 @Import(EmbeddedMongoWithTransactionsConfig.class)
-class WorkflowCreationServiceTest {
+public class HappyPathReplayITest {
+  @Autowired private ReactiveMongoOperations reactiveMongoOperations;
 
   @MockBean private WorkflowMetadataService workflowMetadataService;
 
   @Autowired private WorkflowCreationService workflowCreationService;
 
-  @Autowired private ReactiveMongoOperations reactiveMongoOperations;
+  @Autowired private WorkflowTaskManagementService workflowTaskManagementService;
+
+  @Autowired private WorkflowRepository workflowRepository;
+
+  @Autowired StoredEventRepository storedEventRepository;
 
   @BeforeEach
   void before() {
@@ -44,43 +55,38 @@ class WorkflowCreationServiceTest {
     StepVerifier.create(createCollectionFlux)
         .expectNextCount(MongoDbUtils.getCollectionNames().size())
         .verifyComplete();
-  }
 
-  @AfterEach
-  void tearDown() {
-    // mongoTestUtils.tearDown();
-  }
-
-  @Test
-  void whenANewRequestIsSubmitted_thenShouldCreateWorkflow() {
-    // given
     final var configuration = WorkflowModelFixture.sampleTwoTasksConfiguration();
     doReturn(Mono.just(ConfigurationMapper.INSTANCE.toService(configuration)))
         .when(workflowMetadataService)
         .peekConfigurationForWorkflow(any());
+  }
 
+  @Test
+  void whenWorkflowRootFinishesAndAdvanceAllTasksAndAchieveConclusionState_thenWorkflowIsFinished()
+      throws InterruptedException {
+    // given
     final var createWorkflowCommand = ServiceFixtures.kyleReeseCreateWorkflowCommand();
+    TimeUnit.SECONDS.sleep(1);
 
-    // when
+    // 1 - create workflow
     final var createWorkflowMono = workflowCreationService.createWorkflow(createWorkflowCommand);
-    // then
+    final WorkflowVO[] createdWorkflowVoArray = new WorkflowVO[1];
     StepVerifier.create(createWorkflowMono)
         .expectNextMatches(
             workflowVO -> {
-              assertThat(workflowVO)
-                  .hasFieldOrPropertyWithValue("configurationId", configuration.getId())
-                  .hasFieldOrPropertyWithValue("customerId", createWorkflowCommand.getCustomerId())
-                  .hasFieldOrPropertyWithValue("customerRequestId", createWorkflowCommand.getId())
-                  .hasFieldOrPropertyWithValue("result", WorkflowVO.Result.WORKFLOW_ONGOING)
-                  .hasFieldOrPropertyWithValue("status", WorkflowVO.Status.CONFIGURED)
-                  .hasNoNullFieldsOrProperties()
-                  .isNotNull();
+              createdWorkflowVoArray[0] = workflowVO;
               return true;
             })
         .verifyComplete();
 
-    // TODO fix mockito inline configuration
-    // verify(workflowRepository, times(1)).findByCustomerRequest(any());
-    // verify(workflowRepository, times(1)).save(any());
+    TimeUnit.SECONDS.sleep(2);
+    System.out.println();
+    final var storedEventList =
+        storedEventRepository
+            .findByObjectIdOrderByOccurredOnAsc(createdWorkflowVoArray[0].getId())
+            .collectList()
+            .block();
+    System.out.println(storedEventList);
   }
 }

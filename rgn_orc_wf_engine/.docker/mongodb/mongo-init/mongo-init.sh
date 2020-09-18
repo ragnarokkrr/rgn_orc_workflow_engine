@@ -14,7 +14,7 @@ echo "Initiated replica set"
 sleep 3
 
 mongo localhost:27017/admin <<-EOF
-  db.adminCommand( { setFeatureCompatibilityVersion: "4.2" } );
+  db.adminCommand( { setFeatureCompatibilityVersion: "4.0" } );
   db.adminCommand( { setParameter: 1, transactionLifetimeLimitSeconds: 120 } );
 EOF
 

@@ -7,8 +7,8 @@ import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
-import ragna.wf.orc.engine.application.replay.WorkflowRootCreatedReplayer;
 import ragna.wf.orc.engine.domain.tasks.vo.CriteriaEvaluationResult;
+import ragna.wf.orc.engine.infrastructure.storedevents.replay.main.MainStoredEventReplayerCallback;
 import ragna.wf.orc.eventstore.service.vo.StoredEventVo;
 
 import java.util.Optional;
@@ -21,7 +21,7 @@ public class MainReplayContextVo {
   private ReplayResult replayResult;
   private MatchResult matchResult;
   private CriteriaEvaluationResult criteriaEvaluationResult;
-  private Optional<? extends WorkflowRootCreatedReplayer> mainStoredEventReplayerCallback;
+  private Optional<? extends MainStoredEventReplayerCallback> mainStoredEventReplayerCallback;
 
   public static MainReplayContextVo createContext(final StoredEventVo storedEventVo) {
     final var mainReplayContextVo = new MainReplayContextVo(storedEventVo);
@@ -34,7 +34,7 @@ public class MainReplayContextVo {
   }
 
   public MainReplayContextVo mainStoredEventReplayerCallback(
-      final Optional<? extends WorkflowRootCreatedReplayer> mainStoredEventReplayerCallback) {
+      final Optional<? extends MainStoredEventReplayerCallback> mainStoredEventReplayerCallback) {
     this.mainStoredEventReplayerCallback = mainStoredEventReplayerCallback;
     return this;
   }

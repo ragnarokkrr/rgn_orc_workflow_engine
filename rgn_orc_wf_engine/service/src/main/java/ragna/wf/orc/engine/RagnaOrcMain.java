@@ -29,9 +29,9 @@ public class RagnaOrcMain {
     return args -> {
       LOGGER.info().log("INITIALIZING DB");
       final MongoDatabase adminDatabase = mongoClient.getDatabase("admin");
-      adminDatabase
-          .runCommand(new Document("setFeatureCompatibilityVersion", "4.2"))
-          .subscribe(new SubscriberHelpers.PrintDocumentSubscriber());
+//      adminDatabase
+  //        .runCommand(new Document("setFeatureCompatibilityVersion", "4.2"))
+    //      .subscribe(new SubscriberHelpers.PrintDocumentSubscriber());
 
       //adminDatabase
       //    .runCommand(

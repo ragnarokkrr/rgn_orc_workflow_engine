@@ -5,6 +5,8 @@ import org.fissore.slf4j.FluentLogger;
 import org.fissore.slf4j.FluentLoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import ragna.wf.orc.engine.infrastructure.config.DomainEventsConfigurationProperties;
+import ragna.wf.orc.engine.infrastructure.config.FeatureTogglesConfigProperties;
 import ragna.wf.orc.engine.infrastructure.storedevents.replay.main.vo.MainReplayContextVo;
 import ragna.wf.orc.eventstore.service.EventStoreStreamingService;
 import ragna.wf.orc.eventstore.service.vo.StoredEventVo;
@@ -21,14 +23,23 @@ public class StoredEventReplayService {
       FluentLoggerFactory.getLogger(StoredEventReplayService.class);
   private final EventStoreStreamingService eventStoreStreamingService;
   private final ReplayProcessor<MainReplayContextVo> mainReplayContextVoReplay;
+  private final FeatureTogglesConfigProperties featureTogglesConfig;
+  private final DomainEventsConfigurationProperties domainEventsConfigurationProperties;
 
   @PostConstruct
   void init() {
+    final var replayInitialDelaySecs = domainEventsConfigurationProperties.getReplayInitialDelaySecs();
+    if (!featureTogglesConfig.isReplayEngineEnabled()) {
+      LOGGER.info().log("EVENT STORE STREAMING: DISABLED!");
+      return;
+    }
+    LOGGER.info().log("EVENT STORE STREAMING: ENABLED! (wait {} secs until startup)", replayInitialDelaySecs);
+
     eventStoreStreamingService
         .streamUnprocessedEvents()
         .map(this::dispatchEvent)
         .subscribeOn(Schedulers.newElastic("StoredEventReplay", 3))
-        .delaySubscription(Duration.ofSeconds(30))
+        .delaySubscription(Duration.ofSeconds(replayInitialDelaySecs))
         .subscribe();
   }
 

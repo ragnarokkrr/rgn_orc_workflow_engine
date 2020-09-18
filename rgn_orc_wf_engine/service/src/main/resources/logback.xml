@@ -13,7 +13,7 @@
         <appender-ref ref="CONSOLE"/>
     </logger>
 
-    <logger name="org.mongodb.driver" level="debug" additivity="false">
+    <logger name="org.mongodb.driver" level="info" additivity="false">
         <appender-ref ref="CONSOLE"/>
     </logger>
 
