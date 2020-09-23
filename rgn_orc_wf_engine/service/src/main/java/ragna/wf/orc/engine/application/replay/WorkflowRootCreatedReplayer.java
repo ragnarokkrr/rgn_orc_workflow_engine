@@ -27,14 +27,15 @@ public class WorkflowRootCreatedReplayer
         (WorkflowRootCreated) mainReplayContextVo.getStoredEventVo().getDomainEvent();
     final var workflowRoot = (WorkflowRoot) workflowRootCreated.getSource();
 
-    final var triggerFirstTaskCommand = TriggerFirstTaskCommand.builder().build();
-    triggerFirstTaskCommand.setWorkflowId(workflowRoot.getId());
+    final var triggerFirstTaskCommand = TriggerFirstTaskCommand.builder()
+            .workflowId(workflowRoot.getId())
+            .build();
 
     return workflowTaskManagementService
         .triggerFirstTask(triggerFirstTaskCommand)
         .doOnNext(workflowVO -> LOGGER.debug().log("First Task triggered: {}", workflowVO))
         .then(
-            Mono.just(mainReplayContextVo.processed())
+            Mono.just(mainReplayContextVo)
                 .onErrorResume(
                     throwable ->
                         Mono.just(mainReplayContextVo.errorProcessing(throwable.getMessage()))));

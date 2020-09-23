@@ -48,7 +48,7 @@ public class WorkflowCreationService {
         findWorkflowByCustomerRequest(createWorkflowCommand)
             .switchIfEmpty(
                 createWorkflowRootMono(createWorkflowCommand)
-                    .zipWith(getConfigurationVOMono, this::configureToWorkflow)
+                    .zipWith(getConfigurationVOMono, this::configureWorkflow)
                     .flatMap(this::saveWorkflowRoot));
 
     return transactionalOperator.transactional(
@@ -93,7 +93,7 @@ public class WorkflowCreationService {
             throwable -> LOGGER.error().log("Error saving workflow {}", workflowRoot, throwable));
   }
 
-  private WorkflowRoot configureToWorkflow(
+  private WorkflowRoot configureWorkflow(
       final WorkflowRoot workflowRoot, final ConfigurationVO configurationVO) {
     final var configuration = ConfigurationMapper.INSTANCE.toModel(configurationVO);
     return workflowRoot.addWorkflowConfiguration(configuration).createExecutionPlan().configured();
@@ -122,11 +122,4 @@ public class WorkflowCreationService {
                     .log("Configuration found {}! {}", createWorkflowCommand, configurationVO));
   }
 
-  private Mono<WorkflowRoot> save(final WorkflowRoot workflowRoot) {
-    return workflowRepository
-        .save(workflowRoot)
-        .doOnSubscribe(subscription -> LOGGER.debug().log("Saving {}", workflowRoot))
-        .doOnError(throwable -> LOGGER.error().log("Failed to save {}", workflowRoot, throwable))
-        .doOnNext(savedWorkflowRoot -> LOGGER.debug().log("Saved {}", savedWorkflowRoot));
-  }
 }

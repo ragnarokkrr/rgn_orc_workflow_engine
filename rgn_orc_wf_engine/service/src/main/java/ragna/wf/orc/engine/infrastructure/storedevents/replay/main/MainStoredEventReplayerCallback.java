@@ -16,14 +16,7 @@ public interface MainStoredEventReplayerCallback<T extends DomainEvent> {
 
   default Mono<MainReplayContextVo> activateTaskIfConfigured(final MainReplayContextVo mainReplayContextVo) {
     LogHolder.LOGGER.info().log("Default no-op match {}", mainReplayContextVo.getStoredEventVo());
-    return Mono.just(mainReplayContextVo.matchResult(MainReplayContextVo.MatchResult.builder()
-            .matchResultType(MainReplayContextVo.MatchResultEnum.DEFAULT)
-            .build()));
-  }
-
-  default Mono<MainReplayContextVo> doMatch(final MainReplayContextVo mainReplayContextVo) {
-    LogHolder.LOGGER.info().log("Default no-op doMatch {}", mainReplayContextVo.getStoredEventVo());
-    return Mono.just(mainReplayContextVo);
+    return Mono.just(mainReplayContextVo.matchDefault());
   }
 
   default Mono<MainReplayContextVo> doReplay(final MainReplayContextVo mainReplayContextVo) {

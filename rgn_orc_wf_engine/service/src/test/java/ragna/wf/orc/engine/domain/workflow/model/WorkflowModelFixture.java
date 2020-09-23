@@ -67,4 +67,13 @@ public final class WorkflowModelFixture {
                 .status(TaskCriteriaEvaluationCommand.Status.MATCHED)
                 .build()));
   }
+
+  public static CustomerRequest kyleReeseCustomerRequest() {
+    return CustomerRequest.builder()
+        .id("1")
+        .customerId("1")
+        .customerName("Kyle Reese")
+        .requestMemo("Kyle Reese's request memo")
+        .build();
+  }
 }

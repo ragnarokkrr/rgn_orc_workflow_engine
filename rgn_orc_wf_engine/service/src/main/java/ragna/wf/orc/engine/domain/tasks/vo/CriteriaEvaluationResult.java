@@ -20,19 +20,19 @@ public class CriteriaEvaluationResult {
     }
 
     if (criteriaResultList.stream()
-            .map(CriterionResult::getResultType)
-            .anyMatch(resultType -> isError().test(resultType))) {
+        .map(CriterionResult::getResultType)
+        .anyMatch(resultType -> isError().test(resultType))) {
       return CriteriaResultType.ERROR;
     }
 
     if (criteriaResultList.stream()
-            .map(CriterionResult::getResultType)
-            .anyMatch(resultType -> isInvalidCriterion().test(resultType))) {
+        .map(CriterionResult::getResultType)
+        .anyMatch(resultType -> isInvalidCriterion().test(resultType))) {
       return CriteriaResultType.INVALID_CRITERION;
     }
 
     if (criteriaResultList.stream()
-            .allMatch(criteriaResult -> isMatched().test(criteriaResult.resultType))) {
+        .allMatch(criteriaResult -> isMatched().test(criteriaResult.resultType))) {
       return CriteriaResultType.MATCHED;
     }
 
@@ -64,9 +64,10 @@ public class CriteriaEvaluationResult {
     private String id;
     private String name;
     private String value;
-    private CriterionResultType resultType;
+    @Builder.Default private CriterionResultType resultType = CriterionResultType.DEFAULT;
 
     public enum CriterionResultType {
+      DEFAULT,
       MATCHED,
       UNMATCHED,
       INVALID_CRITERION,
@@ -78,7 +79,7 @@ public class CriteriaEvaluationResult {
     private List<CriterionResult> criteriaResultList = new ArrayList<>();
 
     public CriteriaEvaluationResultBuilder addAllCriteriaResult(
-            final List<CriterionResult> criterionResults) {
+        final List<CriterionResult> criterionResults) {
       this.criteriaResultList.addAll(criterionResults);
       return this;
     }

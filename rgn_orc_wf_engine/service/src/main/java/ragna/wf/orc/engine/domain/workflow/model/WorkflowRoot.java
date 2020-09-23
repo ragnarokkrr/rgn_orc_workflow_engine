@@ -46,7 +46,7 @@ public class WorkflowRoot {
 
   @Transient
   @Getter(AccessLevel.NONE)
-  private final Collection<DomainEvent> domainEvents = new ArrayList<>();
+  private final List<DomainEvent> domainEvents = new ArrayList<>();
 
   @Id private String id;
   private CustomerRequest customerRequest;
@@ -122,7 +122,7 @@ public class WorkflowRoot {
     return this;
   }
 
-  public WorkflowRoot registerTaskCriteriaEvaluationResults(
+  public WorkflowRoot registerTaskCriteriaActivationResults(
       final TaskType taskType,
       final int order,
       final List<TaskCriteriaEvaluationCommand> taskCriteriaEvaluationCommands) {
@@ -276,7 +276,7 @@ public class WorkflowRoot {
   }
 
   @DomainEvents
-  public Collection<ApplicationEventWrapper> aggregateDomainEvents() {
+  public List<ApplicationEventWrapper> aggregateDomainEvents() {
     LOGGER.info().log("aggregateDomainEvents: {} ", domainEvents);
     return domainEvents.stream().map(ApplicationEventWrapper::wrap).collect(Collectors.toList());
   }

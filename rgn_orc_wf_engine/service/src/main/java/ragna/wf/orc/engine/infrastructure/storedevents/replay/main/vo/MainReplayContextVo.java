@@ -20,7 +20,7 @@ public class MainReplayContextVo {
   private final StoredEventVo storedEventVo;
   private ReplayResult replayResult;
   private MatchResult matchResult;
-  private CriteriaEvaluationResult criteriaEvaluationResult;
+  private Optional<CriteriaEvaluationResult> criteriaEvaluationResult;
   private Optional<? extends MainStoredEventReplayerCallback> mainStoredEventReplayerCallback;
 
   public static MainReplayContextVo createContext(final StoredEventVo storedEventVo) {
@@ -30,12 +30,18 @@ public class MainReplayContextVo {
     mainReplayContextVo.matchResult =
         MatchResult.builder().matchResultType(MatchResultEnum.PROCESSING).build();
     mainReplayContextVo.mainStoredEventReplayerCallback = Optional.empty();
+    mainReplayContextVo.criteriaEvaluationResult = Optional.empty();
     return mainReplayContextVo;
   }
 
   public MainReplayContextVo mainStoredEventReplayerCallback(
       final Optional<? extends MainStoredEventReplayerCallback> mainStoredEventReplayerCallback) {
     this.mainStoredEventReplayerCallback = mainStoredEventReplayerCallback;
+    return this;
+  }
+
+  public MainReplayContextVo matchDefault() {
+    this.matchResult = MatchResult.builder().matchResultType(MatchResultEnum.DEFAULT).build();
     return this;
   }
 
@@ -61,8 +67,9 @@ public class MainReplayContextVo {
     return this;
   }
 
-  public MainReplayContextVo criteriaEvaluationResult(final CriteriaEvaluationResult criteriaEvaluationResult) {
-    this.criteriaEvaluationResult = criteriaEvaluationResult;
+  public MainReplayContextVo criteriaEvaluationResult(
+      final CriteriaEvaluationResult criteriaEvaluationResult) {
+    this.criteriaEvaluationResult = Optional.of(criteriaEvaluationResult);
     return this;
   }
 
@@ -76,13 +83,24 @@ public class MainReplayContextVo {
     return this;
   }
 
+  public MainReplayContextVo published() {
+    this.replayResult = ReplayResult.builder().replayResultType(ReplayResultEnum.PUBLISHED).build();
+    return this;
+  }
+
+  public MainReplayContextVo unmatched() {
+    this.replayResult = ReplayResult.builder().replayResultType(ReplayResultEnum.UNMATCHED).build();
+    return this;
+  }
+
   public enum MatchResultEnum {
+    PROCESSING,
     MATCHED,
     UNMATCHED,
     DEFAULT,
     TASK_NOT_FOUND,
     TASK_CONFIGURATION_NOT_FOUND,
-    ERROR, PROCESSING
+    ERROR
   }
 
   public enum ReplayResultEnum {

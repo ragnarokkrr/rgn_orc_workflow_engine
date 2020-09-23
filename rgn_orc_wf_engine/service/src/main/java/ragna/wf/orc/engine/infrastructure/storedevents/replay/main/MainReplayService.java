@@ -7,6 +7,8 @@ import org.fissore.slf4j.FluentLoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
+import ragna.wf.orc.common.events.DomainEvent;
+import ragna.wf.orc.engine.domain.tasks.vo.CriteriaEvaluationResult;
 import ragna.wf.orc.engine.infrastructure.config.FeatureTogglesConfigProperties;
 import ragna.wf.orc.engine.infrastructure.storedevents.replay.main.vo.MainReplayContextVo;
 import ragna.wf.orc.engine.infrastructure.storedevents.replay.secondary.vo.SecondaryReplayContextVo;
@@ -30,7 +32,7 @@ public class MainReplayService {
   private final FeatureTogglesConfigProperties featureTogglesConfig;
 
   @PostConstruct
-  void init() {
+  public void init() {
     if (!featureTogglesConfig.isReplayEngineEnabled()) {
       LOGGER.info().log("MAIN REPLAY ENGINE: DISABLED!");
       return;
@@ -48,24 +50,16 @@ public class MainReplayService {
             .flatMap(this::replay)
             .flatMap(this::publishEventIfNecessary)
             .flatMap(this::markStoredEventProcessingStatus)
-            .map(this::dispatch)
+            .map(this::dispatchToSideReplay)
             .subscribeOn(Schedulers.newElastic("MainReplay", 3))
             .subscribe();
   }
 
-  private Mono<MainReplayContextVo> publishEventIfNecessary(final MainReplayContextVo mainReplayContextVo) {
-    return Mono.just(mainReplayContextVo);
-  }
-
-  private Mono<MainReplayContextVo> evaluateTaskActivationCriteria(final MainReplayContextVo mainReplayContextVo) {
-    return Mono.just(mainReplayContextVo);
-  }
-
-  private Mono<MainReplayContextVo> findHandler(final MainReplayContextVo mainReplayContextVo) {
+  Mono<MainReplayContextVo> findHandler(final MainReplayContextVo mainReplayContextVo) {
     final var domainEventType = mainReplayContextVo.getStoredEventVo().getDomainEvent().getClass();
     final var matchedReplayer = MainStoredEventReplayerRegistry.matchReplayer(domainEventType);
 
-    if (matchedReplayer.isEmpty()) {
+     if (matchedReplayer.isEmpty()) {
       LOGGER.warn().log("Replay handler not found {}", mainReplayContextVo.getStoredEventVo());
       return Mono.just(mainReplayContextVo.noHandlerFound("Check MainStoredEventReplayerRegistry"));
     }
@@ -81,7 +75,7 @@ public class MainReplayService {
     return Mono.just(mainReplayContextVo);
   }
 
-  private Mono<MainReplayContextVo> replay(final MainReplayContextVo mainReplayContextVo) {
+  Mono<MainReplayContextVo> evaluateTaskActivationCriteria(final MainReplayContextVo mainReplayContextVo) {
     if (mainReplayContextVo.getMainStoredEventReplayerCallback().isEmpty()
             || mainReplayContextVo.getReplayResult().getReplayResultType() == MainReplayContextVo.ReplayResultEnum.NO_HANDLER_FOUND) {
       LOGGER.warn().log("No MainStoredEventReplayerCallback found '{}', skipping {}", mainReplayContextVo.getReplayResult(),
@@ -90,14 +84,48 @@ public class MainReplayService {
     }
 
     final var mainStoredEventReplayerCallback =
-            mainReplayContextVo.getMainStoredEventReplayerCallback().get();
-
-    return mainStoredEventReplayerCallback.doReplay(mainReplayContextVo);
+            (MainStoredEventReplayerCallback<? extends DomainEvent>) mainReplayContextVo.getMainStoredEventReplayerCallback().get();
+    return mainStoredEventReplayerCallback.activateTaskIfConfigured(mainReplayContextVo);
   }
 
-  private Mono<MainReplayContextVo> markStoredEventProcessingStatus(
+  Mono<MainReplayContextVo> replay(final MainReplayContextVo mainReplayContextVo) {
+    if (mainReplayContextVo.getMainStoredEventReplayerCallback().isEmpty()
+            || mainReplayContextVo.getReplayResult().getReplayResultType() == MainReplayContextVo.ReplayResultEnum.NO_HANDLER_FOUND) {
+      LOGGER.warn().log("No MainStoredEventReplayerCallback found '{}', skipping {}", mainReplayContextVo.getReplayResult(),
+              mainReplayContextVo.getStoredEventVo());
+      return Mono.just(mainReplayContextVo);
+    }
+
+    final var mainStoredEventReplayerCallback =
+            (MainStoredEventReplayerCallback<? extends DomainEvent>) mainReplayContextVo.getMainStoredEventReplayerCallback().get();
+
+    return mainStoredEventReplayerCallback.doReplay(mainReplayContextVo).map(MainReplayContextVo::processed);
+  }
+
+  Mono<MainReplayContextVo> publishEventIfNecessary(final MainReplayContextVo mainReplayContextVo) {
+    if (mainReplayContextVo.getCriteriaEvaluationResult().isEmpty()) {
+      LOGGER.warn().log("Activation criteria criteria is empty for {}: ",
+              mainReplayContextVo.getStoredEventVo());
+      return Mono.just(mainReplayContextVo);
+    }
+
+    final var criteriaEvaluationResult = mainReplayContextVo.getCriteriaEvaluationResult().get();
+    if (criteriaEvaluationResult.getCriteriaResultType() != CriteriaEvaluationResult.CriteriaResultType.MATCHED) {
+      LOGGER.warn().log("Activation criteria unmatched for {}: ",
+              mainReplayContextVo.getStoredEventVo(), criteriaEvaluationResult);
+      return Mono.just(mainReplayContextVo.unmatched() );
+    }
+
+    final var mainStoredEventReplayerCallback =
+            (MainStoredEventReplayerCallback<? extends DomainEvent>) mainReplayContextVo.getMainStoredEventReplayerCallback().get();
+    return mainStoredEventReplayerCallback.publish(mainReplayContextVo)
+            .map(MainReplayContextVo::published)
+            .doOnNext(mainReplayContextVo1 -> LOGGER.info().log("PUBLISHED!!!! {}", mainReplayContextVo1));
+  }
+
+  Mono<MainReplayContextVo> markStoredEventProcessingStatus(
           final MainReplayContextVo mainReplayContextVo) {
-    final var updateStoredEventCommand = mapProcessingResult(mainReplayContextVo);
+    final var updateStoredEventCommand = mapReplayProcessingResult(mainReplayContextVo);
 
     if (updateStoredEventCommand.isEmpty()) {
       LOGGER.debug().log("Stored Event Processing result not mapped for event store update: {}", mainReplayContextVo.getStoredEventVo());
@@ -110,23 +138,33 @@ public class MainReplayService {
             .then(Mono.just(mainReplayContextVo));
   }
 
-  private Mono<MainReplayContextVo> dispatch(MainReplayContextVo mainReplayContextVo) {
+  Mono<MainReplayContextVo> dispatchToSideReplay(MainReplayContextVo mainReplayContextVo) {
     final var secondaryReplayContextVo = SecondaryReplayContextVo.createContext(mainReplayContextVo.getStoredEventVo());
     sideReplayContextVoReplayProcessor.onNext(secondaryReplayContextVo);
     return Mono.just(mainReplayContextVo);
   }
 
-  private Optional<UpdateStoredEventCommand> mapProcessingResult(final MainReplayContextVo mainReplayContextVo) {
-    return switch (mainReplayContextVo.getReplayResult().getReplayResultType()) {
+  Optional<UpdateStoredEventCommand> mapReplayProcessingResult(final MainReplayContextVo mainReplayContextVo) {
+    final var replayResultType = mainReplayContextVo.getReplayResult().getReplayResultType();
+    LOGGER.info().log("mapReplayProcessingResult() replayResultType={}, {}", replayResultType,mainReplayContextVo.getStoredEventVo() );
+    return switch (replayResultType) {
       case PROCESSED, NO_HANDLER_FOUND -> Optional.of(UpdateStoredEventCommand.builder()
               .id(mainReplayContextVo.getStoredEventVo().getId())
               .targetState(UpdateStoredEventCommand.TargetState.PROCESSED)
+              .build());
+      case PUBLISHED -> Optional.of(UpdateStoredEventCommand.builder()
+              .id(mainReplayContextVo.getStoredEventVo().getId())
+              .targetState(UpdateStoredEventCommand.TargetState.PUBLISHED)
+              .build());
+      case UNMATCHED -> Optional.of(UpdateStoredEventCommand.builder()
+              .id(mainReplayContextVo.getStoredEventVo().getId())
+              .targetState(UpdateStoredEventCommand.TargetState.UNPUBLISHED)
               .build());
       case ERROR -> Optional.of(UpdateStoredEventCommand.builder()
               .id(mainReplayContextVo.getStoredEventVo().getId())
               .targetState(UpdateStoredEventCommand.TargetState.FAILED)
               .build());
-      case PROCESSING, PUBLISHED, IGNORED, MATCHED, UNMATCHED -> Optional.empty();
+      case PROCESSING, IGNORED, MATCHED -> Optional.empty();
     };
   }
 }

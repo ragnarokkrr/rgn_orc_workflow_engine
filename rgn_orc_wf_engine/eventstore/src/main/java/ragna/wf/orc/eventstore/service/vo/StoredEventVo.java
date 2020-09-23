@@ -44,6 +44,12 @@ public class StoredEventVo {
     return this;
   }
 
+  public StoredEventVo published() {
+    this.eventStatus = StoredEventStatus.PUBLISHED;
+    this.processedOn = LocalDateTime.now();
+    return this;
+  }
+
   public enum StoredEventStatus {
     UNPROCESSED,
     PROCESSING,

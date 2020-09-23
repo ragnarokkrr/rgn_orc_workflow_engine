@@ -26,7 +26,7 @@ class WorkflowRootHappyPathsTest {
     // when
     workflowRoot.triggerFirstTask();
     workflowRoot.finishTaskAndAdvance(TaskType.ANALYSIS, 1, PlannedTask.Result.RECOMMENDED);
-    workflowRoot.registerTaskCriteriaEvaluationResults(
+    workflowRoot.registerTaskCriteriaActivationResults(
         TaskType.ANALYSIS, 1, WorkflowModelFixture.johnConnorCriteriaEvaluation());
     workflowRoot.finishTaskAndAdvance(TaskType.DECISION, 2, PlannedTask.Result.APPROVED);
 

@@ -20,7 +20,7 @@ public class RegisterTaskResultsCommand {
   // @NotBlank private String workflowId;
   @NotNull private TaskType taskType;
   @NotNull private int order;
-  @NotNull private List<TaskCriteriaResult> result;
+  @NotNull private List<TaskCriteriaResult> taskCriteriaResults;
 
   public enum TaskType {
     ANALYSIS,

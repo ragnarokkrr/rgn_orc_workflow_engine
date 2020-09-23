@@ -84,7 +84,7 @@ public class WorkflowTaskManagementService {
   }
 
   @Transactional
-  public Mono<WorkflowVO> registerTaskResult(
+  public Mono<WorkflowVO> registerTaskActivationResult(
       final RegisterTaskResultsCommand registerTaskResultsCommand) {
 
     LOGGER.info().log("Registering task results for workflow. {}", registerTaskResultsCommand);
@@ -103,7 +103,7 @@ public class WorkflowTaskManagementService {
                         registerTaskResultsCommand.getWorkflowId())))
             .map(
                 workflowRoot ->
-                    this.registerDomainTaskResult(workflowRoot, registerTaskResultsCommand))
+                    this.registerDomainTaskActivationResult(workflowRoot, registerTaskResultsCommand))
             .flatMap(this::saveWorkflowRoot)
             .map(WorkflowMapper.INSTANCE::toService)
             .doOnSuccess(
@@ -117,18 +117,18 @@ public class WorkflowTaskManagementService {
     return transactionalOperator.transactional(registerTaskResultMono);
   }
 
-  private WorkflowRoot registerDomainTaskResult(
+  private WorkflowRoot registerDomainTaskActivationResult(
       final WorkflowRoot workflowRoot,
       final RegisterTaskResultsCommand registerTaskResultsCommand) {
     final var taskType =
         RegisterTaskResultsCommandMapper.INSTANCE.toModel(registerTaskResultsCommand.getTaskType());
 
     final var taskCriteriaResults =
-        registerTaskResultsCommand.getResult().stream()
+        registerTaskResultsCommand.getTaskCriteriaResults().stream()
             .map(RegisterTaskResultsCommandMapper.INSTANCE::toModel)
             .collect(Collectors.toList());
 
-    workflowRoot.registerTaskCriteriaEvaluationResults(
+    workflowRoot.registerTaskCriteriaActivationResults(
         taskType, registerTaskResultsCommand.getOrder(), taskCriteriaResults);
 
     return workflowRoot;

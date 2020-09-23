@@ -4,7 +4,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
@@ -141,11 +140,11 @@ class WorkflowServiceHappyPathTest {
             .workflowId(createdWorkflowVO.getId())
             .taskType(RegisterTaskResultsCommand.TaskType.ANALYSIS)
             .order(1)
-            .result(taskCriteriaResults)
+            .taskCriteriaResults(taskCriteriaResults)
             .build();
 
     final var registerFirstTaskResultsMono =
-        workflowTaskManagementService.registerTaskResult(registerFirsTaskResultsCommand);
+        workflowTaskManagementService.registerTaskActivationResult(registerFirsTaskResultsCommand);
     StepVerifier.create(registerFirstTaskResultsMono)
         .expectNextMatches(
             workflowVO -> {

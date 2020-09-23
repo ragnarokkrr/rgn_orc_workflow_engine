@@ -88,7 +88,7 @@ public class WorkflowApi {
           final String workflowId,
       @Valid @RequestBody RegisterTaskResultsCommand registerTaskResultsCommand) {
     return Mono.just(RestMapper.INSTANCE.toService(workflowId, registerTaskResultsCommand))
-        .flatMap(workflowTaskManagementService::registerTaskResult)
+        .flatMap(workflowTaskManagementService::registerTaskActivationResult)
         .map(RestMapper.INSTANCE::toRest)
         .map(ResponseEntity::ok)
         .defaultIfEmpty(ResponseEntity.notFound().build());
