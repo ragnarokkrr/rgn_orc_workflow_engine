@@ -166,7 +166,7 @@ public class HappyPathReplayTest {
         .containsExactly(
                 StoredEventStatus.PROCESSED,
                 StoredEventStatus.UNPUBLISHED,
-                StoredEventStatus.PROCESSING,
+                StoredEventStatus.PROCESSED,
                 StoredEventStatus.PROCESSING,
                 StoredEventStatus.PROCESSING,
                 StoredEventStatus.PROCESSING,

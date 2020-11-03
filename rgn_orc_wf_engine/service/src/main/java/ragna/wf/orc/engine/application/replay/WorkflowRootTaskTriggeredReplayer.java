@@ -104,19 +104,12 @@ public class WorkflowRootTaskTriggeredReplayer implements MainStoredEventReplaye
         final var domainTaskType = RegisterTaskResultsCommand.TaskType.valueOf(lastTriggeredTask.getTaskType().name());
 
         final var criteriaResultList = criteriaEvaluationResult.getCriteriaResultList().stream()
-                .map(criterionResult -> {
-                    final var result =
-                            switch (criterionResult.getResultType()) {
-                                case MATCHED -> RegisterTaskResultsCommand.TaskCriteriaResult.Result.APPROVED;
-                                case ERROR -> RegisterTaskResultsCommand.TaskCriteriaResult.Result.ERROR;
-                                default -> RegisterTaskResultsCommand.TaskCriteriaResult.Result.DISAPPROVED;
-                            };
-                    return RegisterTaskResultsCommand.TaskCriteriaResult.builder()
+                .map(criterionResult ->
+                    RegisterTaskResultsCommand.TaskCriteriaResult.builder()
                             .id(criterionResult.getId())
                             .value(criterionResult.getValue())
-                            .result(result)
-                            .build();
-                })
+                            .result(mapTaskActivationCriteriaResult(criterionResult))
+                            .build())
                 .collect(Collectors.toList());
 
         return RegisterTaskResultsCommand.builder()
@@ -125,6 +118,14 @@ public class WorkflowRootTaskTriggeredReplayer implements MainStoredEventReplaye
                 .order(lastTriggeredTask.getOrder())
                 .taskCriteriaResults(criteriaResultList)
                 .build();
+    }
+
+    private RegisterTaskResultsCommand.TaskCriteriaResult.Result mapTaskActivationCriteriaResult(final CriteriaEvaluationResult.CriterionResult criterionResult) {
+        return switch (criterionResult.getResultType()) {
+            case MATCHED -> RegisterTaskResultsCommand.TaskCriteriaResult.Result.APPROVED;
+            case ERROR -> RegisterTaskResultsCommand.TaskCriteriaResult.Result.ERROR;
+            default -> RegisterTaskResultsCommand.TaskCriteriaResult.Result.DISAPPROVED;
+        };
     }
 
     MainReplayContextVo.MatchResultEnum mapMatchResult(final CriteriaEvaluationResult.CriteriaResultType criteriaResultType) {

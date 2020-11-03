@@ -146,25 +146,20 @@ public class MainReplayService {
 
   Optional<UpdateStoredEventCommand> mapReplayProcessingResult(final MainReplayContextVo mainReplayContextVo) {
     final var replayResultType = mainReplayContextVo.getReplayResult().getReplayResultType();
-    LOGGER.info().log("mapReplayProcessingResult() replayResultType={}, {}", replayResultType,mainReplayContextVo.getStoredEventVo() );
+    LOGGER.debug().log("mapReplayProcessingResult() replayResultType={}, {}", replayResultType,mainReplayContextVo.getStoredEventVo() );
     return switch (replayResultType) {
-      case PROCESSED, NO_HANDLER_FOUND -> Optional.of(UpdateStoredEventCommand.builder()
-              .id(mainReplayContextVo.getStoredEventVo().getId())
-              .targetState(UpdateStoredEventCommand.TargetState.PROCESSED)
-              .build());
-      case PUBLISHED -> Optional.of(UpdateStoredEventCommand.builder()
-              .id(mainReplayContextVo.getStoredEventVo().getId())
-              .targetState(UpdateStoredEventCommand.TargetState.PUBLISHED)
-              .build());
-      case UNMATCHED -> Optional.of(UpdateStoredEventCommand.builder()
-              .id(mainReplayContextVo.getStoredEventVo().getId())
-              .targetState(UpdateStoredEventCommand.TargetState.UNPUBLISHED)
-              .build());
-      case ERROR -> Optional.of(UpdateStoredEventCommand.builder()
-              .id(mainReplayContextVo.getStoredEventVo().getId())
-              .targetState(UpdateStoredEventCommand.TargetState.FAILED)
-              .build());
+      case PROCESSED, NO_HANDLER_FOUND -> Optional.of(buildUpdateStoredEventCommand(mainReplayContextVo, UpdateStoredEventCommand.TargetState.PROCESSED));
+      case PUBLISHED -> Optional.of(buildUpdateStoredEventCommand(mainReplayContextVo, UpdateStoredEventCommand.TargetState.PUBLISHED));
+      case UNMATCHED -> Optional.of(buildUpdateStoredEventCommand(mainReplayContextVo, UpdateStoredEventCommand.TargetState.UNPUBLISHED));
+      case ERROR -> Optional.of(buildUpdateStoredEventCommand(mainReplayContextVo, UpdateStoredEventCommand.TargetState.FAILED));
       case PROCESSING, IGNORED, MATCHED -> Optional.empty();
     };
+  }
+
+  private UpdateStoredEventCommand buildUpdateStoredEventCommand(final MainReplayContextVo mainReplayContextVo, final UpdateStoredEventCommand.TargetState failed) {
+    return UpdateStoredEventCommand.builder()
+            .id(mainReplayContextVo.getStoredEventVo().getId())
+            .targetState(failed)
+            .build();
   }
 }
