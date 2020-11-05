@@ -137,9 +137,9 @@ public class WorkflowRootTaskTriggeredReplayer implements MainStoredEventReplaye
     }
 
     MainReplayContextVo assessTaskActivation(final MainReplayContextVo mainReplayContextVo, final CriteriaEvaluationResult criteriaEvaluationResult) {
-        return mainReplayContextVo.matchResult(MainReplayContextVo.MatchResult.builder()
-                .matchResultType(mapMatchResult(criteriaEvaluationResult.getCriteriaResultType())).build())
-                .criteriaEvaluationResult(criteriaEvaluationResult);
+        final var matchResult = MainReplayContextVo.MatchResult.builder()
+                .matchResultType(mapMatchResult(criteriaEvaluationResult.getCriteriaResultType())).build();
+        return mainReplayContextVo.matchResult(matchResult);
     }
 
     private OrcException newNoTriggeredTaskFoundException(final WorkflowRoot workflowRoot) {

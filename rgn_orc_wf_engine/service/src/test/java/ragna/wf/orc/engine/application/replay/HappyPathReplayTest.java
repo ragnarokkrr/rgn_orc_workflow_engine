@@ -57,7 +57,7 @@ public class HappyPathReplayTest {
   @Autowired StoredEventRepository storedEventRepository;
 
   @BeforeEach
-  void before() {
+  void before() throws InterruptedException {
 
     final var createCollectionFlux = MongoDbUtils.reCreateCollections(this.reactiveMongoOperations);
 
@@ -69,6 +69,7 @@ public class HappyPathReplayTest {
     doReturn(Mono.just(ConfigurationMapper.INSTANCE.toService(configuration)))
         .when(workflowMetadataService)
         .peekConfigurationForWorkflow(any());
+      TimeUnit.MILLISECONDS.sleep(3000);
   }
 
   @Test
