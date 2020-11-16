@@ -89,7 +89,6 @@ class WorkflowRootTaskTriggeredReplayerTest {
     doReturn(this.workflowRootTaskTriggeredReplayerSpy)
         .when(applicationContextMock)
         .getBean(WorkflowRootTaskTriggeredReplayer.class);
-    System.out.println();
   }
 
   @Test
@@ -140,7 +139,7 @@ class WorkflowRootTaskTriggeredReplayerTest {
     // when
     mainReplayContextVoReplayProcessor.onNext(MainReplayContextVo.createContext(storedEventVo));
 
-    TimeUnit.MILLISECONDS.sleep(100);
+    TimeUnit.SECONDS.sleep(1);
 
     // then
 
@@ -151,7 +150,7 @@ class WorkflowRootTaskTriggeredReplayerTest {
     verify(workflowRootTaskTriggeredReplayerSpy, times(1)).publish(any());
     verify(workflowRootTaskTriggeredReplayerSpy, times(1)).saveMatchTaskCriteriaResult(any());
     verify(workflowRootTaskTriggeredReplayerSpy, times(1)).mapMatchResult(any());
-    verify(workflowRootTaskTriggeredReplayerSpy, times(1)).assessTaskActivation(any(), any());
+    verify(workflowRootTaskTriggeredReplayerSpy, times(1)).assessTaskActivation(any());
     verify(triggerTaskMessageProducerMock, times(1)).send(any());
 
     final var contextVoResultCaptorResult =

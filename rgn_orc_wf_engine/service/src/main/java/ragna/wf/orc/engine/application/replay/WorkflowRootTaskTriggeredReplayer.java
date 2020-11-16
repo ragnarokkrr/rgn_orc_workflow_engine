@@ -62,8 +62,8 @@ public class WorkflowRootTaskTriggeredReplayer implements MainStoredEventReplaye
                 .forEach(criteriaEvaluationQueryBuilder::addCriterion);
 
         return taskActivationCriteriaService.matchTaskCriteria(criteriaEvaluationQueryBuilder.build())
-                .map(criteriaEvaluationResult ->
-                        assessTaskActivation(mainReplayContextVo, criteriaEvaluationResult))
+                .map(mainReplayContextVo::criteriaEvaluationResult)
+                .map(this::assessTaskActivation)
                 .doOnNext(mainReplayContextVo1 -> LOGGER.info().log("activateTaskIfConfigured {}", mainReplayContextVo1))
                 ;
     }
@@ -93,10 +93,9 @@ public class WorkflowRootTaskTriggeredReplayer implements MainStoredEventReplaye
             return Mono.error(newNoTriggeredTaskFoundException(workflowRoot));
         }
 
-        final var lastTriggeredTask = lastTriggeredTaskOptional.get();
-        final var criteriaEvaluationResult = mainReplayContextVo.getCriteriaEvaluationResult().get();
-
-        return workflowTaskManagementService.registerTaskActivationResult(buildRegisterTaskResultCommand(workflowRoot, lastTriggeredTask, criteriaEvaluationResult))
+        final var  registerTaskResultsCommand = buildRegisterTaskResultCommand(workflowRoot, lastTriggeredTaskOptional.get(),
+                mainReplayContextVo.getCriteriaEvaluationResult().get());
+        return workflowTaskManagementService.registerTaskActivationResult(registerTaskResultsCommand)
                 .then(Mono.just(mainReplayContextVo));
     }
 
@@ -105,11 +104,11 @@ public class WorkflowRootTaskTriggeredReplayer implements MainStoredEventReplaye
 
         final var criteriaResultList = criteriaEvaluationResult.getCriteriaResultList().stream()
                 .map(criterionResult ->
-                    RegisterTaskResultsCommand.TaskCriteriaResult.builder()
-                            .id(criterionResult.getId())
-                            .value(criterionResult.getValue())
-                            .result(mapTaskActivationCriteriaResult(criterionResult))
-                            .build())
+                        RegisterTaskResultsCommand.TaskCriteriaResult.builder()
+                                .id(criterionResult.getId())
+                                .value(criterionResult.getValue())
+                                .result(mapTaskActivationCriteriaResult(criterionResult))
+                                .build())
                 .collect(Collectors.toList());
 
         return RegisterTaskResultsCommand.builder()
@@ -136,9 +135,12 @@ public class WorkflowRootTaskTriggeredReplayer implements MainStoredEventReplaye
         };
     }
 
-    MainReplayContextVo assessTaskActivation(final MainReplayContextVo mainReplayContextVo, final CriteriaEvaluationResult criteriaEvaluationResult) {
+    MainReplayContextVo assessTaskActivation(final MainReplayContextVo mainReplayContextVo) {
+        if (mainReplayContextVo.getCriteriaEvaluationResult().isEmpty()) {
+            return mainReplayContextVo;
+        }
         final var matchResult = MainReplayContextVo.MatchResult.builder()
-                .matchResultType(mapMatchResult(criteriaEvaluationResult.getCriteriaResultType())).build();
+                .matchResultType(mapMatchResult(mainReplayContextVo.getCriteriaEvaluationResult().get().getCriteriaResultType())).build();
         return mainReplayContextVo.matchResult(matchResult);
     }
 
