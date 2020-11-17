@@ -1,5 +1,7 @@
 package ragna.wf.orc.engine.application.replay;
 
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -10,6 +12,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.mongodb.core.ReactiveMongoOperations;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.testcontainers.containers.MongoDBContainer;
 import ragna.wf.orc.common.data.mongodb.utils.MongoDbUtils;
 import ragna.wf.orc.engine.domain.metadata.service.WorkflowMetadataService;
 import ragna.wf.orc.engine.domain.workflow.model.WorkflowModelFixture;
@@ -29,6 +32,7 @@ import ragna.wf.orc.eventstore.config.EmbeddedMongoWithTransactionsConfig;
 import ragna.wf.orc.eventstore.model.StoredEvent;
 import ragna.wf.orc.eventstore.model.StoredEventStatus;
 import ragna.wf.orc.eventstore.repository.StoredEventRepository;
+import ragna.wf.utils.MongoDBTestContainers;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
@@ -55,6 +59,21 @@ public class HappyPathReplayTest {
   @Autowired private WorkflowRepository workflowRepository;
 
   @Autowired StoredEventRepository storedEventRepository;
+    private static final MongoDBContainer MONGO_DB_CONTAINER =
+            new MongoDBContainer("mongo:4.2");
+
+    @BeforeAll
+    static void setUpAll() {
+        MONGO_DB_CONTAINER.start();
+        MongoDBTestContainers.setSpringDataProperties(MONGO_DB_CONTAINER);
+    }
+
+    @AfterAll
+    static void tearDownAll() {
+        if (!MONGO_DB_CONTAINER.isShouldBeReused()) {
+            MONGO_DB_CONTAINER.stop();
+        }
+    }
 
   @BeforeEach
   void before() throws InterruptedException {
@@ -69,7 +88,7 @@ public class HappyPathReplayTest {
     doReturn(Mono.just(ConfigurationMapper.INSTANCE.toService(configuration)))
         .when(workflowMetadataService)
         .peekConfigurationForWorkflow(any());
-      TimeUnit.MILLISECONDS.sleep(3000);
+      TimeUnit.MILLISECONDS.sleep(1000);
   }
 
   @Test

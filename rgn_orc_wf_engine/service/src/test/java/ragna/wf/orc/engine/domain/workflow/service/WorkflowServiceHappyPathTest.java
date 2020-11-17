@@ -1,5 +1,7 @@
 package ragna.wf.orc.engine.domain.workflow.service;
 
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -10,13 +12,10 @@ import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.mongodb.core.ReactiveMongoOperations;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.testcontainers.containers.MongoDBContainer;
 import ragna.wf.orc.common.data.mongodb.utils.MongoDbUtils;
 import ragna.wf.orc.engine.domain.metadata.service.WorkflowMetadataService;
-import ragna.wf.orc.engine.domain.workflow.model.PlannedTask;
-import ragna.wf.orc.engine.domain.workflow.model.TaskType;
-import ragna.wf.orc.engine.domain.workflow.model.WorkflowModelFixture;
-import ragna.wf.orc.engine.domain.workflow.model.WorkflowResult;
-import ragna.wf.orc.engine.domain.workflow.model.WorkflowStatus;
+import ragna.wf.orc.engine.domain.workflow.model.*;
 import ragna.wf.orc.engine.domain.workflow.repository.WorkflowRepository;
 import ragna.wf.orc.engine.domain.workflow.service.mapper.ConfigurationMapper;
 import ragna.wf.orc.engine.domain.workflow.service.mapper.RegisterTaskResultsCommandMapper;
@@ -25,6 +24,7 @@ import ragna.wf.orc.engine.domain.workflow.service.vo.RegisterTaskResultsCommand
 import ragna.wf.orc.engine.domain.workflow.service.vo.TriggerFirstTaskCommand;
 import ragna.wf.orc.engine.domain.workflow.service.vo.WorkflowVO;
 import ragna.wf.orc.eventstore.config.EmbeddedMongoWithTransactionsConfig;
+import ragna.wf.utils.MongoDBTestContainers;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
@@ -49,6 +49,22 @@ class WorkflowServiceHappyPathTest {
   @Autowired private ReactiveMongoOperations reactiveMongoOperations;
 
   @Autowired private WorkflowRepository workflowRepository;
+
+  private static final MongoDBContainer MONGO_DB_CONTAINER =
+            new MongoDBContainer("mongo:4.2");
+
+  @BeforeAll
+  static void setUpAll() {
+    MONGO_DB_CONTAINER.start();
+    MongoDBTestContainers.setSpringDataProperties(MONGO_DB_CONTAINER);
+  }
+
+  @AfterAll
+  static void tearDownAll() {
+      if (!MONGO_DB_CONTAINER.isShouldBeReused()) {
+          MONGO_DB_CONTAINER.stop();
+      }
+  }
 
   @BeforeEach
   void before() {

@@ -29,7 +29,8 @@ dependencies {
         exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
     }
 
-    testImplementation 'de.flapdoodle.embed:de.flapdoodle.embed.mongo'
+    //testImplementation 'de.flapdoodle.embed:de.flapdoodle.embed.mongo'
+    testImplementation "org.testcontainers:mongodb:1.15.0"
     testImplementation 'io.projectreactor:reactor-test'
     // TODO fix mockito inline configuration
     testImplementation group: 'org.powermock', name: 'powermock-api-mockito2', version: '2.0.7'

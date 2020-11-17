@@ -1,6 +1,7 @@
 dependencies {
     implementation project(':rgn-orc-wf-engine-common')
     implementation 'de.flapdoodle.embed:de.flapdoodle.embed.mongo'
+    implementation "org.testcontainers:mongodb:1.15.0"
 }
 
 

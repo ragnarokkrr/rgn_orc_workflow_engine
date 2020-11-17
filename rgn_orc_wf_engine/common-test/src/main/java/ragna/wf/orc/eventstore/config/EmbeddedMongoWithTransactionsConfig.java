@@ -6,6 +6,7 @@ import com.mongodb.ServerAddress;
 import com.mongodb.reactivestreams.client.MongoClient;
 import com.mongodb.reactivestreams.client.MongoClients;
 import com.mongodb.reactivestreams.client.MongoDatabase;
+/*
 import de.flapdoodle.embed.mongo.MongodExecutable;
 import de.flapdoodle.embed.mongo.MongodStarter;
 import de.flapdoodle.embed.mongo.config.IMongodConfig;
@@ -14,7 +15,9 @@ import de.flapdoodle.embed.mongo.config.MongodConfigBuilder;
 import de.flapdoodle.embed.mongo.config.Net;
 import de.flapdoodle.embed.mongo.distribution.Version;
 import de.flapdoodle.embed.process.runtime.Network;
+
 import org.bson.Document;
+ */
 import org.springframework.boot.autoconfigure.AbstractDependsOnBeanFactoryPostProcessor;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
@@ -33,6 +36,9 @@ import java.util.concurrent.TimeUnit;
 
 // https://apisimulator.io/spring-boot-auto-configuration-embedded-mongodb-transactions/
 // https://mongodb.github.io/mongo-java-driver/4.0/driver/getting-started/quick-start/
+// UPGRADE: https://github.com/flapdoodle-oss/de.flapdoodle.embed.mongo/issues/325
+// ERROR: https://github.com/flapdoodle-oss/de.flapdoodle.embed.mongo/issues/324
+/*
 @Profile("embedMongoWithTx")
 @Configuration(proxyBeanMethods = false)
 @AutoConfigureBefore({MongoAutoConfiguration.class})
@@ -41,6 +47,7 @@ import java.util.concurrent.TimeUnit;
   EmbeddedMongoAutoConfiguration.class,
   EmbeddedMongoWithTransactionsConfig.DependenciesConfiguration.class
 })
+*/
 public class EmbeddedMongoWithTransactionsConfig {
 
   // You may get a warning in the log upon shutdown like this:
@@ -53,7 +60,7 @@ public class EmbeddedMongoWithTransactionsConfig {
   public static final int DFLT_PORT_NUMBER = 27017;
   public static final String DFLT_REPLICASET_NAME = "rs0";
   public static final int DFLT_STOP_TIMEOUT_MILLIS = 200;
-
+/*
   private Version.Main mFeatureAwareVersion = Version.Main.V4_0;
   private int mPortNumber = DFLT_PORT_NUMBER;
   private String mReplicaSetName = DFLT_REPLICASET_NAME;
@@ -75,7 +82,7 @@ public class EmbeddedMongoWithTransactionsConfig {
   /**
    * Initializes a new replica set. Based on code from
    * https://github.com/flapdoodle-oss/de.flapdoodle.embed.mongo/issues/257
-   */
+   * /
   class EmbeddedMongoReplicaSetInitialization {
 
     EmbeddedMongoReplicaSetInitialization() throws Exception {
@@ -128,7 +135,7 @@ public class EmbeddedMongoWithTransactionsConfig {
   /**
    * Additional configuration to ensure that the replica set initialization happens after the {@link
    * MongodExecutable} bean is created. That's it - after the database is started.
-   */
+   * /
   @ConditionalOnClass({MongoClient.class, MongodStarter.class})
   protected static class DependenciesConfiguration
       extends AbstractDependsOnBeanFactoryPostProcessor {
@@ -137,4 +144,6 @@ public class EmbeddedMongoWithTransactionsConfig {
       super(EmbeddedMongoReplicaSetInitialization.class, null, MongodExecutable.class);
     }
   }
+
+ */
 }

@@ -63,14 +63,14 @@ public class WorkflowRootTaskTriggeredReplayer implements MainStoredEventReplaye
 
         return taskActivationCriteriaService.matchTaskCriteria(criteriaEvaluationQueryBuilder.build())
                 .map(mainReplayContextVo::criteriaEvaluationResult)
-                .map(this::assessTaskActivation)
+                .map(this::activateTask)
                 .doOnNext(mainReplayContextVo1 -> LOGGER.info().log("activateTaskIfConfigured {}", mainReplayContextVo1))
                 ;
     }
 
     @Override
     public Mono<MainReplayContextVo> doReplay(final MainReplayContextVo mainReplayContextVo) {
-        return saveMatchTaskCriteriaResult(mainReplayContextVo);
+        return saveTaskCriteriaMatchResult(mainReplayContextVo);
     }
 
     @Override
@@ -81,7 +81,7 @@ public class WorkflowRootTaskTriggeredReplayer implements MainStoredEventReplaye
                 .then(Mono.just(mainReplayContextVo));
     }
 
-    Mono<MainReplayContextVo> saveMatchTaskCriteriaResult(final MainReplayContextVo mainReplayContextVo) {
+    Mono<MainReplayContextVo> saveTaskCriteriaMatchResult(final MainReplayContextVo mainReplayContextVo) {
         final var workflowRoot = (WorkflowRoot) mainReplayContextVo.getStoredEventVo().getDomainEvent().getSource();
         final var lastTriggeredTaskOptional = workflowRoot.findLastTriggeredTask();
 
@@ -135,7 +135,7 @@ public class WorkflowRootTaskTriggeredReplayer implements MainStoredEventReplaye
         };
     }
 
-    MainReplayContextVo assessTaskActivation(final MainReplayContextVo mainReplayContextVo) {
+    MainReplayContextVo activateTask(final MainReplayContextVo mainReplayContextVo) {
         if (mainReplayContextVo.getCriteriaEvaluationResult().isEmpty()) {
             return mainReplayContextVo;
         }
