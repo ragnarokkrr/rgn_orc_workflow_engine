@@ -16,11 +16,7 @@ import org.testcontainers.containers.MongoDBContainer;
 import ragna.wf.orc.common.data.mongodb.utils.MongoDbUtils;
 import ragna.wf.orc.engine.domain.metadata.service.WorkflowMetadataService;
 import ragna.wf.orc.engine.domain.workflow.model.WorkflowModelFixture;
-import ragna.wf.orc.engine.domain.workflow.model.events.WorkflowRootCreated;
-import ragna.wf.orc.engine.domain.workflow.model.events.WorkflowRootFinished;
-import ragna.wf.orc.engine.domain.workflow.model.events.WorkflowRootTaskEvaluated;
-import ragna.wf.orc.engine.domain.workflow.model.events.WorkflowRootTaskFinished;
-import ragna.wf.orc.engine.domain.workflow.model.events.WorkflowRootTaskTriggered;
+import ragna.wf.orc.engine.domain.workflow.model.events.*;
 import ragna.wf.orc.engine.domain.workflow.repository.WorkflowRepository;
 import ragna.wf.orc.engine.domain.workflow.service.ServiceFixtures;
 import ragna.wf.orc.engine.domain.workflow.service.WorkflowCreationService;
@@ -29,10 +25,10 @@ import ragna.wf.orc.engine.domain.workflow.service.mapper.ConfigurationMapper;
 import ragna.wf.orc.engine.domain.workflow.service.vo.FinishTaskCommand;
 import ragna.wf.orc.engine.domain.workflow.service.vo.WorkflowVO;
 import ragna.wf.orc.eventstore.config.EmbeddedMongoWithTransactionsConfig;
+import ragna.wf.orc.eventstore.config.MongoDBTestContainers;
 import ragna.wf.orc.eventstore.model.StoredEvent;
 import ragna.wf.orc.eventstore.model.StoredEventStatus;
 import ragna.wf.orc.eventstore.repository.StoredEventRepository;
-import ragna.wf.utils.MongoDBTestContainers;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
@@ -60,7 +56,7 @@ public class HappyPathReplayTest {
 
   @Autowired StoredEventRepository storedEventRepository;
     private static final MongoDBContainer MONGO_DB_CONTAINER =
-            new MongoDBContainer("mongo:4.2");
+            MongoDBTestContainers.defaultMongoContainer();
 
     @BeforeAll
     static void setUpAll() {

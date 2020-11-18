@@ -5,7 +5,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.mongodb.core.ReactiveMongoOperations;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -15,8 +14,7 @@ import ragna.wf.orc.engine.domain.metadata.service.WorkflowMetadataService;
 import ragna.wf.orc.engine.domain.workflow.model.WorkflowModelFixture;
 import ragna.wf.orc.engine.domain.workflow.service.mapper.ConfigurationMapper;
 import ragna.wf.orc.engine.domain.workflow.service.vo.WorkflowVO;
-import ragna.wf.orc.eventstore.config.EmbeddedMongoWithTransactionsConfig;
-import ragna.wf.utils.MongoDBTestContainers;
+import ragna.wf.orc.eventstore.config.MongoDBTestContainers;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
@@ -27,7 +25,6 @@ import static org.mockito.Mockito.doReturn;
 @Profile("embedMongoWithTx")
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(properties = {"orc.feature.toggles.replay-enabled=false"})
-@Import(EmbeddedMongoWithTransactionsConfig.class)
 class WorkflowCreationServiceTest {
 
   @MockBean private WorkflowMetadataService workflowMetadataService;
@@ -37,7 +34,7 @@ class WorkflowCreationServiceTest {
   @Autowired private ReactiveMongoOperations reactiveMongoOperations;
 
   private static final MongoDBContainer MONGO_DB_CONTAINER =
-          new MongoDBContainer("mongo:4.2");
+          MongoDBTestContainers.defaultMongoContainer();
 
   @BeforeAll
   static void setUpAll() {
