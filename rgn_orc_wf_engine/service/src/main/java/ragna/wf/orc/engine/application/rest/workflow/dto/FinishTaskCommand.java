@@ -1,13 +1,12 @@
 package ragna.wf.orc.engine.application.rest.workflow.dto;
 
+import javax.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import javax.validation.constraints.NotNull;
 
 @Data
 @Setter(AccessLevel.NONE)

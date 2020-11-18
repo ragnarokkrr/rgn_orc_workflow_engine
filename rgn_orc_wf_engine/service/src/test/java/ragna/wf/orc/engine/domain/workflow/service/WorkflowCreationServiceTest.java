@@ -1,5 +1,9 @@
 package ragna.wf.orc.engine.domain.workflow.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doReturn;
+
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,10 +22,6 @@ import ragna.wf.orc.eventstore.config.MongoDBTestContainers;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doReturn;
-
 @Profile("embedMongoWithTx")
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(properties = {"orc.feature.toggles.replay-enabled=false"})
@@ -34,7 +34,7 @@ class WorkflowCreationServiceTest {
   @Autowired private ReactiveMongoOperations reactiveMongoOperations;
 
   private static final MongoDBContainer MONGO_DB_CONTAINER =
-          MongoDBTestContainers.defaultMongoContainer();
+      MongoDBTestContainers.defaultMongoContainer();
 
   @BeforeAll
   static void setUpAll() {
@@ -65,8 +65,7 @@ class WorkflowCreationServiceTest {
   }
 
   @Test
-  void
-  whenANewRequestIsSubmitted_thenShouldCreateWorkflow() {
+  void whenANewRequestIsSubmitted_thenShouldCreateWorkflow() {
     // given
     final var configuration = WorkflowModelFixture.sampleTwoTasksConfiguration();
     doReturn(Mono.just(ConfigurationMapper.INSTANCE.toService(configuration)))

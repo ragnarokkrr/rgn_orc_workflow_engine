@@ -1,5 +1,6 @@
 package ragna.wf.orc.engine.domain.workflow.service;
 
+import javax.validation.Validator;
 import lombok.RequiredArgsConstructor;
 import org.fissore.slf4j.FluentLogger;
 import org.fissore.slf4j.FluentLoggerFactory;
@@ -18,8 +19,6 @@ import ragna.wf.orc.engine.domain.workflow.service.mapper.WorkflowMapper;
 import ragna.wf.orc.engine.domain.workflow.service.vo.CreateWorkflowCommand;
 import ragna.wf.orc.engine.domain.workflow.service.vo.WorkflowVO;
 import reactor.core.publisher.Mono;
-
-import javax.validation.Validator;
 
 @Service
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
@@ -121,5 +120,4 @@ public class WorkflowCreationService {
                     .debug()
                     .log("Configuration found {}! {}", createWorkflowCommand, configurationVO));
   }
-
 }

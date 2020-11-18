@@ -1,5 +1,7 @@
 package ragna.wf.orc.engine.domain.workflow.service;
 
+import java.util.stream.Collectors;
+import javax.validation.Validator;
 import lombok.RequiredArgsConstructor;
 import org.fissore.slf4j.FluentLogger;
 import org.fissore.slf4j.FluentLoggerFactory;
@@ -17,9 +19,6 @@ import ragna.wf.orc.engine.domain.workflow.service.vo.RegisterTaskResultsCommand
 import ragna.wf.orc.engine.domain.workflow.service.vo.TriggerFirstTaskCommand;
 import ragna.wf.orc.engine.domain.workflow.service.vo.WorkflowVO;
 import reactor.core.publisher.Mono;
-
-import javax.validation.Validator;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
@@ -103,7 +102,8 @@ public class WorkflowTaskManagementService {
                         registerTaskResultsCommand.getWorkflowId())))
             .map(
                 workflowRoot ->
-                    this.registerDomainTaskActivationResult(workflowRoot, registerTaskResultsCommand))
+                    this.registerDomainTaskActivationResult(
+                        workflowRoot, registerTaskResultsCommand))
             .flatMap(this::saveWorkflowRoot)
             .map(WorkflowMapper.INSTANCE::toService)
             .doOnSuccess(

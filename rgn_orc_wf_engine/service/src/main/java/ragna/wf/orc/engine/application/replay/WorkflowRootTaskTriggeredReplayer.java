@@ -1,5 +1,6 @@
 package ragna.wf.orc.engine.application.replay;
 
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.fissore.slf4j.FluentLogger;
 import org.fissore.slf4j.FluentLoggerFactory;
@@ -22,135 +23,172 @@ import ragna.wf.orc.engine.infrastructure.storedevents.replay.main.MainStoredEve
 import ragna.wf.orc.engine.infrastructure.storedevents.replay.main.vo.MainReplayContextVo;
 import reactor.core.publisher.Mono;
 
-import java.util.stream.Collectors;
-
 @Service
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
-public class WorkflowRootTaskTriggeredReplayer implements MainStoredEventReplayerCallback<WorkflowRootTaskTriggered> {
-    private static final FluentLogger LOGGER =
-            FluentLoggerFactory.getLogger(WorkflowRootTaskTriggeredReplayer.class);
-    private final TaskActivationCriteriaService taskActivationCriteriaService;
-    private final WorkflowTaskManagementService workflowTaskManagementService;
-    private final TriggerTaskMessageProducer triggerTaskMessageProducer;
+public class WorkflowRootTaskTriggeredReplayer
+    implements MainStoredEventReplayerCallback<WorkflowRootTaskTriggered> {
+  private static final FluentLogger LOGGER =
+      FluentLoggerFactory.getLogger(WorkflowRootTaskTriggeredReplayer.class);
+  private final TaskActivationCriteriaService taskActivationCriteriaService;
+  private final WorkflowTaskManagementService workflowTaskManagementService;
+  private final TriggerTaskMessageProducer triggerTaskMessageProducer;
 
-    @Override
-    public Mono<MainReplayContextVo> activateTaskIfConfigured(final MainReplayContextVo mainReplayContextVo) {
-        final var workflowRootTaskTriggered = (WorkflowRootTaskTriggered) mainReplayContextVo.getStoredEventVo().getDomainEvent();
-        final var workflowRoot = (WorkflowRoot) workflowRootTaskTriggered.getSource();
+  @Override
+  public Mono<MainReplayContextVo> activateTaskIfConfigured(
+      final MainReplayContextVo mainReplayContextVo) {
+    final var workflowRootTaskTriggered =
+        (WorkflowRootTaskTriggered) mainReplayContextVo.getStoredEventVo().getDomainEvent();
+    final var workflowRoot = (WorkflowRoot) workflowRootTaskTriggered.getSource();
 
-        final var lastTriggeredTaskOptional = workflowRoot.findLastTriggeredTask();
+    final var lastTriggeredTaskOptional = workflowRoot.findLastTriggeredTask();
 
-        if (lastTriggeredTaskOptional.isEmpty()) {
-            return Mono.just(mainReplayContextVo.matchResult(MainReplayContextVo.MatchResult.builder()
-                    .matchResultType(MainReplayContextVo.MatchResultEnum.TASK_NOT_FOUND)
-                    .build()));
-        }
-
-        final var configuredTaskOptional = workflowRoot.findTaskConfiguration(lastTriggeredTaskOptional.get());
-
-        if (configuredTaskOptional.isEmpty()) {
-            return Mono.just(mainReplayContextVo.matchResult(MainReplayContextVo.MatchResult.builder()
-                    .matchResultType(MainReplayContextVo.MatchResultEnum.TASK_CONFIGURATION_NOT_FOUND)
-                    .build()));
-        }
-
-        final var criteriaEvaluationQueryBuilder = CriteriaEvaluationQuery.builder()
-                .customerId(workflowRoot.getCustomerRequest().getCustomerId());
-
-        configuredTaskOptional.get().getConfiguredTaskCriteriaList().stream()
-                .map(CriterionMapper.INSTANCE::mapToService)
-                .forEach(criteriaEvaluationQueryBuilder::addCriterion);
-
-        return taskActivationCriteriaService.matchTaskCriteria(criteriaEvaluationQueryBuilder.build())
-                .map(mainReplayContextVo::criteriaEvaluationResult)
-                .map(this::activateTask)
-                .doOnNext(mainReplayContextVo1 -> LOGGER.info().log("activateTaskIfConfigured {}", mainReplayContextVo1))
-                ;
+    if (lastTriggeredTaskOptional.isEmpty()) {
+      return Mono.just(
+          mainReplayContextVo.matchResult(
+              MainReplayContextVo.MatchResult.builder()
+                  .matchResultType(MainReplayContextVo.MatchResultEnum.TASK_NOT_FOUND)
+                  .build()));
     }
 
-    @Override
-    public Mono<MainReplayContextVo> doReplay(final MainReplayContextVo mainReplayContextVo) {
-        return saveTaskCriteriaMatchResult(mainReplayContextVo);
+    final var configuredTaskOptional =
+        workflowRoot.findTaskConfiguration(lastTriggeredTaskOptional.get());
+
+    if (configuredTaskOptional.isEmpty()) {
+      return Mono.just(
+          mainReplayContextVo.matchResult(
+              MainReplayContextVo.MatchResult.builder()
+                  .matchResultType(MainReplayContextVo.MatchResultEnum.TASK_CONFIGURATION_NOT_FOUND)
+                  .build()));
     }
 
-    @Override
-    public Mono<MainReplayContextVo> publish(final MainReplayContextVo mainReplayContextVo) {
-        LOGGER.info().log("Publishing {} to Orc topic output", mainReplayContextVo.getStoredEventVo());
-        final var triggerTaskDto = TriggerTaskDto.builder().build();
-        return Mono.fromCallable(() -> triggerTaskMessageProducer.send(triggerTaskDto))
-                .then(Mono.just(mainReplayContextVo));
+    final var criteriaEvaluationQueryBuilder =
+        CriteriaEvaluationQuery.builder()
+            .customerId(workflowRoot.getCustomerRequest().getCustomerId());
+
+    configuredTaskOptional.get().getConfiguredTaskCriteriaList().stream()
+        .map(CriterionMapper.INSTANCE::mapToService)
+        .forEach(criteriaEvaluationQueryBuilder::addCriterion);
+
+    return taskActivationCriteriaService
+        .matchTaskCriteria(criteriaEvaluationQueryBuilder.build())
+        .map(mainReplayContextVo::criteriaEvaluationResult)
+        .map(this::activateTask)
+        .doOnNext(
+            mainReplayContextVo1 ->
+                LOGGER.info().log("activateTaskIfConfigured {}", mainReplayContextVo1));
+  }
+
+  @Override
+  public Mono<MainReplayContextVo> doReplay(final MainReplayContextVo mainReplayContextVo) {
+    return saveTaskCriteriaMatchResult(mainReplayContextVo);
+  }
+
+  @Override
+  public Mono<MainReplayContextVo> publish(final MainReplayContextVo mainReplayContextVo) {
+    LOGGER.info().log("Publishing {} to Orc topic output", mainReplayContextVo.getStoredEventVo());
+    final var triggerTaskDto = TriggerTaskDto.builder().build();
+    return Mono.fromCallable(() -> triggerTaskMessageProducer.send(triggerTaskDto))
+        .then(Mono.just(mainReplayContextVo));
+  }
+
+  Mono<MainReplayContextVo> saveTaskCriteriaMatchResult(
+      final MainReplayContextVo mainReplayContextVo) {
+    final var workflowRoot =
+        (WorkflowRoot) mainReplayContextVo.getStoredEventVo().getDomainEvent().getSource();
+    final var lastTriggeredTaskOptional = workflowRoot.findLastTriggeredTask();
+
+    if (mainReplayContextVo.getCriteriaEvaluationResult().isEmpty()) {
+      return Mono.error(newActivationCriteriaResultsNotFoundException(workflowRoot));
     }
 
-    Mono<MainReplayContextVo> saveTaskCriteriaMatchResult(final MainReplayContextVo mainReplayContextVo) {
-        final var workflowRoot = (WorkflowRoot) mainReplayContextVo.getStoredEventVo().getDomainEvent().getSource();
-        final var lastTriggeredTaskOptional = workflowRoot.findLastTriggeredTask();
-
-        if (mainReplayContextVo.getCriteriaEvaluationResult().isEmpty()) {
-            return Mono.error(newActivationCriteriaResultsNotFoundException(workflowRoot));
-        }
-
-        if (lastTriggeredTaskOptional.isEmpty()) {
-            return Mono.error(newNoTriggeredTaskFoundException(workflowRoot));
-        }
-
-        final var  registerTaskResultsCommand = buildRegisterTaskResultCommand(workflowRoot, lastTriggeredTaskOptional.get(),
-                mainReplayContextVo.getCriteriaEvaluationResult().get());
-        return workflowTaskManagementService.registerTaskActivationResult(registerTaskResultsCommand)
-                .then(Mono.just(mainReplayContextVo));
+    if (lastTriggeredTaskOptional.isEmpty()) {
+      return Mono.error(newNoTriggeredTaskFoundException(workflowRoot));
     }
 
-    private RegisterTaskResultsCommand buildRegisterTaskResultCommand(final WorkflowRoot workflowRoot, final PlannedTask lastTriggeredTask, final CriteriaEvaluationResult criteriaEvaluationResult) {
-        final var domainTaskType = RegisterTaskResultsCommand.TaskType.valueOf(lastTriggeredTask.getTaskType().name());
+    final var registerTaskResultsCommand =
+        buildRegisterTaskResultCommand(
+            workflowRoot,
+            lastTriggeredTaskOptional.get(),
+            mainReplayContextVo.getCriteriaEvaluationResult().get());
+    return workflowTaskManagementService
+        .registerTaskActivationResult(registerTaskResultsCommand)
+        .then(Mono.just(mainReplayContextVo));
+  }
 
-        final var criteriaResultList = criteriaEvaluationResult.getCriteriaResultList().stream()
-                .map(criterionResult ->
-                        RegisterTaskResultsCommand.TaskCriteriaResult.builder()
-                                .id(criterionResult.getId())
-                                .value(criterionResult.getValue())
-                                .result(mapTaskActivationCriteriaResult(criterionResult))
-                                .build())
-                .collect(Collectors.toList());
+  private RegisterTaskResultsCommand buildRegisterTaskResultCommand(
+      final WorkflowRoot workflowRoot,
+      final PlannedTask lastTriggeredTask,
+      final CriteriaEvaluationResult criteriaEvaluationResult) {
+    final var domainTaskType =
+        RegisterTaskResultsCommand.TaskType.valueOf(lastTriggeredTask.getTaskType().name());
 
-        return RegisterTaskResultsCommand.builder()
-                .workflowId(workflowRoot.getId())
-                .taskType(domainTaskType)
-                .order(lastTriggeredTask.getOrder())
-                .taskCriteriaResults(criteriaResultList)
-                .build();
+    final var criteriaResultList =
+        criteriaEvaluationResult.getCriteriaResultList().stream()
+            .map(
+                criterionResult ->
+                    RegisterTaskResultsCommand.TaskCriteriaResult.builder()
+                        .id(criterionResult.getId())
+                        .value(criterionResult.getValue())
+                        .result(mapTaskActivationCriteriaResult(criterionResult))
+                        .build())
+            .collect(Collectors.toList());
+
+    return RegisterTaskResultsCommand.builder()
+        .workflowId(workflowRoot.getId())
+        .taskType(domainTaskType)
+        .order(lastTriggeredTask.getOrder())
+        .taskCriteriaResults(criteriaResultList)
+        .build();
+  }
+
+  private RegisterTaskResultsCommand.TaskCriteriaResult.Result mapTaskActivationCriteriaResult(
+      final CriteriaEvaluationResult.CriterionResult criterionResult) {
+    return switch (criterionResult.getResultType()) {
+      case MATCHED -> RegisterTaskResultsCommand.TaskCriteriaResult.Result.APPROVED;
+      case ERROR -> RegisterTaskResultsCommand.TaskCriteriaResult.Result.ERROR;
+      default -> RegisterTaskResultsCommand.TaskCriteriaResult.Result.DISAPPROVED;
+    };
+  }
+
+  MainReplayContextVo.MatchResultEnum mapMatchResult(
+      final CriteriaEvaluationResult.CriteriaResultType criteriaResultType) {
+    return switch (criteriaResultType) {
+      case MATCHED -> MainReplayContextVo.MatchResultEnum.MATCHED;
+      case ERROR -> MainReplayContextVo.MatchResultEnum.ERROR;
+      case UNMATCHED, INVALID_CRITERION -> MainReplayContextVo.MatchResultEnum.UNMATCHED;
+    };
+  }
+
+  MainReplayContextVo activateTask(final MainReplayContextVo mainReplayContextVo) {
+    if (mainReplayContextVo.getCriteriaEvaluationResult().isEmpty()) {
+      return mainReplayContextVo;
     }
+    final var matchResult =
+        MainReplayContextVo.MatchResult.builder()
+            .matchResultType(
+                mapMatchResult(
+                    mainReplayContextVo
+                        .getCriteriaEvaluationResult()
+                        .get()
+                        .getCriteriaResultType()))
+            .build();
+    return mainReplayContextVo.matchResult(matchResult);
+  }
 
-    private RegisterTaskResultsCommand.TaskCriteriaResult.Result mapTaskActivationCriteriaResult(final CriteriaEvaluationResult.CriterionResult criterionResult) {
-        return switch (criterionResult.getResultType()) {
-            case MATCHED -> RegisterTaskResultsCommand.TaskCriteriaResult.Result.APPROVED;
-            case ERROR -> RegisterTaskResultsCommand.TaskCriteriaResult.Result.ERROR;
-            default -> RegisterTaskResultsCommand.TaskCriteriaResult.Result.DISAPPROVED;
-        };
-    }
+  private OrcException newNoTriggeredTaskFoundException(final WorkflowRoot workflowRoot) {
+    return new OrcException(
+        String.format(
+            "No triggered task in workflow: %s. (%s)",
+            workflowRoot.getId(), workflowRoot.getCustomerRequest()),
+        ErrorCode.WORKFLOW_TASK_NOT_FOUND);
+  }
 
-    MainReplayContextVo.MatchResultEnum mapMatchResult(final CriteriaEvaluationResult.CriteriaResultType criteriaResultType) {
-        return switch (criteriaResultType) {
-            case MATCHED -> MainReplayContextVo.MatchResultEnum.MATCHED;
-            case ERROR -> MainReplayContextVo.MatchResultEnum.ERROR;
-            case UNMATCHED, INVALID_CRITERION -> MainReplayContextVo.MatchResultEnum.UNMATCHED;
-        };
-    }
-
-    MainReplayContextVo activateTask(final MainReplayContextVo mainReplayContextVo) {
-        if (mainReplayContextVo.getCriteriaEvaluationResult().isEmpty()) {
-            return mainReplayContextVo;
-        }
-        final var matchResult = MainReplayContextVo.MatchResult.builder()
-                .matchResultType(mapMatchResult(mainReplayContextVo.getCriteriaEvaluationResult().get().getCriteriaResultType())).build();
-        return mainReplayContextVo.matchResult(matchResult);
-    }
-
-    private OrcException newNoTriggeredTaskFoundException(final WorkflowRoot workflowRoot) {
-        return new OrcException(String.format("No triggered task in workflow: %s. (%s)", workflowRoot.getId(), workflowRoot.getCustomerRequest())
-                , ErrorCode.WORKFLOW_TASK_NOT_FOUND);
-    }
-
-    private OrcException newActivationCriteriaResultsNotFoundException(final WorkflowRoot workflowRoot) {
-        return new OrcException(String.format("No triggered task in workflow: %s. (%s)", workflowRoot.getId(), workflowRoot.getCustomerRequest())
-                , ErrorCode.WORKFLOW_TASK_ACTIVATION_EVALUATION_RESULT_NOT_FOUND);
-    }
+  private OrcException newActivationCriteriaResultsNotFoundException(
+      final WorkflowRoot workflowRoot) {
+    return new OrcException(
+        String.format(
+            "No triggered task in workflow: %s. (%s)",
+            workflowRoot.getId(), workflowRoot.getCustomerRequest()),
+        ErrorCode.WORKFLOW_TASK_ACTIVATION_EVALUATION_RESULT_NOT_FOUND);
+  }
 }

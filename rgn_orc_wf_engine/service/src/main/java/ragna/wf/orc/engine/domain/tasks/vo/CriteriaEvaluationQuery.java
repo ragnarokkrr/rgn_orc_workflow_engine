@@ -1,10 +1,9 @@
 package ragna.wf.orc.engine.domain.tasks.vo;
 
-import lombok.Builder;
-import lombok.Data;
-
 import java.util.ArrayList;
 import java.util.List;
+import lombok.Builder;
+import lombok.Data;
 
 @Data
 @Builder

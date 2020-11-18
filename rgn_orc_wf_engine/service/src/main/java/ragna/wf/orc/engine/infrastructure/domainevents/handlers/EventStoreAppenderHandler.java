@@ -1,5 +1,6 @@
 package ragna.wf.orc.engine.infrastructure.domainevents.handlers;
 
+import javax.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.fissore.slf4j.FluentLogger;
 import org.fissore.slf4j.FluentLoggerFactory;
@@ -11,8 +12,6 @@ import ragna.wf.orc.eventstore.service.vo.StoredEventVo;
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.ReplayProcessor;
 import reactor.core.scheduler.Schedulers;
-
-import javax.annotation.PostConstruct;
 
 @Component
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))

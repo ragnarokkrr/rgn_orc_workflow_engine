@@ -1,10 +1,9 @@
 package ragna.wf.orc.engine.domain.workflow.model;
 
-import org.junit.jupiter.api.Test;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Map;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.Test;
 
 class WorkflowRootTest {
 

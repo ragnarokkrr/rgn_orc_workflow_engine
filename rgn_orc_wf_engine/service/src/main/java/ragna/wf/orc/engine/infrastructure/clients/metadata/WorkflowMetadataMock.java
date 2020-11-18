@@ -1,5 +1,8 @@
 package ragna.wf.orc.engine.infrastructure.clients.metadata;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import org.springframework.stereotype.Component;
 import ragna.wf.orc.engine.domain.metadata.service.WorkflowMetadataService;
 import ragna.wf.orc.engine.domain.metadata.service.vo.ConfigurationRequest;
@@ -9,10 +12,6 @@ import ragna.wf.orc.engine.domain.workflow.model.ConfiguredTask;
 import ragna.wf.orc.engine.domain.workflow.model.TaskType;
 import ragna.wf.orc.engine.domain.workflow.service.mapper.ConfigurationMapper;
 import reactor.core.publisher.Mono;
-
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 @Component
 public class WorkflowMetadataMock implements WorkflowMetadataService {
@@ -43,10 +42,11 @@ public class WorkflowMetadataMock implements WorkflowMetadataService {
                                     .build())
                             // Kryo serialization problems with immutable collections
                             .addAllCriteria(
-                                    new ArrayList<>(
-                                            List.of(
-                                                    ConfiguredTaskCriteriaMockFactory.TASK_CRITERIA_ASC.get(),
-                                                    ConfiguredTaskCriteriaMockFactory.TASK_CRITERIA_DESC.get())))
+                                new ArrayList<>(
+                                    List.of(
+                                        ConfiguredTaskCriteriaMockFactory.TASK_CRITERIA_ASC.get(),
+                                        ConfiguredTaskCriteriaMockFactory.TASK_CRITERIA_DESC
+                                            .get())))
                             .build(),
                         ConfiguredTask.builder()
                             .order(2)

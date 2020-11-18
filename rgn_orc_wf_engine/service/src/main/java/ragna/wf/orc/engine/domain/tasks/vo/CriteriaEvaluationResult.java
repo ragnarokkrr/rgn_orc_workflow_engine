@@ -1,12 +1,11 @@
 package ragna.wf.orc.engine.domain.tasks.vo;
 
-import lombok.Builder;
-import lombok.Data;
-import org.springframework.util.CollectionUtils;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
+import lombok.Builder;
+import lombok.Data;
+import org.springframework.util.CollectionUtils;
 
 @Data
 @Builder

@@ -1,5 +1,11 @@
 package ragna.wf.orc.engine.domain.workflow.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doReturn;
+
+import java.util.Objects;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -26,13 +32,6 @@ import ragna.wf.orc.eventstore.config.MongoDBTestContainers;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
-import java.util.Objects;
-import java.util.stream.Collectors;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doReturn;
-
 @Profile("embedMongoWithTx")
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(properties = {"orc.feature.toggles.replay-enabled=false"})
@@ -48,7 +47,7 @@ class WorkflowServiceHappyPathTest {
   @Autowired private WorkflowRepository workflowRepository;
 
   private static final MongoDBContainer MONGO_DB_CONTAINER =
-          MongoDBTestContainers.defaultMongoContainer();
+      MongoDBTestContainers.defaultMongoContainer();
 
   @BeforeAll
   static void setUpAll() {
@@ -58,9 +57,9 @@ class WorkflowServiceHappyPathTest {
 
   @AfterAll
   static void tearDownAll() {
-      if (!MONGO_DB_CONTAINER.isShouldBeReused()) {
-          MONGO_DB_CONTAINER.stop();
-      }
+    if (!MONGO_DB_CONTAINER.isShouldBeReused()) {
+      MONGO_DB_CONTAINER.stop();
+    }
   }
 
   @BeforeEach

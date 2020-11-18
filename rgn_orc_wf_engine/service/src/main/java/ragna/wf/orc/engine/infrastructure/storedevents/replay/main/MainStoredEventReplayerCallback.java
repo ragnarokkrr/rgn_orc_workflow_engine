@@ -1,20 +1,20 @@
 package ragna.wf.orc.engine.infrastructure.storedevents.replay.main;
 
+import java.lang.reflect.ParameterizedType;
 import org.fissore.slf4j.FluentLogger;
 import org.fissore.slf4j.FluentLoggerFactory;
 import ragna.wf.orc.common.events.DomainEvent;
 import ragna.wf.orc.engine.infrastructure.storedevents.replay.main.vo.MainReplayContextVo;
 import reactor.core.publisher.Mono;
 
-import java.lang.reflect.ParameterizedType;
-
 public interface MainStoredEventReplayerCallback<T extends DomainEvent> {
   default Class<T> domainEventType() {
-    return (Class<T>) ((ParameterizedType) getClass()
-            .getGenericSuperclass()).getActualTypeArguments()[0];
+    return (Class<T>)
+        ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0];
   }
 
-  default Mono<MainReplayContextVo> activateTaskIfConfigured(final MainReplayContextVo mainReplayContextVo) {
+  default Mono<MainReplayContextVo> activateTaskIfConfigured(
+      final MainReplayContextVo mainReplayContextVo) {
     LogHolder.LOGGER.info().log("Default no-op match {}", mainReplayContextVo.getStoredEventVo());
     return Mono.just(mainReplayContextVo.matchDefault());
   }

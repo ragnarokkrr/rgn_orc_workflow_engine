@@ -2,7 +2,7 @@ package ragna.wf.orc.engine;
 
 import com.mongodb.reactivestreams.client.MongoClient;
 import com.mongodb.reactivestreams.client.MongoDatabase;
-import org.bson.Document;
+import java.util.concurrent.TimeUnit;
 import org.fissore.slf4j.FluentLogger;
 import org.fissore.slf4j.FluentLoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,9 +10,6 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
-import ragna.wf.orc.common.data.mongodb.test.SubscriberHelpers;
-
-import java.util.concurrent.TimeUnit;
 
 @SpringBootApplication
 public class RagnaOrcMain {
@@ -29,11 +26,11 @@ public class RagnaOrcMain {
     return args -> {
       LOGGER.info().log("INITIALIZING DB");
       final MongoDatabase adminDatabase = mongoClient.getDatabase("admin");
-//      adminDatabase
-  //        .runCommand(new Document("setFeatureCompatibilityVersion", "4.2"))
-    //      .subscribe(new SubscriberHelpers.PrintDocumentSubscriber());
+      //      adminDatabase
+      //        .runCommand(new Document("setFeatureCompatibilityVersion", "4.2"))
+      //      .subscribe(new SubscriberHelpers.PrintDocumentSubscriber());
 
-      //adminDatabase
+      // adminDatabase
       //    .runCommand(
       //        new Document().append("featureCompatibilityVersion", 1).append("getParameter", 1))
       //    .subscribe(new SubscriberHelpers.PrintDocumentSubscriber());

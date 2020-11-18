@@ -1,5 +1,7 @@
 package ragna.wf.orc.engine.infrastructure.storedevents.replay;
 
+import java.time.Duration;
+import javax.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.fissore.slf4j.FluentLogger;
 import org.fissore.slf4j.FluentLoggerFactory;
@@ -13,9 +15,6 @@ import ragna.wf.orc.eventstore.service.vo.StoredEventVo;
 import reactor.core.publisher.ReplayProcessor;
 import reactor.core.scheduler.Schedulers;
 
-import javax.annotation.PostConstruct;
-import java.time.Duration;
-
 @Component
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class StoredEventReplayService {
@@ -28,12 +27,16 @@ public class StoredEventReplayService {
 
   @PostConstruct
   void init() {
-    final var replayInitialDelaySecs = domainEventsConfigurationProperties.getReplayInitialDelaySecs();
+    final var replayInitialDelaySecs =
+        domainEventsConfigurationProperties.getReplayInitialDelaySecs();
     if (!featureTogglesConfig.isReplayEngineEnabled()) {
       LOGGER.info().log("EVENT STORE STREAMING: DISABLED!");
       return;
     }
-    LOGGER.info().log("EVENT STORE STREAMING: ENABLED! (wait {} secs until startup)", replayInitialDelaySecs);
+    LOGGER
+        .info()
+        .log(
+            "EVENT STORE STREAMING: ENABLED! (wait {} secs until startup)", replayInitialDelaySecs);
 
     eventStoreStreamingService
         .streamUnprocessedEvents()

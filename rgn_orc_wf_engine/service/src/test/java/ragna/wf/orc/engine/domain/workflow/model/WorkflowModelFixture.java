@@ -1,10 +1,9 @@
 package ragna.wf.orc.engine.domain.workflow.model;
 
-import ragna.wf.orc.engine.infrastructure.clients.metadata.ConfiguredTaskCriteriaMockFactory;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import ragna.wf.orc.engine.infrastructure.clients.metadata.ConfiguredTaskCriteriaMockFactory;
 
 public final class WorkflowModelFixture {
   private WorkflowModelFixture() {}

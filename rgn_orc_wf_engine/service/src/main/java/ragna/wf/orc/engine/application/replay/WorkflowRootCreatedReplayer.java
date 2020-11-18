@@ -27,9 +27,8 @@ public class WorkflowRootCreatedReplayer
         (WorkflowRootCreated) mainReplayContextVo.getStoredEventVo().getDomainEvent();
     final var workflowRoot = (WorkflowRoot) workflowRootCreated.getSource();
 
-    final var triggerFirstTaskCommand = TriggerFirstTaskCommand.builder()
-            .workflowId(workflowRoot.getId())
-            .build();
+    final var triggerFirstTaskCommand =
+        TriggerFirstTaskCommand.builder().workflowId(workflowRoot.getId()).build();
 
     return workflowTaskManagementService
         .triggerFirstTask(triggerFirstTaskCommand)

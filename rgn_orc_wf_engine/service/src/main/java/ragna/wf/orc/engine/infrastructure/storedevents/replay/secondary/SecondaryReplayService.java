@@ -1,5 +1,6 @@
 package ragna.wf.orc.engine.infrastructure.storedevents.replay.secondary;
 
+import javax.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.fissore.slf4j.FluentLogger;
 import org.fissore.slf4j.FluentLoggerFactory;
@@ -9,8 +10,6 @@ import ragna.wf.orc.engine.infrastructure.config.FeatureTogglesConfigProperties;
 import ragna.wf.orc.engine.infrastructure.storedevents.replay.secondary.vo.SecondaryReplayContextVo;
 import reactor.core.publisher.ReplayProcessor;
 import reactor.core.scheduler.Schedulers;
-
-import javax.annotation.PostConstruct;
 
 @Component
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))

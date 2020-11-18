@@ -1,11 +1,10 @@
 package ragna.wf.orc.engine.application.rest.workflow.dto;
 
+import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor(access = AccessLevel.PUBLIC)

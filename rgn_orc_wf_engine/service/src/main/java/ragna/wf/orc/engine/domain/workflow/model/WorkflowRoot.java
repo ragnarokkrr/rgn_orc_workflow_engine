@@ -1,5 +1,12 @@
 package ragna.wf.orc.engine.domain.workflow.model;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.stream.Collectors;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -24,15 +31,6 @@ import ragna.wf.orc.engine.domain.workflow.model.events.WorkflowRootTaskEvaluate
 import ragna.wf.orc.engine.domain.workflow.model.events.WorkflowRootTaskFinished;
 import ragna.wf.orc.engine.domain.workflow.model.events.WorkflowRootTaskTriggered;
 import ragna.wf.orc.engine.domain.workflow.model.mapper.TaskCriteriaMapper;
-
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Document(collection = "workflows")
 @Data
@@ -146,7 +144,7 @@ public class WorkflowRoot {
   }
 
   public WorkflowRoot finishTaskAndAdvance(
-          TaskType taskType, int order, PlannedTask.Result result) {
+      TaskType taskType, int order, PlannedTask.Result result) {
     LOGGER.debug().log(WorkflowUtils.fornatedMessage(this, "Finishing task and then advance"));
     finishTask(taskType, order, result);
     return advanceIfAnyTaskRemains();
@@ -163,7 +161,7 @@ public class WorkflowRoot {
   WorkflowRoot triggerTask(TaskType taskType, int order) {
     // TODO status assertion
     final var taskToTrigger =
-            WorkflowPlannedTaskService.findTaskToTrigger(this, taskType, order, "triggerTask()");
+        WorkflowPlannedTaskService.findTaskToTrigger(this, taskType, order, "triggerTask()");
     if (!Objects.equals(taskToTrigger.getStatus(), PlannedTask.Status.PLANNED)) {
       final var message = WorkflowUtils.fornatedMessage(this, "triggerTask()");
       throw new OrcIllegalStateException(message, ErrorCode.INVALID_STATE_TO_RIGGER_TASK);

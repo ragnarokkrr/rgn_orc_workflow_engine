@@ -8,7 +8,7 @@ buildscript {
 plugins {
     id 'org.springframework.boot' version '2.4.0'
     id 'io.spring.dependency-management' version '1.0.9.RELEASE'
-    //id 'com.github.sherter.google-java-format' version '0.9'
+    id 'com.github.sherter.google-java-format' version '0.9'
     id 'java-library'
     id 'eclipse'
     id 'idea'
@@ -42,7 +42,7 @@ subprojects {
     apply plugin: 'org.springframework.boot'
     apply plugin: 'io.spring.dependency-management'
     apply from: "${project.rootDir}/dependencies.gradle"
-
+    apply plugin: 'com.github.sherter.google-java-format'
 
     // jacoco {
     //    toolVersion = "0.8.4"

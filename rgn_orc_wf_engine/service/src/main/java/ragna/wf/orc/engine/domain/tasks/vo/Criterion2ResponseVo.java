@@ -6,5 +6,5 @@ import lombok.Data;
 @Data
 @Builder
 public class Criterion2ResponseVo {
-    private Long value;
+  private Long value;
 }

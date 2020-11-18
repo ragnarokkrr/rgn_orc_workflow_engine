@@ -15,9 +15,9 @@ public enum CriteriaServices {
 
   static CriteriaServices fromStringOrDefault(final String key) {
     return Stream.of(values())
-            .filter(criteriaServices -> criteriaServices.key.equals(key))
-            .findFirst()
-            .orElse(NO_CRITERION);
+        .filter(criteriaServices -> criteriaServices.key.equals(key))
+        .findFirst()
+        .orElse(NO_CRITERION);
   }
 
   public String getKey() {

@@ -1,11 +1,10 @@
 package ragna.wf.orc.engine.domain.workflow.model;
 
+import java.util.Objects;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.Assert;
 import ragna.wf.orc.common.exceptions.ErrorCode;
 import ragna.wf.orc.common.exceptions.OrcIllegalStateException;
-
-import java.util.Objects;
 
 interface WorkflowAssertions {
   interface StateAssertion {

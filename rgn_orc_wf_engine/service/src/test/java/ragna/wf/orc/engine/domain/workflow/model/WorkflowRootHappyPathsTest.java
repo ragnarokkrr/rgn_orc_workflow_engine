@@ -1,5 +1,8 @@
 package ragna.wf.orc.engine.domain.workflow.model;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.util.Objects;
 import org.junit.jupiter.api.Test;
 import ragna.wf.orc.common.events.spring.ApplicationEventWrapper;
 import ragna.wf.orc.engine.domain.workflow.model.events.WorkflowRootCreated;
@@ -7,10 +10,6 @@ import ragna.wf.orc.engine.domain.workflow.model.events.WorkflowRootFinished;
 import ragna.wf.orc.engine.domain.workflow.model.events.WorkflowRootTaskEvaluated;
 import ragna.wf.orc.engine.domain.workflow.model.events.WorkflowRootTaskFinished;
 import ragna.wf.orc.engine.domain.workflow.model.events.WorkflowRootTaskTriggered;
-
-import java.util.Objects;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 class WorkflowRootHappyPathsTest {
   @Test

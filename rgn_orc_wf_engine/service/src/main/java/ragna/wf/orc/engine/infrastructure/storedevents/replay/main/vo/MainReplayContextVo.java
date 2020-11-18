@@ -1,5 +1,6 @@
 package ragna.wf.orc.engine.infrastructure.storedevents.replay.main.vo;
 
+import java.util.Optional;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -10,8 +11,6 @@ import org.apache.commons.lang3.StringUtils;
 import ragna.wf.orc.engine.domain.tasks.vo.CriteriaEvaluationResult;
 import ragna.wf.orc.engine.infrastructure.storedevents.replay.main.MainStoredEventReplayerCallback;
 import ragna.wf.orc.eventstore.service.vo.StoredEventVo;
-
-import java.util.Optional;
 
 @Data
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)

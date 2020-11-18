@@ -1,5 +1,19 @@
 package ragna.wf.orc.engine.application.replay;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.powermock.api.mockito.PowerMockito.doAnswer;
+import static org.powermock.api.mockito.PowerMockito.doReturn;
+import static org.powermock.api.mockito.PowerMockito.mock;
+import static org.powermock.api.mockito.PowerMockito.when;
+import static ragna.wf.orc.engine.domain.workflow.model.WorkflowModelFixture.kyleReeseCustomerRequest;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.ApplicationContext;
@@ -25,21 +39,6 @@ import ragna.wf.orc.eventstore.service.mappers.StoredEventMapper;
 import ragna.wf.utils.ResultCaptor;
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.ReplayProcessor;
-
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.powermock.api.mockito.PowerMockito.doAnswer;
-import static org.powermock.api.mockito.PowerMockito.doReturn;
-import static org.powermock.api.mockito.PowerMockito.mock;
-import static org.powermock.api.mockito.PowerMockito.when;
-import static ragna.wf.orc.engine.domain.workflow.model.WorkflowModelFixture.kyleReeseCustomerRequest;
 
 class WorkflowRootTaskTriggeredReplayerTest {
   private MainReplayService mainReplayServiceSpy;
@@ -154,25 +153,24 @@ class WorkflowRootTaskTriggeredReplayerTest {
     verify(triggerTaskMessageProducerMock, times(1)).send(any());
 
     final var contextVoResultCaptorResult =
-            mainReplayContextVoResultCaptorPublish.getResult().block();
+        mainReplayContextVoResultCaptorPublish.getResult().block();
     assertThat(contextVoResultCaptorResult)
-            .isNotNull()
-            .hasFieldOrPropertyWithValue(
-                    "matchResult",
-                    MainReplayContextVo.MatchResult.builder()
-                            .matchResultType(MainReplayContextVo.MatchResultEnum.MATCHED)
-                            .build())
-            .hasFieldOrPropertyWithValue(
-                    "replayResult",
-                    MainReplayContextVo.ReplayResult.builder()
-                            .replayResultType(MainReplayContextVo.ReplayResultEnum.PUBLISHED)
-                            .build())
-            .hasNoNullFieldsOrProperties();
+        .isNotNull()
+        .hasFieldOrPropertyWithValue(
+            "matchResult",
+            MainReplayContextVo.MatchResult.builder()
+                .matchResultType(MainReplayContextVo.MatchResultEnum.MATCHED)
+                .build())
+        .hasFieldOrPropertyWithValue(
+            "replayResult",
+            MainReplayContextVo.ReplayResult.builder()
+                .replayResultType(MainReplayContextVo.ReplayResultEnum.PUBLISHED)
+                .build())
+        .hasNoNullFieldsOrProperties();
     assertThat(contextVoResultCaptorResult.getCriteriaEvaluationResult()).isPresent();
     assertThat(contextVoResultCaptorResult.getMainStoredEventReplayerCallback()).isPresent();
     assertThat(contextVoResultCaptorResult.getMainStoredEventReplayerCallback().get())
-            .isInstanceOf(WorkflowRootTaskTriggeredReplayer.class);
-
+        .isInstanceOf(WorkflowRootTaskTriggeredReplayer.class);
   }
 
   private CriteriaEvaluationResult criteriaEvaluationResultFixture() {

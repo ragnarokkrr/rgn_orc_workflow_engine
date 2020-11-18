@@ -7,7 +7,7 @@ import ragna.wf.orc.engine.domain.workflow.model.ConfiguredTask;
 
 @Mapper
 public interface CriterionMapper {
-    CriterionMapper INSTANCE = Mappers.getMapper(CriterionMapper.class);
+  CriterionMapper INSTANCE = Mappers.getMapper(CriterionMapper.class);
 
-    CriteriaEvaluationQuery.Criterion mapToService(ConfiguredTask.TaskCriterion taskCriterion);
+  CriteriaEvaluationQuery.Criterion mapToService(ConfiguredTask.TaskCriterion taskCriterion);
 }

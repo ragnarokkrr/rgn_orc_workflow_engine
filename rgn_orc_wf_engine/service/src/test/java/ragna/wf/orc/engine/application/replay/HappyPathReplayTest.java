@@ -1,5 +1,10 @@
 package ragna.wf.orc.engine.application.replay;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doReturn;
+
+import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -32,12 +37,6 @@ import ragna.wf.orc.eventstore.repository.StoredEventRepository;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
-import java.util.concurrent.TimeUnit;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doReturn;
-
 @Profile("embedMongoWithTx")
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(
@@ -55,21 +54,21 @@ public class HappyPathReplayTest {
   @Autowired private WorkflowRepository workflowRepository;
 
   @Autowired StoredEventRepository storedEventRepository;
-    private static final MongoDBContainer MONGO_DB_CONTAINER =
-            MongoDBTestContainers.defaultMongoContainer();
+  private static final MongoDBContainer MONGO_DB_CONTAINER =
+      MongoDBTestContainers.defaultMongoContainer();
 
-    @BeforeAll
-    static void setUpAll() {
-        MONGO_DB_CONTAINER.start();
-        MongoDBTestContainers.setSpringDataProperties(MONGO_DB_CONTAINER);
-    }
+  @BeforeAll
+  static void setUpAll() {
+    MONGO_DB_CONTAINER.start();
+    MongoDBTestContainers.setSpringDataProperties(MONGO_DB_CONTAINER);
+  }
 
-    @AfterAll
-    static void tearDownAll() {
-        if (!MONGO_DB_CONTAINER.isShouldBeReused()) {
-            MONGO_DB_CONTAINER.stop();
-        }
+  @AfterAll
+  static void tearDownAll() {
+    if (!MONGO_DB_CONTAINER.isShouldBeReused()) {
+      MONGO_DB_CONTAINER.stop();
     }
+  }
 
   @BeforeEach
   void before() throws InterruptedException {
@@ -84,7 +83,7 @@ public class HappyPathReplayTest {
     doReturn(Mono.just(ConfigurationMapper.INSTANCE.toService(configuration)))
         .when(workflowMetadataService)
         .peekConfigurationForWorkflow(any());
-      TimeUnit.MILLISECONDS.sleep(1000);
+    TimeUnit.MILLISECONDS.sleep(1000);
   }
 
   @Test
@@ -180,13 +179,12 @@ public class HappyPathReplayTest {
     assertThat(storedEventList)
         .extracting(StoredEvent::getEventStatus)
         .containsExactly(
-                StoredEventStatus.PROCESSED,
-                StoredEventStatus.UNPUBLISHED,
-                StoredEventStatus.PROCESSED,
-                StoredEventStatus.PROCESSING,
-                StoredEventStatus.PROCESSING,
-                StoredEventStatus.PROCESSING,
-                StoredEventStatus.PROCESSING
-        );
+            StoredEventStatus.PROCESSED,
+            StoredEventStatus.UNPUBLISHED,
+            StoredEventStatus.PROCESSED,
+            StoredEventStatus.PROCESSING,
+            StoredEventStatus.PROCESSING,
+            StoredEventStatus.PROCESSING,
+            StoredEventStatus.PROCESSING);
   }
 }

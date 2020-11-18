@@ -1,5 +1,10 @@
 package ragna.wf.orc.engine.domain.tasks;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doReturn;
+import static org.powermock.api.mockito.PowerMockito.mock;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -12,11 +17,6 @@ import ragna.wf.orc.engine.domain.tasks.vo.Criterion2ResponseVo;
 import ragna.wf.orc.engine.infrastructure.clients.metadata.ConfiguredTaskCriteriaMockFactory;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doReturn;
-import static org.powermock.api.mockito.PowerMockito.mock;
 
 @ExtendWith(MockitoExtension.class)
 class TaskActivationCriteriaServiceTest {
@@ -48,7 +48,7 @@ class TaskActivationCriteriaServiceTest {
     final var taskCriteria2 = ConfiguredTaskCriteriaMockFactory.TASK_CRITERIA_DESC.get();
     final var criteriaEvaluationQuery =
         CriteriaEvaluationQuery.builder()
-                .customerId("1")
+            .customerId("1")
             .addCriterion(CriterionMapper.INSTANCE.mapToService(taskCriteria1))
             .addCriterion(CriterionMapper.INSTANCE.mapToService(taskCriteria2))
             .build();
@@ -62,8 +62,8 @@ class TaskActivationCriteriaServiceTest {
         .expectNextMatches(
             criteriaEvaluationResult -> {
               assertThat(criteriaEvaluationResult).isNotNull();
-                assertThat(criteriaEvaluationResult)
-                        .hasFieldOrPropertyWithValue("customerId", "1")
+              assertThat(criteriaEvaluationResult)
+                  .hasFieldOrPropertyWithValue("customerId", "1")
                   .hasFieldOrPropertyWithValue(
                       "criteriaResultType", CriteriaEvaluationResult.CriteriaResultType.MATCHED);
 
@@ -89,6 +89,5 @@ class TaskActivationCriteriaServiceTest {
               return true;
             })
         .verifyComplete();
-
   }
 }
