@@ -1,38 +1,53 @@
 package ragna.wf.orc.eventstore.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
-import org.springframework.context.annotation.Profile;
 import org.springframework.data.mongodb.core.ReactiveMongoOperations;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.testcontainers.containers.MongoDBContainer;
 import ragna.wf.orc.common.data.mongodb.utils.MongoDbUtils;
 import ragna.wf.orc.common.events.DomainEvent;
 import ragna.wf.orc.eventstore.EventStoreTestApplication;
-import ragna.wf.orc.eventstore.config.EmbeddedMongoWithTransactionsConfig;
+import ragna.wf.orc.eventstore.config.MongoDBTestContainers;
 import ragna.wf.orc.eventstore.model.StoredEventStatus;
 import ragna.wf.orc.eventstore.repository.StoredEventRepository;
 import ragna.wf.orc.eventstore.service.vo.StoredEventVo;
 import reactor.test.StepVerifier;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-@Profile("embedMongoWithTx")
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = EventStoreTestApplication.class)
-@Import(EmbeddedMongoWithTransactionsConfig.class)
 public class EventStoreServiceTest {
   @Autowired private EventStoreService eventStoreService;
   @Autowired private StoredEventRepository storedEventRepository;
   @Autowired private EventSerializationDelegate eventSerializationDelegate;
   @Autowired private ReactiveMongoOperations reactiveMongoOperations;
+
+  private static final MongoDBContainer MONGO_DB_CONTAINER =
+      MongoDBTestContainers.defaultMongoContainer();
+
+  @BeforeAll
+  static void setUpAll() {
+    MONGO_DB_CONTAINER.start();
+    MongoDBTestContainers.setSpringDataProperties(MONGO_DB_CONTAINER);
+  }
+
+  @AfterAll
+  static void tearDownAll() {
+    if (!MONGO_DB_CONTAINER.isShouldBeReused()) {
+      MONGO_DB_CONTAINER.stop();
+    }
+  }
 
   @BeforeEach
   void before() {

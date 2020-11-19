@@ -1,12 +1,11 @@
 package ragna.wf.orc.eventstore.service.vo;
 
+import java.time.LocalDateTime;
+import java.util.StringJoiner;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import ragna.wf.orc.common.events.DomainEvent;
-
-import java.time.LocalDateTime;
-import java.util.StringJoiner;
 
 @Data
 @AllArgsConstructor

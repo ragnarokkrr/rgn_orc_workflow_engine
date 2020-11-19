@@ -1,20 +1,17 @@
 package ragna.wf.orc.eventstore.service;
 
+import java.time.Duration;
 import lombok.RequiredArgsConstructor;
 import org.fissore.slf4j.FluentLogger;
 import org.fissore.slf4j.FluentLoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
-import ragna.wf.orc.common.events.DomainEvent;
-import ragna.wf.orc.eventstore.model.StoredEvent;
 import ragna.wf.orc.eventstore.repository.StoreEventPollingRepository;
 import ragna.wf.orc.eventstore.service.mappers.StoredEventMapper;
 import ragna.wf.orc.eventstore.service.vo.StoredEventVo;
 import reactor.core.publisher.Flux;
 import reactor.util.retry.RetrySpec;
-
-import java.time.Duration;
 
 @Service
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))

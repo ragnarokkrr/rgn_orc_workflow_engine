@@ -2,6 +2,7 @@ package ragna.wf.orc.eventstore.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.vavr.control.Try;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.fissore.slf4j.FluentLogger;
 import org.fissore.slf4j.FluentLoggerFactory;
@@ -13,8 +14,6 @@ import ragna.wf.orc.eventstore.repository.StoredEventRepository;
 import ragna.wf.orc.eventstore.service.mappers.NotificationLogVoMapper;
 import ragna.wf.orc.eventstore.service.vo.NotificationLogVo;
 import reactor.core.publisher.Mono;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))

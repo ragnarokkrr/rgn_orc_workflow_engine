@@ -1,5 +1,6 @@
 package ragna.wf.orc.eventstore.repository;
 
+import java.time.Duration;
 import lombok.RequiredArgsConstructor;
 import org.fissore.slf4j.FluentLogger;
 import org.fissore.slf4j.FluentLoggerFactory;
@@ -17,8 +18,6 @@ import ragna.wf.orc.eventstore.model.StoredEventStatus;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.retry.RetrySpec;
-
-import java.time.Duration;
 
 @Repository
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))

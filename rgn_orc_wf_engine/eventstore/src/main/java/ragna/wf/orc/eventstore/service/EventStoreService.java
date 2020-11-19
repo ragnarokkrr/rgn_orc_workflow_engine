@@ -1,7 +1,6 @@
 package ragna.wf.orc.eventstore.service;
 
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang3.StringUtils;
 import org.fissore.slf4j.FluentLogger;
 import org.fissore.slf4j.FluentLoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,17 +8,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.reactive.TransactionalOperator;
 import ragna.wf.orc.common.events.DomainEvent;
-import ragna.wf.orc.common.exceptions.eventstore.EventStoreException;
 import ragna.wf.orc.eventstore.model.StoredEvent;
-import ragna.wf.orc.eventstore.model.StoredEventStatus;
 import ragna.wf.orc.eventstore.repository.StoredEventRepository;
 import ragna.wf.orc.eventstore.service.mappers.StoredEventMapper;
 import ragna.wf.orc.eventstore.service.vo.StoredEventVo;
 import ragna.wf.orc.eventstore.service.vo.UpdateStoredEventCommand;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
-import java.util.Arrays;
 
 @Service
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
@@ -47,10 +42,8 @@ public class EventStoreService {
                     eventSerializationDelegate.getSerializationEngine()))
             .map(StoredEventMapper.INSTANCE::toService)
             .doOnError(throwable -> LOGGER.error().log("Error on StoredEvent stored!", throwable))
-            .doOnNext(
-                storedEventVo -> storedEventVo.setDomainEvent(domainEvent))
-            .doOnNext(storedEventVo ->
-                    LOGGER.info().log("StoredEvent stored! {}", storedEventVo));
+            .doOnNext(storedEventVo -> storedEventVo.setDomainEvent(domainEvent))
+            .doOnNext(storedEventVo -> LOGGER.info().log("StoredEvent stored! {}", storedEventVo));
     return this.transactionalOperator.transactional(saveStoredEventMono);
   }
 
@@ -62,14 +55,12 @@ public class EventStoreService {
     return eventSerializationDelegate.serializeEvent(sourceObject);
   }
 
-  @Transactional
+  // @Transactional
   public Mono<StoredEventVo> updateStatus(final UpdateStoredEventCommand updateStoredEventCommand) {
 
     return storedEventRepository
         .findById(updateStoredEventCommand.getId())
-        .map(
-            storedEvent ->
-                this.updateStoredEventStatus(storedEvent, updateStoredEventCommand))
+        .map(storedEvent -> this.updateStoredEventStatus(storedEvent, updateStoredEventCommand))
         .flatMap(storedEventRepository::save)
         .map(StoredEventMapper.INSTANCE::toService);
   }

@@ -56,7 +56,6 @@ public class HappyPathReplayTest {
 
   @BeforeAll
   static void setUpAll() {
-    System.out.println("KKKKKKK: " + Arrays.toString(MONGO_DB_CONTAINER.getCommandParts()));
     MONGO_DB_CONTAINER.start();
 
     MongoDBTestContainers.setSpringDataProperties(MONGO_DB_CONTAINER);
