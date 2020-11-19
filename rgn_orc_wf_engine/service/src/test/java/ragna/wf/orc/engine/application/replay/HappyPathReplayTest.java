@@ -4,6 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -13,8 +15,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Import;
-import org.springframework.context.annotation.Profile;
 import org.springframework.data.mongodb.core.ReactiveMongoOperations;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.testcontainers.containers.MongoDBContainer;
@@ -29,7 +29,6 @@ import ragna.wf.orc.engine.domain.workflow.service.WorkflowTaskManagementService
 import ragna.wf.orc.engine.domain.workflow.service.mapper.ConfigurationMapper;
 import ragna.wf.orc.engine.domain.workflow.service.vo.FinishTaskCommand;
 import ragna.wf.orc.engine.domain.workflow.service.vo.WorkflowVO;
-import ragna.wf.orc.eventstore.config.EmbeddedMongoWithTransactionsConfig;
 import ragna.wf.orc.eventstore.config.MongoDBTestContainers;
 import ragna.wf.orc.eventstore.model.StoredEvent;
 import ragna.wf.orc.eventstore.model.StoredEventStatus;
@@ -37,11 +36,9 @@ import ragna.wf.orc.eventstore.repository.StoredEventRepository;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
-@Profile("embedMongoWithTx")
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(
     properties = {"orc.feature.toggles.replay-enabled=true", "orc.events.replayInitialDelaySecs=1"})
-@Import(EmbeddedMongoWithTransactionsConfig.class)
 public class HappyPathReplayTest {
   @Autowired private ReactiveMongoOperations reactiveMongoOperations;
 
@@ -59,7 +56,9 @@ public class HappyPathReplayTest {
 
   @BeforeAll
   static void setUpAll() {
+    System.out.println("KKKKKKK: " + Arrays.toString(MONGO_DB_CONTAINER.getCommandParts()));
     MONGO_DB_CONTAINER.start();
+
     MongoDBTestContainers.setSpringDataProperties(MONGO_DB_CONTAINER);
   }
 
@@ -83,83 +82,76 @@ public class HappyPathReplayTest {
     doReturn(Mono.just(ConfigurationMapper.INSTANCE.toService(configuration)))
         .when(workflowMetadataService)
         .peekConfigurationForWorkflow(any());
-    TimeUnit.MILLISECONDS.sleep(1000);
+    waitForStoredEventReplay();
+    return;
   }
 
   @Test
   void whenWorkflowRootFinishesAndAdvanceAllTasksAndAchieveConclusionState_thenWorkflowIsFinished()
       throws InterruptedException {
-    TimeUnit.MILLISECONDS.sleep(1000);
+    waitForStoredEventReplay();
 
     // 1 - create workflow
     final var createWorkflowCommand = ServiceFixtures.kyleReeseCreateWorkflowCommand();
     final var createWorkflowMono = workflowCreationService.createWorkflow(createWorkflowCommand);
-    final var createdWorkflowVoArray = new WorkflowVO[1];
+
+    final var createdWorkflowVOs = new ArrayList<WorkflowVO>();
     StepVerifier.create(createWorkflowMono)
-        .expectNextMatches(
-            workflowVO -> {
-              createdWorkflowVoArray[0] = workflowVO;
-              return true;
-            })
+        .recordWith(() -> createdWorkflowVOs)
+        .expectNextCount(1)
         .verifyComplete();
 
-    TimeUnit.MILLISECONDS.sleep(1000);
-
+    waitForStoredEventReplay();
+    final var createdWorkflowVo = createdWorkflowVOs.get(0);
     // 2 - finish task 1
     final var finishTaskCommand =
         FinishTaskCommand.builder()
-            .workflowId(createdWorkflowVoArray[0].getId())
+            .workflowId(createdWorkflowVo.getId())
             .order(1)
             .taskType(FinishTaskCommand.TaskType.ANALYSIS)
             .result(FinishTaskCommand.Result.RECOMMENDED)
             .build();
 
-    final var finishTaskWorkflowVoArray = new WorkflowVO[1];
+    final var finishTaskWorkflowVOs = new ArrayList<WorkflowVO>();
     final var finishTaskAndAdvanceMono =
         workflowTaskManagementService.finishTaskAndAdvance(finishTaskCommand);
 
     StepVerifier.create(finishTaskAndAdvanceMono)
-        .expectNextMatches(
-            workflowVO -> {
-              finishTaskWorkflowVoArray[0] = workflowVO;
-              return true;
-            })
+        .recordWith(() -> finishTaskWorkflowVOs)
+        .expectNextCount(1)
         .verifyComplete();
 
     //
-    TimeUnit.MILLISECONDS.sleep(1000);
+    waitForStoredEventReplay();
 
-    // 3 - finish task 2
+    // 4 - finish task 2
     final var finishTask2Command =
         FinishTaskCommand.builder()
-            .workflowId(createdWorkflowVoArray[0].getId())
+            .workflowId(createdWorkflowVo.getId())
             .order(2)
             .taskType(FinishTaskCommand.TaskType.DECISION)
             .result(FinishTaskCommand.Result.APPROVED)
             .build();
 
-    final var finishTask2WorkflowVoArray = new WorkflowVO[1];
+    final var finishTask2WorkflowVoArray = new ArrayList<WorkflowVO>();
     final var finishTask2AndAdvanceMono =
         workflowTaskManagementService.finishTaskAndAdvance(finishTask2Command);
 
     StepVerifier.create(finishTask2AndAdvanceMono)
-        .expectNextMatches(
-            workflowVO -> {
-              finishTask2WorkflowVoArray[0] = workflowVO;
-              return true;
-            })
+        .recordWith(() -> finishTask2WorkflowVoArray)
+        .expectNextCount(0)
         .verifyComplete();
 
     //
-    TimeUnit.MILLISECONDS.sleep(1000);
+    waitForStoredEventReplay();
 
     final var storedEventList =
         storedEventRepository
-            .findByObjectIdOrderByOccurredOnAsc(createdWorkflowVoArray[0].getId())
+            .findByObjectIdOrderByOccurredOnAsc(createdWorkflowVo.getId())
             .collectList()
             .block();
 
-    final var workflowRoot = workflowRepository.findById(createdWorkflowVoArray[0].getId()).block();
+    final var workflowRoot = workflowRepository.findById(createdWorkflowVo.getId()).block();
 
     assertThat(storedEventList).isNotNull().hasSize(7);
 
@@ -186,5 +178,9 @@ public class HappyPathReplayTest {
             StoredEventStatus.PROCESSING,
             StoredEventStatus.PROCESSING,
             StoredEventStatus.PROCESSING);
+  }
+
+  private void waitForStoredEventReplay() throws InterruptedException {
+    TimeUnit.MILLISECONDS.sleep(1000);
   }
 }

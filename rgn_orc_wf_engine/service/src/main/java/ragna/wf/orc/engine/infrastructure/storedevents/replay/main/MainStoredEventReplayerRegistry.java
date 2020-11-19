@@ -6,14 +6,18 @@ import java.util.Map;
 import java.util.Optional;
 import ragna.wf.orc.common.events.DomainEvent;
 import ragna.wf.orc.engine.application.replay.WorkflowRootCreatedReplayer;
+import ragna.wf.orc.engine.application.replay.WorkflowRootTaskEvaluatedReplayer;
 import ragna.wf.orc.engine.application.replay.WorkflowRootTaskTriggeredReplayer;
 import ragna.wf.orc.engine.domain.workflow.model.events.WorkflowRootCreated;
+import ragna.wf.orc.engine.domain.workflow.model.events.WorkflowRootTaskEvaluated;
 import ragna.wf.orc.engine.domain.workflow.model.events.WorkflowRootTaskTriggered;
 
 public enum MainStoredEventReplayerRegistry {
   WORKFLOW_ROOT_CREATED(WorkflowRootCreated.class, WorkflowRootCreatedReplayer.class),
   WORKFLOW_ROOT_TASK_TRIGGERED(
-      WorkflowRootTaskTriggered.class, WorkflowRootTaskTriggeredReplayer.class);
+      WorkflowRootTaskTriggered.class, WorkflowRootTaskTriggeredReplayer.class),
+  WORKFLOW_ROOT_TASK_EVALUATED(
+      WorkflowRootTaskEvaluated.class, WorkflowRootTaskEvaluatedReplayer.class);
 
   private static final Map<
           Class<? extends DomainEvent>, Class<? extends MainStoredEventReplayerCallback>>

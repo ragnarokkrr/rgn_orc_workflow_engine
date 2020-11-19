@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.fissore.slf4j.FluentLogger;
 import org.fissore.slf4j.FluentLoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import ragna.wf.orc.engine.domain.workflow.model.WorkflowRoot;
 import ragna.wf.orc.engine.domain.workflow.model.events.WorkflowRootCreated;
 import ragna.wf.orc.engine.domain.workflow.service.WorkflowTaskManagementService;
@@ -13,7 +13,7 @@ import ragna.wf.orc.engine.infrastructure.storedevents.replay.main.MainStoredEve
 import ragna.wf.orc.engine.infrastructure.storedevents.replay.main.vo.MainReplayContextVo;
 import reactor.core.publisher.Mono;
 
-@Service
+@Component
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class WorkflowRootCreatedReplayer
     implements MainStoredEventReplayerCallback<WorkflowRootCreated> {

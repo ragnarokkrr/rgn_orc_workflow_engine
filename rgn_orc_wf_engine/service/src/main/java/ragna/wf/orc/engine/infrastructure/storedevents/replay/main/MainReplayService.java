@@ -1,6 +1,7 @@
 package ragna.wf.orc.engine.infrastructure.storedevents.replay.main;
 
 import io.vavr.control.Try;
+import java.time.Duration;
 import java.util.Optional;
 import javax.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +20,7 @@ import ragna.wf.orc.eventstore.service.vo.UpdateStoredEventCommand;
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.ReplayProcessor;
 import reactor.core.scheduler.Schedulers;
+import reactor.util.retry.Retry;
 
 @Component
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
@@ -163,6 +165,7 @@ public class MainReplayService {
         .updateStatus(updateStoredEventCommand.get())
         .doOnSuccess(
             storedEventVo -> LOGGER.debug().log("Stored Event replayed! {}", storedEventVo))
+        .retryWhen(Retry.backoff(3, Duration.ofMillis(50)))
         .then(Mono.just(mainReplayContextVo));
   }
 
