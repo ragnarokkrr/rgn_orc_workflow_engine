@@ -1,16 +1,15 @@
 package ragna.wf.orc.common.data.mongodb.test;
 
-import com.mongodb.MongoTimeoutException;
-import org.bson.Document;
-import org.reactivestreams.Subscriber;
-import org.reactivestreams.Subscription;
+import static java.lang.String.format;
 
+import com.mongodb.MongoTimeoutException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
-
-import static java.lang.String.format;
+import org.bson.Document;
+import org.reactivestreams.Subscriber;
+import org.reactivestreams.Subscription;
 
 // https://github.com/mongodb/mongo-java-driver-reactivestreams/blob/master/examples/tour/src/main/tour/SubscriberHelpers.java
 public final class SubscriberHelpers {

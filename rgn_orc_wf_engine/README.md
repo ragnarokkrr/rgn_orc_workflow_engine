@@ -98,6 +98,13 @@ http://localhost:8888/
 
 ### Tips
 
+**Google Formatter**
+```sh
+$ ./gradlew goJF
+
+$ ./gradlew verGJF
+```
+
 **Forcing Reactor's Agent disabling**
 
 In application startup params

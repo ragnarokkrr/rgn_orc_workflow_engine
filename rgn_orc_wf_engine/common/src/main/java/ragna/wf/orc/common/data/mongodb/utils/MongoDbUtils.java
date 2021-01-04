@@ -1,10 +1,9 @@
 package ragna.wf.orc.common.data.mongodb.utils;
 
+import java.util.List;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.data.mongodb.core.ReactiveMongoOperations;
 import reactor.core.publisher.Flux;
-
-import java.util.List;
 
 public class MongoDbUtils {
   private MongoDbUtils() {}

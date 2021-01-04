@@ -8,6 +8,7 @@ import ragna.wf.orc.engine.infrastructure.storedevents.replay.main.vo.MainReplay
 import reactor.core.publisher.Mono;
 
 public interface MainStoredEventReplayerCallback<T extends DomainEvent> {
+  @SuppressWarnings("unchecked")
   default Class<T> domainEventType() {
     return (Class<T>)
         ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0];

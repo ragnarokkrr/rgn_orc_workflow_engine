@@ -14,7 +14,8 @@ public enum ErrorCode {
       "ORC-0007", "Tried to trigger first task in wrong place"),
   WORKFLOW_NOT_FOUND("ORC-0008", "Workflow not found"),
   WORKFLOW_TASK_NOT_FOUND("ORC-0009", "Workflow task not found"),
-  WORKFLOW_TASK_ACTIVATION_EVALUATION_RESULT_NOT_FOUND("ORC-0010", "Workflow task activation evaluation result not found"),
+  WORKFLOW_TASK_ACTIVATION_EVALUATION_RESULT_NOT_FOUND(
+      "ORC-0010", "Workflow task activation evaluation result not found"),
 
   // Event Store errors
   EVS_GENERAL_ERROR("EVS-0000", "General error"),

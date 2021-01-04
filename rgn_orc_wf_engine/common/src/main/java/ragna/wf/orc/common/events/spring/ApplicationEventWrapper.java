@@ -1,9 +1,8 @@
 package ragna.wf.orc.common.events.spring;
 
+import java.util.StringJoiner;
 import org.springframework.context.ApplicationEvent;
 import ragna.wf.orc.common.events.DomainEvent;
-
-import java.util.StringJoiner;
 
 public class ApplicationEventWrapper extends ApplicationEvent {
   /**

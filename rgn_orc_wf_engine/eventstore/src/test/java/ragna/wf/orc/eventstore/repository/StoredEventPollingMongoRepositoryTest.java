@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.mongodb.core.ReactiveMongoOperations;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.testcontainers.containers.MongoDBContainer;
 import ragna.wf.orc.common.data.mongodb.utils.MongoDbUtils;
@@ -32,11 +33,12 @@ import reactor.core.publisher.Flux;
 import reactor.test.StepVerifier;
 
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = EventStoreTestApplication.class)
+@SpringBootTest(classes = {EventStoreTestApplication.class})
+@ActiveProfiles("tx")
 class StoredEventPollingMongoRepositoryTest {
   @Autowired private StoredEventRepository storedEventRepository;
   @Autowired private ReactiveMongoOperations reactiveMongoOperations;
-  @Autowired private StoredEventPollingMongoRepository storedEventPollingMongoRepository;
+  @Autowired private StoredEventPollingTransactionalRepository storedEventPollingMongoRepository;
   private KryoContext kryoContext = DefaultKryoContext.kryoContextWithDefaultSerializers();
 
   private static final MongoDBContainer MONGO_DB_CONTAINER =

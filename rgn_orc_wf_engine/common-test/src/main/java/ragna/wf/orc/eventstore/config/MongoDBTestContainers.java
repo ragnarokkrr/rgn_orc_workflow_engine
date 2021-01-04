@@ -12,15 +12,19 @@ public class MongoDBTestContainers {
     return new RgnMongoContainer("mongo:4.2").withReuse(true);
   }
 
-  public static void setSpringDataProperties(MongoDBContainer mongoDBContainer){
-    Assert.isTrue(mongoDBContainer instanceof RgnMongoContainer, "Mongo container IS NOT instance of RgnMongoContainer");
-    System.setProperty("spring.autoconfigure.exclude", "org.springframework.boot.autoconfigure.mongo.embedded.EmbeddedMongoAutoConfiguration");
+  public static void setSpringDataProperties(MongoDBContainer mongoDBContainer) {
+    Assert.isTrue(
+        mongoDBContainer instanceof RgnMongoContainer,
+        "Mongo container IS NOT instance of RgnMongoContainer");
+    System.setProperty(
+        "spring.autoconfigure.exclude",
+        "org.springframework.boot.autoconfigure.mongo.embedded.EmbeddedMongoAutoConfiguration");
     System.setProperty("spring.data.mongodb.database", MONGODB_DB);
     System.setProperty("spring.data.mongodb.host", mongoDBContainer.getHost());
-    System.setProperty("spring.data.mongodb.port", ((RgnMongoContainer)mongoDBContainer).getPort().toString());
+    System.setProperty(
+        "spring.data.mongodb.port", ((RgnMongoContainer) mongoDBContainer).getPort().toString());
     System.setProperty("spring.data.mongodb.replicaSet", MONGODB_DOCKER_REPLICASET);
   }
 
-  private MongoDBTestContainers() {
-  }
+  private MongoDBTestContainers() {}
 }

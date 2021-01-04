@@ -1,12 +1,11 @@
 package ragna.wf.orc.common.events;
 
+import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.Setter;
 import ragna.wf.orc.common.serialization.DefaultKryoContext;
 import ragna.wf.orc.common.serialization.KryoContext;
-
-import java.time.LocalDateTime;
 
 @Data
 @Setter(AccessLevel.NONE)

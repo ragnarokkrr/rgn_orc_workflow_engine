@@ -41,8 +41,7 @@ public class MainReplayService {
     LOGGER.info().log("MAIN REPLAY ENGINE: ENABLED!");
     mainReplayContextVoReplayProcessor
         .doOnNext(
-            mainReplayContextVo ->
-                LOGGER.info().log("MainReplay => {}", mainReplayContextVo.getStoredEventVo()))
+            mainReplayContextVo -> LOGGER.info().log("MainReplay 1 => {}", mainReplayContextVo))
         .flatMap(this::findHandler)
         .flatMap(this::evaluateTaskActivationCriteria)
         .flatMap(this::replay)

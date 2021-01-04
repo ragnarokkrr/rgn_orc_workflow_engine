@@ -29,7 +29,7 @@ import ragna.wf.orc.eventstore.EventStoreTestApplication;
 import ragna.wf.orc.eventstore.config.MongoDBTestContainers;
 import ragna.wf.orc.eventstore.model.SerializationEngine;
 import ragna.wf.orc.eventstore.model.StoredEvent;
-import ragna.wf.orc.eventstore.repository.StoredEventPollingMongoRepository;
+import ragna.wf.orc.eventstore.repository.StoreEventPollingRepository;
 import ragna.wf.orc.eventstore.repository.StoredEventRepository;
 import ragna.wf.orc.eventstore.service.vo.StoredEventVo;
 import reactor.core.publisher.Flux;
@@ -40,7 +40,7 @@ import reactor.test.StepVerifier;
 class EventStoreStreamingServiceTest {
   @Autowired private StoredEventRepository storedEventRepository;
   @Autowired private ReactiveMongoOperations reactiveMongoOperations;
-  @Autowired private StoredEventPollingMongoRepository storedEventPollingMongoRepository;
+  @Autowired private StoreEventPollingRepository storeEventPollingRepository;
   @Autowired private EventStoreStreamingService eventStoreStreamingService;
   private KryoContext kryoContext = DefaultKryoContext.kryoContextWithDefaultSerializers();
 

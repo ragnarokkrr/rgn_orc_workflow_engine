@@ -1,12 +1,11 @@
 package ragna.wf.orc.eventstore.config;
 
 import com.github.dockerjava.api.command.InspectContainerResponse;
+import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 import lombok.extern.slf4j.Slf4j;
 import org.testcontainers.containers.MongoDBContainer;
 import org.testcontainers.utility.DockerImageName;
-
-import java.io.IOException;
-import java.util.concurrent.TimeUnit;
 
 @Slf4j
 public class RgnMongoContainer extends MongoDBContainer {
@@ -24,7 +23,6 @@ public class RgnMongoContainer extends MongoDBContainer {
   public RgnMongoContainer(DockerImageName dockerImageName) {
     super(dockerImageName);
     addExposedPort(MONGODB_PORT);
-
   }
 
   public Integer getPort() {
@@ -36,11 +34,13 @@ public class RgnMongoContainer extends MongoDBContainer {
     super.containerIsStarted(containerInfo);
     try {
       log.debug("RGN mongo db: configuring");
-      final var execResultInitRs = execInContainer(
-              buildMongoEvalCommand("""
+      final var execResultInitRs =
+          execInContainer(
+              buildMongoEvalCommand(
+                  """
                       db.adminCommand( {
-                        setParameter: 1, 
-                        maxTransactionLockRequestTimeoutMillis: 1000 
+                        setParameter: 1,
+                        maxTransactionLockRequestTimeoutMillis: 1000
                       } );
                       """));
       log.debug(execResultInitRs.getStdout());
@@ -52,6 +52,6 @@ public class RgnMongoContainer extends MongoDBContainer {
   }
 
   private String[] buildMongoEvalCommand(final String command) {
-      return new String[]{"mongo", "--eval", command};
+    return new String[] {"mongo", "--eval", command};
   }
 }

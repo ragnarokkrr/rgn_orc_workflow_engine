@@ -6,6 +6,7 @@ import org.fissore.slf4j.FluentLogger;
 import org.fissore.slf4j.FluentLoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 import ragna.wf.orc.common.exceptions.ErrorCode;
 import ragna.wf.orc.common.exceptions.OrcException;
 import ragna.wf.orc.engine.application.messaging.output.TriggerTaskMessageProducer;
@@ -43,6 +44,9 @@ public class WorkflowRootTaskTriggeredReplayer
     final var lastTriggeredTaskOptional = workflowRoot.findLastTriggeredTask();
 
     if (lastTriggeredTaskOptional.isEmpty()) {
+      LOGGER
+          .debug()
+          .log("Last triggered task not found: {}", mainReplayContextVo.getStoredEventVo());
       return Mono.just(
           mainReplayContextVo.matchResult(
               MainReplayContextVo.MatchResult.builder()
@@ -54,10 +58,29 @@ public class WorkflowRootTaskTriggeredReplayer
         workflowRoot.findTaskConfiguration(lastTriggeredTaskOptional.get());
 
     if (configuredTaskOptional.isEmpty()) {
+      LOGGER
+          .debug()
+          .log(
+              "Configured task for last triggered task not found: {}",
+              mainReplayContextVo.getStoredEventVo());
+
       return Mono.just(
           mainReplayContextVo.matchResult(
               MainReplayContextVo.MatchResult.builder()
                   .matchResultType(MainReplayContextVo.MatchResultEnum.TASK_CONFIGURATION_NOT_FOUND)
+                  .build()));
+    }
+
+    if (CollectionUtils.isEmpty(configuredTaskOptional.get().getConfiguredTaskCriteriaList())) {
+      LOGGER
+          .debug()
+          .log(
+              "No Configured task criteria for last triggered task not found: {}",
+              mainReplayContextVo.getStoredEventVo());
+      return Mono.just(
+          mainReplayContextVo.matchResult(
+              MainReplayContextVo.MatchResult.builder()
+                  .matchResultType(MainReplayContextVo.MatchResultEnum.NO_CRITERIA_FOUND)
                   .build()));
     }
 
@@ -97,12 +120,20 @@ public class WorkflowRootTaskTriggeredReplayer
         (WorkflowRoot) mainReplayContextVo.getStoredEventVo().getDomainEvent().getSource();
     final var lastTriggeredTaskOptional = workflowRoot.findLastTriggeredTask();
 
-    if (mainReplayContextVo.getCriteriaEvaluationResult().isEmpty()) {
+    if (lastTriggeredTaskOptional.isEmpty()) {
+      return Mono.error(newNoTriggeredTaskFoundException(workflowRoot));
+    }
+
+    if (mainReplayContextVo.getCriteriaEvaluationResult().isEmpty()
+        && mainReplayContextVo.getMatchResult().getMatchResultType()
+            != MainReplayContextVo.MatchResultEnum.NO_CRITERIA_FOUND) {
       return Mono.error(newActivationCriteriaResultsNotFoundException(workflowRoot));
     }
 
-    if (lastTriggeredTaskOptional.isEmpty()) {
-      return Mono.error(newNoTriggeredTaskFoundException(workflowRoot));
+    if (mainReplayContextVo.getCriteriaEvaluationResult().isEmpty()
+        && mainReplayContextVo.getMatchResult().getMatchResultType()
+            == MainReplayContextVo.MatchResultEnum.NO_CRITERIA_FOUND) {
+      return Mono.just(mainReplayContextVo);
     }
 
     final var registerTaskResultsCommand =

@@ -99,6 +99,7 @@ public class MainReplayContextVo {
     DEFAULT,
     TASK_NOT_FOUND,
     TASK_CONFIGURATION_NOT_FOUND,
+    NO_CRITERIA_FOUND,
     ERROR
   }
 

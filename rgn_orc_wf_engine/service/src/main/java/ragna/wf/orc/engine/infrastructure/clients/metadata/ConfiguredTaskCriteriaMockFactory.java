@@ -7,7 +7,7 @@ public enum ConfiguredTaskCriteriaMockFactory {
       ConfiguredTask.TaskCriterion.builder()
           .id("crit01")
           .name("Criteria 01 - ASC")
-          .acceptedValue(5L)
+          .acceptedValue(4L)
           .lowerBound(3L)
           .upperBound(10L)
           .order(ConfiguredTask.TaskCriterion.Order.ASC)

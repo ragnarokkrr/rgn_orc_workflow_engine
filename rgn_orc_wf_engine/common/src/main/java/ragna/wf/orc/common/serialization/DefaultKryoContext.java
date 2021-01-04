@@ -19,8 +19,6 @@ import de.javakaffee.kryoserializers.GregorianCalendarSerializer;
 import de.javakaffee.kryoserializers.JdkProxySerializer;
 import de.javakaffee.kryoserializers.SynchronizedCollectionsSerializer;
 import de.javakaffee.kryoserializers.UnmodifiableCollectionsSerializer;
-import org.apache.commons.lang3.StringUtils;
-
 import java.io.ByteArrayOutputStream;
 import java.lang.reflect.InvocationHandler;
 import java.util.ArrayList;
@@ -28,6 +26,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
+import org.apache.commons.lang3.StringUtils;
 
 public class DefaultKryoContext implements KryoContext {
 

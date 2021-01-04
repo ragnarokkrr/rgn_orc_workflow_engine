@@ -5,7 +5,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -88,8 +87,6 @@ public class HappyPathReplayTest {
   @Test
   void whenWorkflowRootFinishesAndAdvanceAllTasksAndAchieveConclusionState_thenWorkflowIsFinished()
       throws InterruptedException {
-    waitForStoredEventReplay();
-
     // 1 - create workflow
     final var createWorkflowCommand = ServiceFixtures.kyleReeseCreateWorkflowCommand();
     final var createWorkflowMono = workflowCreationService.createWorkflow(createWorkflowCommand);
@@ -138,7 +135,7 @@ public class HappyPathReplayTest {
 
     StepVerifier.create(finishTask2AndAdvanceMono)
         .recordWith(() -> finishTask2WorkflowVoArray)
-        .expectNextCount(0)
+        .expectNextCount(1)
         .verifyComplete();
 
     //
@@ -171,12 +168,12 @@ public class HappyPathReplayTest {
         .extracting(StoredEvent::getEventStatus)
         .containsExactly(
             StoredEventStatus.PROCESSED,
-            StoredEventStatus.UNPUBLISHED,
+            StoredEventStatus.PUBLISHED,
             StoredEventStatus.PROCESSED,
-            StoredEventStatus.PROCESSING,
-            StoredEventStatus.PROCESSING,
-            StoredEventStatus.PROCESSING,
-            StoredEventStatus.PROCESSING);
+            StoredEventStatus.PROCESSED,
+            StoredEventStatus.PROCESSED,
+            StoredEventStatus.PROCESSED,
+            StoredEventStatus.PROCESSED);
   }
 
   private void waitForStoredEventReplay() throws InterruptedException {

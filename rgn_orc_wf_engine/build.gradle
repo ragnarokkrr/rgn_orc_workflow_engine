@@ -2,11 +2,12 @@
 buildscript {
     repositories {
         mavenCentral()
+        maven { url "https://plugins.gradle.org/m2/" }
     }
 }
 
 plugins {
-    id 'org.springframework.boot' version '2.4.0'
+    id 'org.springframework.boot' version '2.4.1'
     id 'io.spring.dependency-management' version '1.0.9.RELEASE'
     id 'com.github.sherter.google-java-format' version '0.9'
     id 'java-library'
@@ -34,6 +35,13 @@ allprojects {
     //tasks.withType(JavaExec) {
     //    jvmArgs += "--enable-preview"
     //}
+    repositories {
+        mavenCentral()
+        maven { url "https://repo.spring.io/release" }
+        maven { url "https://repo.spring.io/milestone" }
+        maven { url "https://repo.spring.io/snapshot" }
+        maven { url "https://plugins.gradle.org/m2/" }
+    }
 }
 
 subprojects {
@@ -54,10 +62,6 @@ subprojects {
             outputDir = compileJava.destinationDir
             testOutputDir = compileTestJava.destinationDir
         }
-    }
-
-    repositories {
-        mavenCentral()
     }
 
     test {

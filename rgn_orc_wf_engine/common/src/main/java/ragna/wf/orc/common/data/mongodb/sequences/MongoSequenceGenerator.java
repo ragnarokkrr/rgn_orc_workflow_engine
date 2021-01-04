@@ -1,5 +1,10 @@
 package ragna.wf.orc.common.data.mongodb.sequences;
 
+import static org.springframework.data.mongodb.core.FindAndModifyOptions.options;
+import static org.springframework.data.mongodb.core.query.Criteria.where;
+import static org.springframework.data.mongodb.core.query.Query.query;
+
+import java.util.concurrent.CountDownLatch;
 import lombok.RequiredArgsConstructor;
 import org.fissore.slf4j.FluentLogger;
 import org.fissore.slf4j.FluentLoggerFactory;
@@ -12,16 +17,11 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.reactive.TransactionalOperator;
 import reactor.core.publisher.Mono;
 
-import java.util.concurrent.CountDownLatch;
-
-import static org.springframework.data.mongodb.core.FindAndModifyOptions.options;
-import static org.springframework.data.mongodb.core.query.Criteria.where;
-import static org.springframework.data.mongodb.core.query.Query.query;
-
 @Component
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class MongoSequenceGenerator {
-  private static final FluentLogger LOGGER = FluentLoggerFactory.getLogger(MongoSequenceGenerator.class);
+  private static final FluentLogger LOGGER =
+      FluentLoggerFactory.getLogger(MongoSequenceGenerator.class);
   private final ReactiveMongoOperations mongoOperations;
   private final TransactionalOperator transactionalOperator;
 

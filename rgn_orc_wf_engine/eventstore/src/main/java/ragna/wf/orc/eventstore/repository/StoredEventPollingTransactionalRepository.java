@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.fissore.slf4j.FluentLogger;
 import org.fissore.slf4j.FluentLoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.FindAndReplaceOptions;
@@ -20,10 +21,11 @@ import reactor.core.publisher.Mono;
 import reactor.util.retry.RetrySpec;
 
 @Repository
+@Profile("tx")
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
-public class StoredEventPollingMongoRepository implements StoreEventPollingRepository {
+public class StoredEventPollingTransactionalRepository implements StoreEventPollingRepository {
   private static final FluentLogger LOGGER =
-      FluentLoggerFactory.getLogger(StoredEventPollingMongoRepository.class);
+      FluentLoggerFactory.getLogger(StoredEventPollingTransactionalRepository.class);
   private final ReactiveMongoTemplate reactiveMongoTemplate;
 
   @Override

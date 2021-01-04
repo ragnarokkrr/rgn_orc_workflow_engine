@@ -1,6 +1,6 @@
 package ragna.wf.orc.common.serialization;
 
-import org.junit.jupiter.api.Test;
+import static org.assertj.core.api.Java6Assertions.assertThat;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -9,8 +9,7 @@ import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-
-import static org.assertj.core.api.Java6Assertions.assertThat;
+import org.junit.jupiter.api.Test;
 
 class KryoPoolingTest {
 
