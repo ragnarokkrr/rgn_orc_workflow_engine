@@ -18,11 +18,14 @@ public class WorkflowRootTaskEvaluatedReplayer
       FluentLoggerFactory.getLogger(WorkflowRootTaskEvaluatedReplayer.class);
 
   @Override
-  // TODO: next step
   public Mono<MainReplayContextVo> doReplay(final MainReplayContextVo mainReplayContextVo) {
-    LOGGER.info().log("CCCCCCCCCCCCC");
     return Mono.just(mainReplayContextVo)
-        .doOnError(throwable -> LOGGER.error().log("EEEEEEEEE", throwable))
-        .doOnSuccess(mainReplayContextVo1 -> LOGGER.info().log("BBBBBBBB"));
+        .doOnSuccess(
+            mainReplayContextVo1 ->
+                LOGGER
+                    .info()
+                    .log(
+                        "Task Evaluated Event replayed! {}",
+                        mainReplayContextVo1.getStoredEventVo()));
   }
 }

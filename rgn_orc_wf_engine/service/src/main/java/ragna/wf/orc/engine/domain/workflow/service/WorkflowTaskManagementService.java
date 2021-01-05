@@ -111,7 +111,7 @@ public class WorkflowTaskManagementService {
                     LOGGER
                         .info()
                         .log(
-                            "Registering task results {}. ({})",
+                            "Task results registered {}. ({})",
                             workflowVO,
                             registerTaskResultsCommand));
     return transactionalOperator.transactional(registerTaskResultMono);

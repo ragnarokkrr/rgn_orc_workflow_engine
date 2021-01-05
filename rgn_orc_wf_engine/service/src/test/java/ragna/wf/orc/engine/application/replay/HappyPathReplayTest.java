@@ -87,7 +87,7 @@ public class HappyPathReplayTest {
   @Test
   void whenWorkflowRootFinishesAndAdvanceAllTasksAndAchieveConclusionState_thenWorkflowIsFinished()
       throws InterruptedException {
-    // 1 - create workflow
+    // *** 1) create workflow
     final var createWorkflowCommand = ServiceFixtures.kyleReeseCreateWorkflowCommand();
     final var createWorkflowMono = workflowCreationService.createWorkflow(createWorkflowCommand);
 
@@ -99,7 +99,7 @@ public class HappyPathReplayTest {
 
     waitForStoredEventReplay();
     final var createdWorkflowVo = createdWorkflowVOs.get(0);
-    // 2 - finish task 1
+    // *** 2) finish task 1
     final var finishTaskCommand =
         FinishTaskCommand.builder()
             .workflowId(createdWorkflowVo.getId())
