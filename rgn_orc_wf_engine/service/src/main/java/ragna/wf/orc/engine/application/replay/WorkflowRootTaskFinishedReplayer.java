@@ -42,13 +42,17 @@ public class WorkflowRootTaskFinishedReplayer
                 LOGGER
                     .info()
                     .log(
-                        "Task Finished Event published! {}",
+                        "Task Finished Event replayed! {}",
                         mainReplayContextVo1.getStoredEventVo()));
   }
 
   // TODO: implement send finish task message
   @Override
   public Mono<MainReplayContextVo> publish(final MainReplayContextVo mainReplayContextVo) {
+    LOGGER
+        .info()
+        .log("Task Finished Event will be published! {}", mainReplayContextVo.getStoredEventVo());
+
     return Mono.just(mainReplayContextVo)
         .doOnSuccess(
             mainReplayContextVo1 ->

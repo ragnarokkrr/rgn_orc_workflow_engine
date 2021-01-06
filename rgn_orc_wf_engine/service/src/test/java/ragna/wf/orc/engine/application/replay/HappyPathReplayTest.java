@@ -3,6 +3,8 @@ package ragna.wf.orc.engine.application.replay;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
@@ -14,6 +16,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.data.mongodb.core.ReactiveMongoOperations;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.testcontainers.containers.MongoDBContainer;
@@ -28,6 +31,7 @@ import ragna.wf.orc.engine.domain.workflow.service.WorkflowTaskManagementService
 import ragna.wf.orc.engine.domain.workflow.service.mapper.ConfigurationMapper;
 import ragna.wf.orc.engine.domain.workflow.service.vo.FinishTaskCommand;
 import ragna.wf.orc.engine.domain.workflow.service.vo.WorkflowVO;
+import ragna.wf.orc.engine.infrastructure.storedevents.replay.main.vo.MainReplayContextVo;
 import ragna.wf.orc.eventstore.config.MongoDBTestContainers;
 import ragna.wf.orc.eventstore.model.StoredEvent;
 import ragna.wf.orc.eventstore.model.StoredEventStatus;
@@ -48,6 +52,14 @@ public class HappyPathReplayTest {
   @Autowired private WorkflowTaskManagementService workflowTaskManagementService;
 
   @Autowired private WorkflowRepository workflowRepository;
+
+  @SpyBean private WorkflowRootFinishedReplayer workflowRootFinishedReplayer;
+
+  @SpyBean private WorkflowRootCreatedReplayer workflowRootCreatedReplayer;
+
+  @SpyBean private WorkflowRootTaskTriggeredReplayer workflowRootTaskTriggeredReplayer;
+  @SpyBean private WorkflowRootTaskEvaluatedReplayer workflowRootTaskEvaluatedReplayer;
+  @SpyBean private WorkflowRootTaskFinishedReplayer workflowRootTaskFinishedReplayer;
 
   @Autowired StoredEventRepository storedEventRepository;
   private static final MongoDBContainer MONGO_DB_CONTAINER =
@@ -174,6 +186,12 @@ public class HappyPathReplayTest {
             StoredEventStatus.PROCESSED,
             StoredEventStatus.PROCESSED,
             StoredEventStatus.PROCESSED);
+
+    verify(workflowRootCreatedReplayer, times(1)).doReplay(any(MainReplayContextVo.class));
+    verify(workflowRootFinishedReplayer, times(1)).doReplay(any(MainReplayContextVo.class));
+    verify(workflowRootTaskTriggeredReplayer, times(2)).doReplay(any(MainReplayContextVo.class));
+    verify(workflowRootTaskEvaluatedReplayer, times(1)).doReplay(any(MainReplayContextVo.class));
+    verify(workflowRootTaskFinishedReplayer, times(2)).doReplay(any(MainReplayContextVo.class));
   }
 
   private void waitForStoredEventReplay() throws InterruptedException {

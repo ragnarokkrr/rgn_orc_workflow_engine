@@ -5,17 +5,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import ragna.wf.orc.common.events.DomainEvent;
-import ragna.wf.orc.engine.application.replay.WorkflowRootCreatedReplayer;
-import ragna.wf.orc.engine.application.replay.WorkflowRootTaskEvaluatedReplayer;
-import ragna.wf.orc.engine.application.replay.WorkflowRootTaskFinishedReplayer;
-import ragna.wf.orc.engine.application.replay.WorkflowRootTaskTriggeredReplayer;
-import ragna.wf.orc.engine.domain.workflow.model.events.WorkflowRootCreated;
-import ragna.wf.orc.engine.domain.workflow.model.events.WorkflowRootTaskEvaluated;
-import ragna.wf.orc.engine.domain.workflow.model.events.WorkflowRootTaskFinished;
-import ragna.wf.orc.engine.domain.workflow.model.events.WorkflowRootTaskTriggered;
+import ragna.wf.orc.engine.application.replay.*;
+import ragna.wf.orc.engine.domain.workflow.model.events.*;
 
 public enum MainStoredEventReplayerRegistry {
   WORKFLOW_ROOT_CREATED(WorkflowRootCreated.class, WorkflowRootCreatedReplayer.class),
+  WORKFLOW_ROOT_FINISHED(WorkflowRootFinished.class, WorkflowRootFinishedReplayer.class),
   WORKFLOW_ROOT_TASK_TRIGGERED(
       WorkflowRootTaskTriggered.class, WorkflowRootTaskTriggeredReplayer.class),
   WORKFLOW_ROOT_TASK_EVALUATED(
