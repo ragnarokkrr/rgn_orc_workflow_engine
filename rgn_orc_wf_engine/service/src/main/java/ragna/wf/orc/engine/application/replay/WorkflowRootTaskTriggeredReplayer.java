@@ -103,7 +103,7 @@ public class WorkflowRootTaskTriggeredReplayer
 
   @Override
   public Mono<MainReplayContextVo> doReplay(final MainReplayContextVo mainReplayContextVo) {
-    return saveTaskCriteriaMatchResult(mainReplayContextVo);
+    return saveTaskCriteriaMatchResultIfNecessary(mainReplayContextVo);
   }
 
   @Override
@@ -114,7 +114,7 @@ public class WorkflowRootTaskTriggeredReplayer
         .then(Mono.just(mainReplayContextVo));
   }
 
-  Mono<MainReplayContextVo> saveTaskCriteriaMatchResult(
+  Mono<MainReplayContextVo> saveTaskCriteriaMatchResultIfNecessary(
       final MainReplayContextVo mainReplayContextVo) {
     final var workflowRoot =
         (WorkflowRoot) mainReplayContextVo.getStoredEventVo().getDomainEvent().getSource();
@@ -141,6 +141,12 @@ public class WorkflowRootTaskTriggeredReplayer
             workflowRoot,
             lastTriggeredTaskOptional.get(),
             mainReplayContextVo.getCriteriaEvaluationResult().get());
+    return saveTaskCriteriaMatchResult(mainReplayContextVo, registerTaskResultsCommand);
+  }
+
+  Mono<MainReplayContextVo> saveTaskCriteriaMatchResult(
+      final MainReplayContextVo mainReplayContextVo,
+      final RegisterTaskResultsCommand registerTaskResultsCommand) {
     return workflowTaskManagementService
         .registerTaskActivationResult(registerTaskResultsCommand)
         .then(Mono.just(mainReplayContextVo));

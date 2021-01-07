@@ -147,7 +147,8 @@ class WorkflowRootTaskTriggeredReplayerTest {
     verify(workflowRootTaskTriggeredReplayerSpy, times(1)).activateTaskIfConfigured(any());
     verify(workflowRootTaskTriggeredReplayerSpy, times(1)).doReplay(any());
     verify(workflowRootTaskTriggeredReplayerSpy, times(1)).publish(any());
-    verify(workflowRootTaskTriggeredReplayerSpy, times(1)).saveTaskCriteriaMatchResult(any());
+    verify(workflowRootTaskTriggeredReplayerSpy, times(1))
+        .saveTaskCriteriaMatchResultIfNecessary(any());
     verify(workflowRootTaskTriggeredReplayerSpy, times(1)).mapMatchResult(any());
     verify(workflowRootTaskTriggeredReplayerSpy, times(1)).activateTask(any());
     verify(triggerTaskMessageProducerMock, times(1)).send(any());

@@ -7,6 +7,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import java.util.ArrayList;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -22,7 +23,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.testcontainers.containers.MongoDBContainer;
 import ragna.wf.orc.common.data.mongodb.utils.MongoDbUtils;
 import ragna.wf.orc.engine.domain.metadata.service.WorkflowMetadataService;
-import ragna.wf.orc.engine.domain.workflow.model.WorkflowModelFixture;
+import ragna.wf.orc.engine.domain.workflow.model.*;
 import ragna.wf.orc.engine.domain.workflow.model.events.*;
 import ragna.wf.orc.engine.domain.workflow.repository.WorkflowRepository;
 import ragna.wf.orc.engine.domain.workflow.service.ServiceFixtures;
@@ -159,11 +160,10 @@ public class HappyPathReplayTest {
             .collectList()
             .block();
 
-    final var workflowRoot = workflowRepository.findById(createdWorkflowVo.getId()).block();
+    final var workflowRootFinalResult =
+        workflowRepository.findById(createdWorkflowVo.getId()).block();
 
     assertThat(storedEventList).isNotNull().hasSize(7);
-
-    assertThat(workflowRoot).isNotNull();
 
     assertThat(storedEventList)
         .extracting(StoredEvent::getTypedName)
@@ -190,8 +190,89 @@ public class HappyPathReplayTest {
     verify(workflowRootCreatedReplayer, times(1)).doReplay(any(MainReplayContextVo.class));
     verify(workflowRootFinishedReplayer, times(1)).doReplay(any(MainReplayContextVo.class));
     verify(workflowRootTaskTriggeredReplayer, times(2)).doReplay(any(MainReplayContextVo.class));
+    verify(workflowRootTaskTriggeredReplayer, times(1)).publish(any(MainReplayContextVo.class));
+    verify(workflowRootTaskTriggeredReplayer, times(2))
+        .saveTaskCriteriaMatchResultIfNecessary(any(MainReplayContextVo.class));
+    verify(workflowRootTaskTriggeredReplayer, times(1))
+        .saveTaskCriteriaMatchResult(any(MainReplayContextVo.class), any());
     verify(workflowRootTaskEvaluatedReplayer, times(1)).doReplay(any(MainReplayContextVo.class));
     verify(workflowRootTaskFinishedReplayer, times(2)).doReplay(any(MainReplayContextVo.class));
+
+    assertThat(workflowRootFinalResult)
+        .isNotNull()
+        .hasFieldOrPropertyWithValue("status", WorkflowStatus.FINISHED)
+        .hasFieldOrPropertyWithValue("result", WorkflowResult.APPROVED)
+        .hasNoNullFieldsOrProperties();
+
+    assertThat(workflowRootFinalResult.getExecutionPlan()).hasNoNullFieldsOrProperties();
+
+    assertThat(workflowRootFinalResult.getExecutionPlan().getPlannedTasks())
+        .extracting(PlannedTask::getEvaluatedOn)
+        .filteredOn(Objects::isNull)
+        .hasSize(1);
+
+    assertThat(workflowRootFinalResult.getExecutionPlan().getPlannedTasks())
+        .extracting(PlannedTask::getEvaluatedOn)
+        .filteredOn(Objects::nonNull)
+        .hasSize(1);
+
+    assertThat(workflowRootFinalResult.getExecutionPlan().getPlannedTasks())
+        .extracting(PlannedTask::getFinishedOn)
+        .filteredOn(Objects::nonNull)
+        .hasSize(2);
+
+    assertThat(workflowRootFinalResult.getExecutionPlan().getPlannedTasks())
+        .extracting(PlannedTask::getStatus)
+        .contains(PlannedTask.Status.CONCLUDED, PlannedTask.Status.CONCLUDED);
+
+    assertThat(workflowRootFinalResult.getExecutionPlan().getPlannedTasks())
+        .extracting(PlannedTask::getResult)
+        .contains(PlannedTask.Result.RECOMMENDED, PlannedTask.Result.APPROVED);
+
+    assertThat(workflowRootFinalResult.getExecutionPlan().getPlannedTasks())
+        .extracting(PlannedTask::getTaskType)
+        .contains(TaskType.ANALYSIS, TaskType.DECISION);
+
+    assertThat(workflowRootFinalResult.getExecutionPlan().getPlannedTasks())
+        .extracting(PlannedTask::getOrder)
+        .contains(1, 2);
+
+    assertThat(
+            workflowRootFinalResult
+                .getExecutionPlan()
+                .getPlannedTasks()
+                .get(0)
+                .getTaskCriteriaResult())
+        .containsKeys("crit01", "crit02");
+    assertThat(
+            workflowRootFinalResult
+                .getExecutionPlan()
+                .getPlannedTasks()
+                .get(0)
+                .getTaskCriteriaResult())
+        .containsValues(
+            PlannedTask.TaskCriteriaResult.builder()
+                .id("crit01")
+                .value("4")
+                .result(PlannedTask.TaskCriteriaResult.Result.APPROVED)
+                // TODO Fix TaskCriteriaResult.Status
+                // .status(PlannedTask.TaskCriteriaResult.Status.MATCHED)
+                .build(),
+            PlannedTask.TaskCriteriaResult.builder()
+                .id("crit02")
+                .value("5")
+                .result(PlannedTask.TaskCriteriaResult.Result.APPROVED)
+                // TODO Fix TaskCriteriaResult.Status
+                // .status(PlannedTask.TaskCriteriaResult.Status.MATCHED)
+                .build());
+
+    assertThat(
+            workflowRootFinalResult
+                .getExecutionPlan()
+                .getPlannedTasks()
+                .get(1)
+                .getTaskCriteriaResult())
+        .isEmpty();
   }
 
   private void waitForStoredEventReplay() throws InterruptedException {
