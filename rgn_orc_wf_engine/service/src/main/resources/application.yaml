@@ -8,6 +8,27 @@ spring.data.mongodb:
   port: 27017 # Mongo server port.
   repositories.enabled: true # Enable Mongo repositories.
 
+spring.kafka:
+  consumer:
+    auto-offset-reset: earliest
+    group-id: ragna
+
+spring.cloud.stream:
+  kafka: localhost:9092
+  bindings:
+    orc-create-workflow-input:
+      destination: orc-create-workflow-input
+      contentType: application/json
+      group: ${spring.application.name}
+      consumer.partitioned: true
+
+#    orc-trigger-task-output:
+#    orc-finish-task-input:
+#    orc-finish-workflow-output:
+
+kafka:
+  bootstrapAddress: localhost:9092
+
 logging.level.org:
   mongodb:
     driver:

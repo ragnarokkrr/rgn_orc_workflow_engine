@@ -1,4 +1,4 @@
-package ragna.wf.orc.engine.application.messaging.output.vo;
+package ragna.wf.orc.engine.application.messaging.producer.vo;
 
 import lombok.Builder;
 import lombok.Data;

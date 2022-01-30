@@ -127,6 +127,11 @@ In application startup params
 * Spring Webflux / Reactor
     * [Project Reactor expand method](https://www.javacodegeeks.com/2020/02/project-reactor-expand-method.html)
     * [How to use Processor in Java's Reactor](https://ducmanhphan.github.io/2019-08-25-How-to-use-Processor-in-Reactor-Java/#topicprocessor)
+    * [A reactive stack with Spring Boot, Kafka and Angular](https://raymondhlee.wordpress.com/2019/11/23/a-reactive-stack-with-spring-boot-kafka-and-angular/)
+* TestContainer
+    * [Testing Kafka and Spring Boot](https://www.baeldung.com/spring-boot-kafka-testing)
+    * [Jupiter / JUnit 5](https://www.testcontainers.org/test_framework_integration/junit_5)
+    * [Kafka Containers](https://www.testcontainers.org/modules/kafka/)
 * Gradle
     * [easy reuse of test artifacts](https://stackoverflow.com/questions/5644011/multi-project-test-dependencies-with-gradle/60138176#60138176)
 * Microservices / DDD

@@ -1,9 +1,9 @@
-package ragna.wf.orc.engine.application.messaging.output;
+package ragna.wf.orc.engine.application.messaging.producer;
 
 import org.fissore.slf4j.FluentLogger;
 import org.fissore.slf4j.FluentLoggerFactory;
 import org.springframework.stereotype.Component;
-import ragna.wf.orc.engine.application.messaging.output.vo.TriggerTaskDto;
+import ragna.wf.orc.engine.application.messaging.producer.vo.TriggerTaskDto;
 
 @Component
 public class TriggerTaskMessageProducer {
